@@ -1,0 +1,36 @@
+asset_id,site_id,asset_class,description,installed_year,criticality
+GT-1,ESS-RVL,grid_transformer,132/33 kV 90 MVA grid transformer,1987,high
+GT-2,ESS-RVL,grid_transformer,132/33 kV 90 MVA grid transformer,1991,high
+SWG-RVL-33,ESS-RVL,switchgear,33 kV switchboard,2008,high
+BAT-RVL,ESS-RVL,battery,110 V substation battery and charger,2019,medium
+T-104,ESS-ASH,primary_transformer,33/11 kV 24 MVA ONAN/ONAF primary transformer,1979,high
+T-105,ESS-ASH,primary_transformer,33/11 kV 24 MVA ONAN/ONAF primary transformer,2004,high
+SWG-ASH-11,ESS-ASH,switchgear,11 kV switchboard with vacuum circuit breakers,2012,high
+FDR-ASH-07,ESS-ASH,feeder,11 kV feeder Ashford Road to Kingsmead,1994,medium
+FDR-ASH-09,ESS-ASH,feeder,11 kV feeder Ashford Road to Orchard Way,2001,medium
+BAT-ASH,ESS-ASH,battery,110 V substation battery and charger,2017,medium
+T-201,ESS-KGM,primary_transformer,33/11 kV 15 MVA primary transformer,1996,high
+T-202,ESS-KGM,primary_transformer,33/11 kV 15 MVA primary transformer,1996,high
+SWG-KGM-11,ESS-KGM,switchgear,11 kV switchboard with oil circuit breakers (due for replacement),1974,high
+FDR-KGM-03,ESS-KGM,feeder,11 kV feeder Kingsmead to Brookfield,1988,medium
+BAT-KGM,ESS-KGM,battery,110 V substation battery and charger,2015,medium
+CT-KGM-01,ESS-KGM,cable_tunnel,Kingsmead cable tunnel (420 m confined space),1975,high
+TX-BRK-01,ESS-BRK,distribution_transformer,11 kV/LV 1000 kVA distribution transformer,2003,medium
+RMU-BRK-01,ESS-BRK,ring_main_unit,11 kV ring main unit,2003,medium
+TX-ORC-01,ESS-ORC,distribution_transformer,11 kV/LV 500 kVA distribution transformer,2010,low
+RMU-ORC-01,ESS-ORC,ring_main_unit,11 kV ring main unit,2010,medium
+PRS-HRW-01,GPR-HRW,pressure_reduction_station,IP to MP pressure reduction station with streams A and B,1999,high
+SSV-HRW-A,GPR-HRW,slam_shut_valve,Stream A slam-shut valve,1999,high
+SSV-HRW-B,GPR-HRW,slam_shut_valve,Stream B slam-shut valve,1999,high
+FLT-HRW-01,GPR-HRW,filter,Inlet filter,2011,medium
+G-112,GPR-MLN,district_governor,MP to LP district governor,2006,high
+SSV-112,GPR-MLN,slam_shut_valve,Governor slam-shut valve,2006,high
+FLT-112,GPR-MLN,filter,Governor inlet filter,2006,low
+G-118,GPR-STN,district_governor,MP to LP district governor,1998,high
+SSV-118,GPR-STN,slam_shut_valve,Governor slam-shut valve,1998,high
+G-124,GPR-KAV,district_governor,MP to LP district governor,2015,high
+SSV-124,GPR-KAV,slam_shut_valve,Governor slam-shut valve,2015,high
+MAIN-IP-01,GNA-HRW,main_ip,Harrowmere to Vale IP steel main (7 bar 300 mm),1968,high
+MAIN-MP-03,GNA-HRW,main_mp,Vale Road MP PE main (2 bar 180 mm),2009,medium
+MAIN-LP-17,GNA-HRW,main_lp,Mill Lane LP PE main (75 mbar 125 mm),2014,low
+MAIN-LP-22,GNA-HRW,main_lp,Station Road LP cast iron main (75 mbar 6 inch) on replacement programme,1932,high

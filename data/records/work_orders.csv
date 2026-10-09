@@ -1,0 +1,79 @@
+wo_id,asset_id,work_type,title,status,priority,raised_on,due_on,completed_on,notes
+WO-00001,G-118,planned,Annual governor maintenance (PR-GAS-010),completed,3,2024-09-01,2024-10-01,2024-09-21,
+WO-00002,G-124,planned,Annual governor maintenance (PR-GAS-010),completed,3,2024-09-01,2024-10-01,2024-09-14,
+WO-00003,SWG-KGM-11,planned,Annual switchgear maintenance,completed,3,2024-09-03,2024-10-03,2024-09-13,
+WO-00004,T-105,planned,Annual transformer maintenance and protection checks,completed,3,2024-09-07,2024-10-07,2024-09-26,
+WO-00005,BAT-KGM,planned,Annual battery impedance test (PR-ELEC-058),completed,3,2024-09-08,2024-10-08,2024-09-27,
+WO-00006,GT-1,planned,Annual transformer maintenance and protection checks,completed,3,2024-09-08,2024-10-08,2024-10-04,
+WO-00007,T-202,planned,Annual transformer maintenance and protection checks,completed,3,2024-09-08,2024-10-08,2024-09-30,
+WO-00008,GT-2,planned,Annual transformer maintenance and protection checks,completed,3,2024-09-14,2024-10-14,2024-10-13,
+WO-00009,G-112,planned,Annual governor maintenance (PR-GAS-010),completed,3,2024-09-15,2024-10-15,2024-10-15,
+WO-00010,PRS-HRW-01,planned,Annual station maintenance and stream changeover (PR-GAS-036),completed,3,2024-09-16,2024-10-16,2024-10-01,
+WO-00011,T-104,planned,Annual transformer maintenance and protection checks,completed,3,2024-09-16,2024-10-16,2024-10-13,
+WO-00012,T-201,planned,Annual transformer maintenance and protection checks,completed,3,2024-09-18,2024-10-18,2024-10-18,
+WO-00013,BAT-ASH,planned,Annual battery impedance test (PR-ELEC-058),completed,3,2024-09-20,2024-10-20,2024-10-12,
+WO-00014,RMU-BRK-01,planned,Ring main unit maintenance,completed,3,2024-09-20,2024-10-20,2024-10-03,
+WO-00015,BAT-RVL,planned,Annual battery impedance test (PR-ELEC-058),completed,3,2024-09-22,2024-10-22,2024-10-02,
+WO-00016,SWG-RVL-33,planned,Annual switchgear maintenance,completed,3,2024-09-22,2024-10-22,2024-10-19,
+WO-00017,RMU-ORC-01,planned,Ring main unit maintenance,completed,3,2024-09-25,2024-10-25,2024-10-21,
+WO-00018,SWG-ASH-11,planned,Annual switchgear maintenance,completed,3,2024-09-26,2024-10-26,2024-10-18,
+WO-00019,T-202,reactive,Remedy defect: Silica gel breather more than two-thirds discoloured; replacement requested.,completed,2,2024-10-06,2024-11-03,2024-10-14,Raised from routine_visual.
+WO-00020,MAIN-LP-22,reactive,Remedy defect: 2 gas indication(s) recorded along the route and reported for repair.,completed,2,2024-10-26,2024-11-23,2024-10-30,Raised from leakage_survey.
+WO-00021,SWG-KGM-11,reactive,Remedy defect: Circuit breaker on panel 5 failed to trip on secondary injection test.,completed,1,2024-11-13,2024-11-20,2024-11-28,Raised from protection_test.
+WO-00022,SWG-KGM-11,reactive,Remedy defect: Partial discharge 29.5 dB TEV on panel 3; oil weep at a breaker tank seal.,completed,2,2025-01-12,2025-02-09,2025-02-06,Raised from routine_visual.
+WO-00023,SWG-KGM-11,planned,Replace 1974 oil switchboard with vacuum switchgear,open,2,2025-02-10,2027-06-30,,Capital project after INC-2024-007 and recurring partial discharge findings.
+WO-00024,BAT-ASH,reactive,"Remedy defect: Cells 17 and 41 at 2.11 V and 2.14 V, below 2.18 V (PR-ELEC-058).",completed,2,2025-03-12,2025-04-09,2025-03-15,Raised from battery_check.
+WO-00025,GT-2,reactive,Remedy defect: Silica gel breather more than two-thirds discoloured; replacement requested.,completed,2,2025-04-07,2025-05-05,2025-04-24,Raised from routine_visual.
+WO-00026,SWG-KGM-11,reactive,Remedy defect: Partial discharge 30.2 dB TEV on panel 3; oil weep at a breaker tank seal.,completed,2,2025-04-12,2025-05-10,2025-04-14,Raised from routine_visual.
+WO-00027,MAIN-LP-22,reactive,Remedy defect: 1 gas indication(s) recorded along the route and reported for repair.,completed,2,2025-04-26,2025-05-24,2025-05-13,Raised from leakage_survey.
+WO-00028,GT-2,reactive,Remedy defect: Silica gel breather more than two-thirds discoloured; replacement requested.,completed,2,2025-06-07,2025-07-05,2025-06-14,Raised from routine_visual.
+WO-00029,SWG-KGM-11,reactive,Remedy defect: Partial discharge 29.5 dB TEV on panel 3; oil weep at a breaker tank seal.,completed,2,2025-07-12,2025-08-09,2025-07-29,Raised from routine_visual.
+WO-00030,G-118,planned,Annual governor maintenance (PR-GAS-010),completed,3,2025-09-01,2025-10-01,2025-09-18,
+WO-00031,G-124,planned,Annual governor maintenance (PR-GAS-010),completed,3,2025-09-01,2025-10-01,2025-09-21,
+WO-00032,SWG-KGM-11,planned,Annual switchgear maintenance,completed,3,2025-09-03,2025-10-03,2025-09-20,
+WO-00033,T-105,planned,Annual transformer maintenance and protection checks,completed,3,2025-09-07,2025-10-07,2025-09-24,
+WO-00034,BAT-KGM,planned,Annual battery impedance test (PR-ELEC-058),completed,3,2025-09-08,2025-10-08,2025-10-04,
+WO-00035,GT-1,planned,Annual transformer maintenance and protection checks,completed,3,2025-09-08,2025-10-08,2025-10-04,
+WO-00036,T-202,planned,Annual transformer maintenance and protection checks,completed,3,2025-09-08,2025-10-08,2025-10-08,
+WO-00037,GT-2,planned,Annual transformer maintenance and protection checks,completed,3,2025-09-14,2025-10-14,2025-10-11,
+WO-00038,G-112,planned,Annual governor maintenance (PR-GAS-010),completed,3,2025-09-15,2025-10-15,2025-10-05,
+WO-00039,PRS-HRW-01,planned,Annual station maintenance and stream changeover (PR-GAS-036),completed,3,2025-09-16,2025-10-16,2025-10-11,
+WO-00040,T-104,planned,Annual transformer maintenance and protection checks,completed,3,2025-09-16,2025-10-16,2025-10-11,
+WO-00041,T-201,planned,Annual transformer maintenance and protection checks,completed,3,2025-09-18,2025-10-18,2025-10-03,
+WO-00042,BAT-ASH,planned,Annual battery impedance test (PR-ELEC-058),completed,3,2025-09-20,2025-10-20,2025-10-19,
+WO-00043,RMU-BRK-01,planned,Ring main unit maintenance,completed,3,2025-09-20,2025-10-20,2025-10-13,
+WO-00044,BAT-RVL,planned,Annual battery impedance test (PR-ELEC-058),completed,3,2025-09-22,2025-10-22,2025-10-05,
+WO-00045,SWG-RVL-33,planned,Annual switchgear maintenance,completed,3,2025-09-22,2025-10-22,2025-10-12,
+WO-00046,RMU-ORC-01,planned,Ring main unit maintenance,completed,3,2025-09-25,2025-10-25,2025-10-20,
+WO-00047,SWG-ASH-11,planned,Annual switchgear maintenance,completed,3,2025-09-26,2025-10-26,2025-10-26,
+WO-00048,MAIN-LP-22,reactive,Remedy defect: 2 gas indication(s) recorded along the route and reported for repair.,completed,2,2025-10-26,2025-11-23,2025-11-14,Raised from leakage_survey.
+WO-00049,MAIN-LP-22,planned,Replace Station Road cast iron main with PE (mains replacement),open,2,2026-01-07,2027-03-31,,Brought forward after INC-2025-040.
+WO-00050,G-112,reactive,"Remedy defect: Logger maximum outlet 43.7 mbar, more than 5 mbar above the 35 mbar set point (P",completed,2,2026-01-10,2026-02-07,2026-01-29,Raised from monthly_pressure_check.
+WO-00051,G-112,reactive,"Remedy defect: Logger maximum outlet 46.2 mbar, more than 5 mbar above the 35 mbar set point (P",completed,2,2026-02-10,2026-03-10,2026-02-22,Raised from monthly_pressure_check.
+WO-00052,G-112,reactive,"Remedy defect: Logger maximum outlet 47.6 mbar, more than 5 mbar above the 35 mbar set point (P",completed,2,2026-03-10,2026-04-07,2026-03-28,Raised from monthly_pressure_check.
+WO-00053,G-112,reactive,Replace worn main valve seat after SSV-112 over-pressure trip,completed,1,2026-03-10,2026-03-17,2026-03-16,Root cause of INC-2026-011. Seat replaced under PR-GAS-010 and PR-GAS-021.
+WO-00054,SWG-KGM-11,reactive,Remedy defect: Partial discharge 30.3 dB TEV on panel 3; oil weep at a breaker tank seal.,completed,2,2026-04-12,2026-05-10,2026-04-28,Raised from routine_visual.
+WO-00055,T-104,reactive,"Remedy defect: Acetylene 2.6 ppm, above the 2 ppm caution threshold (PR-ELEC-044). Increased sa",completed,2,2026-04-21,2026-05-19,2026-05-09,Raised from oil_sample_dga.
+WO-00056,MAIN-LP-22,reactive,Remedy defect: 2 gas indication(s) recorded along the route and reported for repair.,completed,2,2026-04-26,2026-05-24,2026-05-07,Raised from leakage_survey.
+WO-00057,PRS-HRW-01,reactive,"Remedy defect: Outlet odorant 3.9 mg/m3, below the 5.0 mg/m3 minimum (PR-GAS-066). Injection pu",completed,2,2026-06-24,2026-07-22,2026-06-30,Raised from monthly_station_check.
+WO-00058,G-112,reactive,"Remedy defect: Logger maximum outlet 42.4 mbar, more than 5 mbar above the 35 mbar set point (P",completed,2,2026-07-10,2026-08-07,2026-07-13,Raised from monthly_pressure_check.
+WO-00059,T-104,reactive,"Replace failed cooling fan contactor, bank 2",completed,1,2026-07-15,2026-07-16,2026-07-16,Linked to INC-2026-022.
+WO-00060,T-104,reactive,"Remedy defect: Acetylene 4.1 ppm, above the 2 ppm caution threshold (PR-ELEC-044). Increased sa",completed,2,2026-07-21,2026-08-18,2026-07-26,Raised from oil_sample_dga.
+WO-00061,G-112,reactive,"Remedy defect: Logger maximum outlet 45.2 mbar, more than 5 mbar above the 35 mbar set point (P",completed,2,2026-08-10,2026-09-07,2026-09-02,Raised from monthly_pressure_check.
+WO-00062,G-112,reactive,Investigate recurring overnight outlet pressure creep,in_progress,2,2026-08-17,2026-10-26,,Linked to INC-2026-027. Creep relief and pilot under suspicion; 7-day logger fitted.
+WO-00063,T-104,reactive,"Remedy defect: Acetylene 4.6 ppm, above the 2 ppm caution threshold (PR-ELEC-044). Increased sa",completed,2,2026-08-20,2026-09-17,2026-09-13,Raised from oil_sample_dga.
+WO-00064,G-118,planned,Annual governor maintenance (PR-GAS-010),completed,3,2026-09-01,2026-10-01,2026-09-21,
+WO-00065,G-124,planned,Annual governor maintenance (PR-GAS-010),completed,3,2026-09-01,2026-10-01,2026-09-16,
+WO-00066,SWG-KGM-11,planned,Annual switchgear maintenance,open,3,2026-09-03,2026-10-03,,
+WO-00067,GT-1,reactive,Remedy defect: Silica gel breather more than two-thirds discoloured; replacement requested.,completed,2,2026-09-07,2026-10-05,2026-09-22,Raised from routine_visual.
+WO-00068,T-105,planned,Annual transformer maintenance and protection checks,open,3,2026-09-07,2026-10-07,,
+WO-00069,BAT-KGM,planned,Annual battery impedance test (PR-ELEC-058),completed,3,2026-09-08,2026-10-08,2026-09-29,
+WO-00070,GT-1,planned,Annual transformer maintenance and protection checks,open,3,2026-09-08,2026-10-08,,
+WO-00071,T-104,reactive,Engineering review of rising acetylene (PR-ELEC-044 6.6.4),completed,1,2026-09-08,2026-09-15,2026-09-14,Linked to INC-2026-029. Review found probable arcing at the tap changer selector. Load limited to the ONAN rating and weekly sampling until the outage.
+WO-00072,T-202,planned,Annual transformer maintenance and protection checks,completed,3,2026-09-08,2026-10-08,2026-09-19,
+WO-00073,T-104,reactive,"Remedy defect: Acetylene 5.8 ppm, above the 5 ppm action threshold (PR-ELEC-044). Weekly sampli",in_progress,1,2026-09-09,2026-09-16,,Raised from oil_sample_dga.
+WO-00074,G-112,reactive,"Remedy defect: Logger maximum outlet 46.2 mbar, more than 5 mbar above the 35 mbar set point (P",in_progress,2,2026-09-10,2026-10-08,,Raised from monthly_pressure_check.
+WO-00075,T-104,planned,Outage for internal inspection of tap changer selector,open,1,2026-09-14,2026-11-27,,Action from the INC-2026-029 engineering review. Needs a switching programme under PR-ELEC-015 to transfer load to T-105 first.
+WO-00076,T-104,reactive,"Remedy defect: Acetylene 6.1 ppm, above the 5 ppm action threshold (PR-ELEC-044). Weekly sampli",in_progress,1,2026-09-16,2026-09-23,,Raised from oil_sample_dga.
+WO-00077,T-104,reactive,"Remedy defect: Acetylene 6.5 ppm, above the 5 ppm action threshold (PR-ELEC-044). Weekly sampli",in_progress,1,2026-09-23,2026-09-30,,Raised from oil_sample_dga.
+WO-00078,T-104,reactive,"Remedy defect: Acetylene 6.9 ppm, above the 5 ppm action threshold (PR-ELEC-044). Weekly sampli",in_progress,1,2026-09-30,2026-10-07,,Raised from oil_sample_dga.

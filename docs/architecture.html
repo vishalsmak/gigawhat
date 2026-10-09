@@ -63,6 +63,8 @@ h3 { font: 600 1rem/1.3 var(--sans); margin: 0 0 6px; }
 .two ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: .95rem; }
 .wont h3 { color: var(--emergency); }
 .will h3 { color: var(--routine); }
+.two > .here { border-color: var(--accent); }
+.here h3 { color: var(--accent); }
 
 figure { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; min-width: 0; }
 .scroll { overflow-x: auto; }
@@ -107,6 +109,7 @@ th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--li
 tr:last-child td { border-bottom: 0; }
 th { font: 600 .7rem/1.3 var(--mono); letter-spacing: .07em; text-transform: uppercase; color: var(--muted); background: var(--box); }
 td.q { font-style: italic; color: var(--ink-2); }
+td.grp { font: 600 .7rem/1.3 var(--mono); letter-spacing: .07em; text-transform: uppercase; color: var(--accent); background: var(--accent-soft); padding-block: 7px; }
 .chip { display: inline-block; white-space: nowrap; padding: 1px 10px; border-radius: 999px; font: 600 .78rem/1.6 var(--sans); border: 1px solid currentColor; }
 .c-routine { color: var(--routine); background: color-mix(in srgb, var(--routine) 12%, var(--surface)); }
 .c-relevant { color: var(--relevant); background: color-mix(in srgb, var(--relevant) 12%, var(--surface)); }
@@ -137,7 +140,7 @@ code { font-family: var(--mono); font-size: .88em; }
     <div><dt>Setting</dt><dd>Fictional UK multi-utility, gas and electricity</dd></div>
     <div><dt>Users</dt><dd>Field engineers, control room, Authorised Persons, auditors</dd></div>
     <div><dt>Data</dt><dd>Public HSE guidance plus fictional procedures and records</dd></div>
-    <div><dt>Status</dt><dd>Demo shared by link · Phase 1 of 8 built</dd></div>
+    <div><dt>Status</dt><dd>Demo shared by link · Phases 1–2 of 8 built</dd></div>
   </dl>
 </header>
 
@@ -163,6 +166,178 @@ code { font-family: var(--mono); font-size: .88em; }
       </ul>
     </div>
   </div>
+</section>
+
+<section>
+  <h2>The standard RAG pipeline this builds on</h2>
+  <p class="prose">Retrieval-augmented generation (RAG) means finding the relevant passages first and giving them to the model alongside the question, so it answers from your documents rather than from memory. The major references describe the same shape, even when their stage names differ: an indexing pipeline that runs when documents change, a query pipeline that runs for every question, and a few concerns that span both. This is the reference GigaWhat is built against. The table below the diagram shows where GigaWhat follows the standard and where it adds to it.</p>
+  <figure>
+    <div class="scroll">
+    <svg viewBox="0 0 1080 500" role="img" aria-label="Reference RAG pipeline. Indexing, offline: load, parse and clean, chunk, enrich, embed, index and store. Querying, online: intake, an optional transform step, retrieve, fuse and rerank, augment, generate, check and respond. The index feeds retrieval. Across both pipelines: evaluate, observe, access control, security.">
+      <defs>
+        <marker id="f0-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+        <marker id="f0-b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah-acc" d="M0,0 L10,5 L0,10 z"/></marker>
+      </defs>
+
+      <!-- Indexing lane -->
+      <rect class="zone" x="20" y="16" width="1040" height="134" rx="10"/>
+      <text class="zl" x="36" y="38">INDEXING · OFFLINE · RUNS WHEN DOCUMENTS CHANGE</text>
+      <rect class="box" x="36" y="56" width="150" height="74" rx="6"/>
+      <text class="ts" x="111" y="80" text-anchor="middle">Load</text>
+      <text class="s" x="111" y="98" text-anchor="middle">connectors, file stores;</text>
+      <text class="s" x="111" y="114" text-anchor="middle">incremental refresh</text>
+      <path class="edge" d="M186 93 H205" marker-end="url(#f0-a)"/>
+      <rect class="box" x="207" y="56" width="150" height="74" rx="6"/>
+      <text class="ts" x="282" y="80" text-anchor="middle">Parse + clean</text>
+      <text class="s" x="282" y="98" text-anchor="middle">text, headings, tables;</text>
+      <text class="s" x="282" y="114" text-anchor="middle">OCR for scans</text>
+      <path class="edge" d="M357 93 H376" marker-end="url(#f0-a)"/>
+      <rect class="box" x="378" y="56" width="150" height="74" rx="6"/>
+      <text class="ts" x="453" y="80" text-anchor="middle">Chunk</text>
+      <text class="s" x="453" y="98" text-anchor="middle">by structure or size;</text>
+      <text class="s" x="453" y="114" text-anchor="middle">parent–child links</text>
+      <path class="edge" d="M528 93 H547" marker-end="url(#f0-a)"/>
+      <rect class="box" x="549" y="56" width="150" height="74" rx="6"/>
+      <text class="ts" x="624" y="80" text-anchor="middle">Enrich</text>
+      <text class="s" x="624" y="98" text-anchor="middle">metadata, chunk context,</text>
+      <text class="s" x="624" y="114" text-anchor="middle">dedupe, PII filter</text>
+      <path class="edge" d="M699 93 H718" marker-end="url(#f0-a)"/>
+      <rect class="box" x="720" y="56" width="150" height="74" rx="6"/>
+      <text class="ts" x="795" y="80" text-anchor="middle">Embed</text>
+      <text class="s" x="795" y="98" text-anchor="middle">dense vectors, plus</text>
+      <text class="s" x="795" y="114" text-anchor="middle">keyword terms (BM25)</text>
+      <path class="edge" d="M870 93 H889" marker-end="url(#f0-a)"/>
+      <rect class="core" x="891" y="56" width="150" height="74" rx="6"/>
+      <text class="ts" x="966" y="80" text-anchor="middle">Index + store</text>
+      <text class="s" x="966" y="98" text-anchor="middle">chunks, vectors,</text>
+      <text class="s" x="966" y="114" text-anchor="middle">metadata, access tags</text>
+
+      <!-- Index feeds retrieval -->
+      <path class="edge-acc" d="M966 130 V170 H393 V228" marker-end="url(#f0-b)"/>
+      <text class="lbl-acc" x="680" y="164" text-anchor="middle">searched for every question</text>
+
+      <!-- Query lane -->
+      <rect class="zone" x="20" y="186" width="1040" height="150" rx="10"/>
+      <text class="zl" x="36" y="208">QUERYING · ONLINE · RUNS FOR EVERY QUESTION</text>
+      <rect class="box" x="36" y="230" width="130" height="80" rx="6"/>
+      <text class="ts" x="101" y="256" text-anchor="middle">Intake</text>
+      <text class="s" x="101" y="274" text-anchor="middle">question + history;</text>
+      <text class="s" x="101" y="290" text-anchor="middle">input guardrails</text>
+      <path class="edge" d="M166 270 H180" marker-end="url(#f0-a)"/>
+      <rect class="box" x="182" y="230" width="130" height="80" rx="6" stroke-dasharray="5 4"/>
+      <text class="ts" x="247" y="256" text-anchor="middle">Transform</text>
+      <text class="s" x="247" y="274" text-anchor="middle">rewrite, decompose,</text>
+      <text class="s" x="247" y="290" text-anchor="middle">route</text>
+      <path class="edge" d="M312 270 H326" marker-end="url(#f0-a)"/>
+      <rect class="box" x="328" y="230" width="130" height="80" rx="6"/>
+      <text class="ts" x="393" y="256" text-anchor="middle">Retrieve</text>
+      <text class="s" x="393" y="274" text-anchor="middle">vector + keyword,</text>
+      <text class="s" x="393" y="290" text-anchor="middle">permission filters</text>
+      <path class="edge" d="M458 270 H472" marker-end="url(#f0-a)"/>
+      <rect class="box" x="474" y="230" width="130" height="80" rx="6"/>
+      <text class="ts" x="539" y="256" text-anchor="middle">Fuse + rerank</text>
+      <text class="s" x="539" y="274" text-anchor="middle">rank fusion, then</text>
+      <text class="s" x="539" y="290" text-anchor="middle">rerank to top k</text>
+      <path class="edge" d="M604 270 H618" marker-end="url(#f0-a)"/>
+      <rect class="box" x="620" y="230" width="130" height="80" rx="6"/>
+      <text class="ts" x="685" y="256" text-anchor="middle">Augment</text>
+      <text class="s" x="685" y="274" text-anchor="middle">instructions, question</text>
+      <text class="s" x="685" y="290" text-anchor="middle">+ chosen chunks</text>
+      <path class="edge" d="M750 270 H764" marker-end="url(#f0-a)"/>
+      <rect class="core" x="766" y="230" width="130" height="80" rx="6"/>
+      <text class="ts" x="831" y="256" text-anchor="middle">Generate</text>
+      <text class="s" x="831" y="274" text-anchor="middle">answer from the</text>
+      <text class="s" x="831" y="290" text-anchor="middle">context only</text>
+      <path class="edge" d="M896 270 H910" marker-end="url(#f0-a)"/>
+      <rect class="box" x="912" y="230" width="130" height="80" rx="6"/>
+      <text class="ts" x="977" y="256" text-anchor="middle">Check + respond</text>
+      <text class="s" x="977" y="274" text-anchor="middle">grounding, safety,</text>
+      <text class="s" x="977" y="290" text-anchor="middle">citations</text>
+
+      <!-- Cross-cutting -->
+      <rect class="zone" x="20" y="372" width="1040" height="112" rx="10"/>
+      <text class="zl" x="36" y="394">ACROSS BOTH PIPELINES</text>
+      <rect class="box" x="36" y="408" width="240" height="60" rx="6"/>
+      <text class="ts" x="156" y="431" text-anchor="middle">Evaluate</text>
+      <text class="s" x="156" y="450" text-anchor="middle">test set; recall@k, faithfulness</text>
+      <rect class="box" x="290" y="408" width="240" height="60" rx="6"/>
+      <text class="ts" x="410" y="431" text-anchor="middle">Observe + feedback</text>
+      <text class="s" x="410" y="450" text-anchor="middle">per-stage traces, cost, user ratings</text>
+      <rect class="box" x="544" y="408" width="240" height="60" rx="6"/>
+      <text class="ts" x="664" y="431" text-anchor="middle">Access control</text>
+      <text class="s" x="664" y="450" text-anchor="middle">permission-aware retrieval, data tags</text>
+      <rect class="box" x="798" y="408" width="240" height="60" rx="6"/>
+      <text class="ts" x="918" y="431" text-anchor="middle">Security</text>
+      <text class="s" x="918" y="450" text-anchor="middle">source checks, injection + PII defence</text>
+    </svg>
+    </div>
+    <figcaption><b>Two pipelines that meet at the index.</b> Indexing turns documents into searchable chunks ahead of time. Querying finds the best chunks for one question and hands them to the model. The dashed box is optional: only three of the nine references include query rewriting. The names vary between sources, but the stages don't. Google calls the halves ingestion and serving, Databricks calls them the data pipeline and the RAG chain, and LangChain calls them indexing and retrieval-and-generation.</figcaption>
+  </figure>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Stage</th><th>What GigaWhat does</th><th>Versus the standard</th></tr></thead>
+      <tbody>
+        <tr><td colspan="3" class="grp">Indexing</td></tr>
+        <tr><td>Load</td><td>HSE guidance plus fictional procedures and records, reloaded when the document controller publishes a version</td><td><span class="chip st-dec">Standard</span></td></tr>
+        <tr><td>Parse + clean</td><td>Docling, keeping headings, numbered steps, tables and WARNING boxes</td><td><span class="chip st-dec">Standard</span></td></tr>
+        <tr><td>Chunk</td><td>By section; a warning stays with its step; each chunk links to its parent section</td><td><span class="chip st-dec">Standard</span></td></tr>
+        <tr><td>Enrich</td><td>Breadcrumb and summary on every chunk (contextual retrieval); approval status, effective date, owner and business unit as metadata; scan for injected instructions</td><td><span class="chip st-dec">Standard</span></td></tr>
+        <tr><td>Embed</td><td>Cohere, or a local model offline</td><td><span class="chip st-dec">Standard</span></td></tr>
+        <tr><td>Index + store</td><td>pgvector and Postgres full-text in one database; a new version supersedes the old one in the same transaction</td><td><span class="chip st-dec">Standard</span></td></tr>
+        <tr><td colspan="3" class="grp">Querying</td></tr>
+        <tr><td>Intake</td><td>Presidio masks personal data; input rails check for jailbreaks and off-topic use</td><td><span class="chip st-dec">Standard</span></td></tr>
+        <tr><td>Transform</td><td>Safety-tier router: rules plus a classifier, the stricter answer wins, and an emergency overrides everything</td><td><span class="chip st-prop">GigaWhat adds</span></td></tr>
+        <tr><td>Retrieve</td><td>Hybrid search inside SQL, under approval, effective-date and row-level-security filters</td><td><span class="chip st-dec">Standard</span></td></tr>
+        <tr><td>Fuse + rerank</td><td>Rank fusion, rerank to the top 8, then expand each hit to its whole section</td><td><span class="chip st-dec">Standard</span></td></tr>
+        <tr><td>Augment + generate</td><td>Cited JSON for routine questions. For safety-critical ones, code copies the procedure word for word and the model writes no steps</td><td><span class="chip st-prop">GigaWhat adds</span></td></tr>
+        <tr><td>Check + respond</td><td>Quotes checked against the sources in code; abstains and names the document owner when evidence is thin</td><td><span class="chip st-dec">Standard</span></td></tr>
+        <tr><td>Human approval</td><td>An Authorised Person releases or declines safety-critical answers through <code>interrupt()</code></td><td><span class="chip st-prop">GigaWhat adds</span></td></tr>
+        <tr><td colspan="3" class="grp">Across both</td></tr>
+        <tr><td>Evaluate</td><td>DeepEval tests in CI that block releases</td><td><span class="chip st-dec">Standard</span></td></tr>
+        <tr><td>Observe + feedback</td><td>Langfuse traces, cost and feedback, plus an append-only audit log</td><td><span class="chip st-dec">Standard</span></td></tr>
+        <tr><td>Access control</td><td>Row-level security by persona and business unit, enforced by the database</td><td><span class="chip st-dec">Standard</span></td></tr>
+        <tr><td>Security</td><td>Read-only tools, no route to the plant, documents scanned when loaded</td><td><span class="chip st-dec">Standard</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note prose">In short, GigaWhat is a standard pipeline plus three additions that come from the safety domain: routing by safety tier, verbatim quoting for safety-critical work, and human approval. The references cover routing in general, but none has safety tiers, verbatim-only answers or a human sign-off step, so these are the parts worth explaining to a reviewer.</p>
+
+  <h3>Naive, advanced and modular RAG</h3>
+  <p class="prose">The most cited survey of the field (Gao et al.) sorts RAG systems into three generations. The terms are common in interviews and papers.</p>
+  <div class="two">
+    <div>
+      <h3>Naive RAG</h3>
+      <ul>
+        <li>"Retrieve-read": index, take the top k chunks from one vector search, paste them into the prompt</li>
+        <li>The usual first tutorial; weak on exact terms, permissions and thin evidence</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Advanced RAG</h3>
+      <ul>
+        <li>Adds pre-retrieval steps: better chunking, metadata, query rewriting, hybrid search</li>
+        <li>Adds post-retrieval steps: reranking and trimming the context</li>
+      </ul>
+    </div>
+    <div class="here">
+      <h3>Modular RAG · GigaWhat</h3>
+      <ul>
+        <li>Steps become swappable modules (routing, fusion, memory) wired into patterns such as rewrite-retrieve-read or adaptive retrieval</li>
+        <li>GigaWhat: advanced retrieval inside a routed LangGraph workflow</li>
+      </ul>
+    </div>
+  </div>
+  <p class="note prose">Synthesised from:
+    <a href="https://arxiv.org/abs/2312.10997">Gao et al., RAG survey</a> ·
+    <a href="https://learn.microsoft.com/en-us/azure/architecture/ai-ml/guide/rag/rag-solution-design-and-evaluation-guide">Azure: Design and develop a RAG solution</a> ·
+    <a href="https://docs.cloud.google.com/architecture/rag-capable-gen-ai-app-using-vertex-ai">Google Cloud: RAG reference architecture</a> ·
+    <a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/retrieval-augmented-generation-options/introduction.html">AWS Prescriptive Guidance: RAG options</a> ·
+    <a href="https://docs.databricks.com/aws/en/agents/retrieval-augmented-generation">Databricks: RAG on Databricks</a> ·
+    <a href="https://docs.langchain.com/oss/python/deepagents/rag">LangChain: RAG tutorial</a> ·
+    <a href="https://www.anthropic.com/engineering/contextual-retrieval">Anthropic: Contextual Retrieval</a> ·
+    <a href="https://github.com/NVIDIA-AI-Blueprints/rag">NVIDIA RAG Blueprint</a> ·
+    <a href="https://genai.owasp.org/llmrisk/llm082025-vector-and-embedding-weaknesses/">OWASP LLM08:2025</a></p>
 </section>
 
 <section>
@@ -614,6 +789,262 @@ Summary: Steps to purge a polyethylene main with nitrogen before commissioning.
 </section>
 
 <section>
+  <h2>How this maps to production</h2>
+  <p class="prose">GigaWhat is built from open-source parts. Companies that run this kind of assistant for real usually build it in one of three ways: assemble it themselves, as GigaWhat does; use their cloud provider's managed RAG services; or build on the data platform where their data already lives, most often Databricks. Each stage of the pipeline exists in all three. What changes is who runs each stage.</p>
+  <figure>
+    <div class="scroll">
+    <svg viewBox="0 0 1080 432" role="img" aria-label="Matrix comparing three stacks across eight stages. GigaWhat: files on disk, Docling, pgvector, hybrid SQL search with Cohere Rerank, LangGraph, Claude via the Anthropic API, Presidio and NeMo, DeepEval and Langfuse. AWS managed: S3, a Bedrock Knowledge Base, Aurora pgvector, the Knowledge Base Retrieve API, LangGraph on AgentCore, Claude on Bedrock, Bedrock Guardrails, Bedrock evaluations and CloudWatch. Databricks: a Unity Catalog volume, a parse job, AI Search, LangGraph on Agent Runtime, Claude on Foundation Model APIs, Unity Gateway, MLflow 3. LangGraph and Claude are the same in all three. Each row ends with how it controls who sees which document.">
+      <!-- Stage groups -->
+      <rect class="band" x="165" y="14" width="326" height="22" rx="4"/>
+      <text class="lbl-band" x="328" y="29" text-anchor="middle">LOADING DOCUMENTS</text>
+      <rect class="band" x="501" y="14" width="438" height="22" rx="4"/>
+      <text class="lbl-band" x="720" y="29" text-anchor="middle">ANSWERING A QUESTION</text>
+      <rect class="band" x="949" y="14" width="102" height="22" rx="4"/>
+      <text class="lbl-band" x="1000" y="29" text-anchor="middle">RUNNING IT</text>
+      <text class="zl" x="216" y="58" text-anchor="middle">STORE FILES</text>
+      <text class="zl" x="328" y="58" text-anchor="middle">PARSE + CHUNK</text>
+      <text class="zl" x="440" y="58" text-anchor="middle">EMBED + INDEX</text>
+      <text class="zl" x="552" y="58" text-anchor="middle">SEARCH</text>
+      <text class="zl" x="664" y="58" text-anchor="middle">WORKFLOW</text>
+      <text class="zl" x="776" y="58" text-anchor="middle">MODEL</text>
+      <text class="zl" x="888" y="58" text-anchor="middle">GUARDRAILS</text>
+      <text class="zl" x="1000" y="58" text-anchor="middle">EVALS + TRACES</text>
+
+      <!-- Row 1: GigaWhat -->
+      <rect class="panel" x="14" y="70" width="1052" height="100" rx="8"/>
+      <text class="t" x="28" y="100">GigaWhat</text>
+      <text class="s" x="28" y="118">as designed</text>
+      <text class="s" x="28" y="134">open-source parts</text>
+      <rect class="box" x="165" y="78" width="102" height="58" rx="6"/>
+      <text class="ts" x="216" y="99" text-anchor="middle">Files on disk</text>
+      <text class="s" x="216" y="115" text-anchor="middle">HSE + fictional</text>
+      <rect class="box" x="277" y="78" width="102" height="58" rx="6"/>
+      <text class="ts" x="328" y="99" text-anchor="middle">Docling</text>
+      <text class="s" x="328" y="115" text-anchor="middle">chunk by section</text>
+      <rect class="box" x="389" y="78" width="102" height="58" rx="6"/>
+      <text class="ts" x="440" y="99" text-anchor="middle">pgvector</text>
+      <text class="s" x="440" y="115" text-anchor="middle">Cohere embed</text>
+      <rect class="box" x="501" y="78" width="102" height="58" rx="6"/>
+      <text class="ts" x="552" y="99" text-anchor="middle">Hybrid SQL</text>
+      <text class="s" x="552" y="115" text-anchor="middle">Cohere Rerank</text>
+      <rect class="core" x="613" y="78" width="102" height="58" rx="6"/>
+      <text class="ts" x="664" y="99" text-anchor="middle">LangGraph</text>
+      <text class="s" x="664" y="115" text-anchor="middle">in FastAPI</text>
+      <text class="s" x="664" y="129" text-anchor="middle">state: Postgres</text>
+      <rect class="core" x="725" y="78" width="102" height="58" rx="6"/>
+      <text class="ts" x="776" y="99" text-anchor="middle">Claude</text>
+      <text class="s" x="776" y="115" text-anchor="middle">Anthropic API</text>
+      <rect class="box" x="837" y="78" width="102" height="58" rx="6"/>
+      <text class="ts" x="888" y="99" text-anchor="middle">Presidio, NeMo</text>
+      <text class="s" x="888" y="115" text-anchor="middle">+ code checks</text>
+      <rect class="box" x="949" y="78" width="102" height="58" rx="6"/>
+      <text class="ts" x="1000" y="99" text-anchor="middle">DeepEval</text>
+      <text class="s" x="1000" y="115" text-anchor="middle">Langfuse</text>
+      <rect class="band" x="165" y="142" width="886" height="20" rx="4"/>
+      <text class="lbl-band" x="177" y="156">Who sees what: row-level security inside Postgres; an app bug can't widen it</text>
+
+      <!-- Row 2: AWS managed -->
+      <rect class="panel" x="14" y="182" width="1052" height="100" rx="8"/>
+      <text class="t" x="28" y="212">AWS managed</text>
+      <text class="s" x="28" y="230">Bedrock services</text>
+      <rect class="box" x="165" y="190" width="102" height="58" rx="6"/>
+      <text class="ts" x="216" y="211" text-anchor="middle">Amazon S3</text>
+      <text class="s" x="216" y="227" text-anchor="middle">bucket</text>
+      <rect class="box" x="277" y="190" width="102" height="58" rx="6"/>
+      <text class="ts" x="328" y="211" text-anchor="middle">Knowledge Base</text>
+      <text class="s" x="328" y="227" text-anchor="middle">hierarchical</text>
+      <text class="s" x="328" y="241" text-anchor="middle">chunking</text>
+      <rect class="box" x="389" y="190" width="102" height="58" rx="6"/>
+      <text class="ts" x="440" y="211" text-anchor="middle">Aurora pgvector</text>
+      <text class="s" x="440" y="227" text-anchor="middle">Titan or Cohere</text>
+      <rect class="box" x="501" y="190" width="102" height="58" rx="6"/>
+      <text class="ts" x="552" y="211" text-anchor="middle">Retrieve API</text>
+      <text class="s" x="552" y="227" text-anchor="middle">hybrid + filters</text>
+      <rect class="core" x="613" y="190" width="102" height="58" rx="6"/>
+      <text class="ts" x="664" y="211" text-anchor="middle">LangGraph</text>
+      <text class="s" x="664" y="227" text-anchor="middle">on AgentCore</text>
+      <text class="s" x="664" y="241" text-anchor="middle">state: Aurora</text>
+      <rect class="core" x="725" y="190" width="102" height="58" rx="6"/>
+      <text class="ts" x="776" y="211" text-anchor="middle">Claude</text>
+      <text class="s" x="776" y="227" text-anchor="middle">Bedrock</text>
+      <rect class="box" x="837" y="190" width="102" height="58" rx="6"/>
+      <text class="ts" x="888" y="211" text-anchor="middle">Bedrock</text>
+      <text class="s" x="888" y="227" text-anchor="middle">Guardrails</text>
+      <rect class="box" x="949" y="190" width="102" height="58" rx="6"/>
+      <text class="ts" x="1000" y="211" text-anchor="middle">Bedrock evals</text>
+      <text class="s" x="1000" y="227" text-anchor="middle">CloudWatch</text>
+      <rect class="band" x="165" y="254" width="886" height="20" rx="4"/>
+      <text class="lbl-band" x="177" y="268">Who sees what: metadata filters the app adds to every query, plus IAM</text>
+
+      <!-- Row 3: Databricks -->
+      <rect class="panel" x="14" y="294" width="1052" height="100" rx="8"/>
+      <text class="t" x="28" y="324">Databricks</text>
+      <text class="s" x="28" y="342">lakehouse platform</text>
+      <rect class="box" x="165" y="302" width="102" height="58" rx="6"/>
+      <text class="ts" x="216" y="323" text-anchor="middle">UC Volume</text>
+      <text class="s" x="216" y="339" text-anchor="middle">raw files</text>
+      <rect class="box" x="277" y="302" width="102" height="58" rx="6"/>
+      <text class="ts" x="328" y="323" text-anchor="middle">Parse job</text>
+      <text class="s" x="328" y="339" text-anchor="middle">into a Delta table</text>
+      <rect class="box" x="389" y="302" width="102" height="58" rx="6"/>
+      <text class="ts" x="440" y="323" text-anchor="middle">AI Search</text>
+      <text class="s" x="440" y="339" text-anchor="middle">Delta Sync index</text>
+      <rect class="box" x="501" y="302" width="102" height="58" rx="6"/>
+      <text class="ts" x="552" y="323" text-anchor="middle">AI Search</text>
+      <text class="s" x="552" y="339" text-anchor="middle">hybrid + rerank</text>
+      <rect class="core" x="613" y="302" width="102" height="58" rx="6"/>
+      <text class="ts" x="664" y="323" text-anchor="middle">LangGraph</text>
+      <text class="s" x="664" y="339" text-anchor="middle">Agent Runtime</text>
+      <text class="s" x="664" y="353" text-anchor="middle">state: Lakebase</text>
+      <rect class="core" x="725" y="302" width="102" height="58" rx="6"/>
+      <text class="ts" x="776" y="323" text-anchor="middle">Claude</text>
+      <text class="s" x="776" y="339" text-anchor="middle">Foundation</text>
+      <text class="s" x="776" y="353" text-anchor="middle">Model APIs</text>
+      <rect class="box" x="837" y="302" width="102" height="58" rx="6"/>
+      <text class="ts" x="888" y="323" text-anchor="middle">Unity Gateway</text>
+      <text class="s" x="888" y="339" text-anchor="middle">service policies</text>
+      <rect class="box" x="949" y="302" width="102" height="58" rx="6"/>
+      <text class="ts" x="1000" y="323" text-anchor="middle">MLflow 3</text>
+      <text class="s" x="1000" y="339" text-anchor="middle">evals + tracing</text>
+      <rect class="band" x="165" y="366" width="886" height="20" rx="4"/>
+      <text class="lbl-band" x="177" y="380">Who sees what: Unity Catalog grants per index; filtering per user is the app's job</text>
+
+      <!-- Legend -->
+      <rect class="core" x="165" y="408" width="18" height="12" rx="3"/>
+      <text class="s" x="190" y="418">Same code or model in all three</text>
+      <rect class="box" x="400" y="408" width="18" height="12" rx="3"/>
+      <text class="s" x="425" y="418">Swapped for the platform's own service</text>
+    </svg>
+    </div>
+    <figcaption><b>What makes GigaWhat GigaWhat carries over; the plumbing underneath is swapped.</b> The LangGraph workflow (safety tiers, the verbatim lane, <code>interrupt()</code> approvals) and the Claude model are the same on all three. What changes is who parses, indexes and searches the documents. The teal band at the end of each row is the difference that matters most here: in GigaWhat the database itself decides who sees which document, while on a managed service the app has to add the right filter to every query. Azure AI Search and Google's Vertex AI RAG Engine fill the same slots as the AWS row.</figcaption>
+  </figure>
+
+  <figure>
+    <div class="scroll">
+    <svg viewBox="0 0 1080 395" role="img" aria-label="Two panels. AWS: staff sign in with Cognito and ask a LangGraph app on AgentCore, which calls Claude on Bedrock with Guardrails, retrieves through a Knowledge Base, and keeps approvals and the audit log in Aurora; the Knowledge Base syncs documents from S3 and stores vectors in Aurora pgvector. Databricks: staff use a Databricks App and ask a LangGraph agent on Agent Runtime, which calls Claude through Foundation Model APIs, retrieves from AI Search, and keeps approvals and the audit log in Lakebase; a job parses files from a Unity Catalog volume into a Delta table, which AI Search syncs from automatically.">
+      <defs>
+        <marker id="f7-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+        <marker id="f7-b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah-acc" d="M0,0 L10,5 L0,10 z"/></marker>
+      </defs>
+
+      <!-- Panel 1: AWS -->
+      <rect class="panel" x="20" y="15" width="510" height="370" rx="10"/>
+      <text class="t" x="36" y="42">AWS managed services</text>
+      <text class="s" x="36" y="60">A Bedrock Knowledge Base loads and searches the documents</text>
+      <text class="zl" x="36" y="86">ANSWERING</text>
+      <rect class="box" x="36" y="96" width="120" height="60" rx="6"/>
+      <text class="ts" x="96" y="120" text-anchor="middle">Staff</text>
+      <text class="s" x="96" y="138" text-anchor="middle">Cognito sign-in</text>
+      <path class="edge" d="M156 126 H186" marker-end="url(#f7-a)"/>
+      <rect class="core" x="188" y="96" width="150" height="60" rx="6"/>
+      <text class="ts" x="263" y="116" text-anchor="middle">LangGraph app</text>
+      <text class="s" x="263" y="133" text-anchor="middle">AgentCore Runtime</text>
+      <text class="s" x="263" y="148" text-anchor="middle">or ECS Fargate</text>
+      <path class="edge-acc" d="M338 116 H368" marker-end="url(#f7-b)"/>
+      <rect class="core" x="370" y="96" width="144" height="60" rx="6"/>
+      <text class="ts" x="442" y="116" text-anchor="middle">Claude on Bedrock</text>
+      <text class="s" x="442" y="133" text-anchor="middle">Bedrock Guardrails</text>
+      <text class="s" x="442" y="148" text-anchor="middle">on input + output</text>
+      <path class="edge" d="M263 156 V194" marker-end="url(#f7-a)"/>
+      <text class="lbl" x="270" y="180">retrieve</text>
+      <path class="edge" d="M338 146 H354 V221 H368" marker-end="url(#f7-a)"/>
+      <rect class="box" x="188" y="196" width="150" height="50" rx="6"/>
+      <text class="ts" x="263" y="216" text-anchor="middle">Knowledge Base</text>
+      <text class="s" x="263" y="233" text-anchor="middle">hybrid · filters</text>
+      <rect class="box" x="370" y="196" width="144" height="50" rx="6"/>
+      <text class="ts" x="442" y="216" text-anchor="middle">Aurora: app state</text>
+      <text class="s" x="442" y="233" text-anchor="middle">approvals · audit log</text>
+      <text class="zl" x="36" y="276">LOADING</text>
+      <rect class="box" x="36" y="286" width="120" height="50" rx="6"/>
+      <text class="ts" x="96" y="306" text-anchor="middle">Amazon S3</text>
+      <text class="s" x="96" y="323" text-anchor="middle">documents</text>
+      <path class="edge" d="M96 286 V221 H186" marker-end="url(#f7-a)"/>
+      <text class="lbl" x="104" y="262">sync</text>
+      <path class="edge" d="M263 246 V284" marker-end="url(#f7-a)"/>
+      <text class="lbl" x="270" y="270">read · write</text>
+      <rect class="box" x="188" y="286" width="150" height="50" rx="6"/>
+      <text class="ts" x="263" y="306" text-anchor="middle">Aurora pgvector</text>
+      <text class="s" x="263" y="323" text-anchor="middle">vectors + text</text>
+      <text class="s" x="36" y="368">Traces: CloudWatch · Evaluation: Bedrock evaluations</text>
+
+      <!-- Panel 2: Databricks -->
+      <rect class="panel" x="550" y="15" width="510" height="370" rx="10"/>
+      <text class="t" x="566" y="42">Databricks</text>
+      <text class="s" x="566" y="60">AI Search keeps itself in sync with a Delta table</text>
+      <text class="zl" x="566" y="86">ANSWERING</text>
+      <rect class="box" x="566" y="96" width="120" height="60" rx="6"/>
+      <text class="ts" x="626" y="120" text-anchor="middle">Staff</text>
+      <text class="s" x="626" y="138" text-anchor="middle">Databricks App</text>
+      <path class="edge" d="M686 126 H716" marker-end="url(#f7-a)"/>
+      <rect class="core" x="718" y="96" width="150" height="60" rx="6"/>
+      <text class="ts" x="793" y="116" text-anchor="middle">LangGraph agent</text>
+      <text class="s" x="793" y="133" text-anchor="middle">Agent Runtime</text>
+      <text class="s" x="793" y="148" text-anchor="middle">on Databricks Apps</text>
+      <path class="edge-acc" d="M868 116 H898" marker-end="url(#f7-b)"/>
+      <rect class="core" x="900" y="96" width="144" height="60" rx="6"/>
+      <text class="ts" x="972" y="116" text-anchor="middle">Claude</text>
+      <text class="s" x="972" y="133" text-anchor="middle">Foundation Model APIs</text>
+      <text class="s" x="972" y="148" text-anchor="middle">via Unity Gateway</text>
+      <path class="edge" d="M793 156 V194" marker-end="url(#f7-a)"/>
+      <text class="lbl" x="800" y="180">retrieve</text>
+      <path class="edge" d="M868 146 H884 V221 H898" marker-end="url(#f7-a)"/>
+      <rect class="box" x="718" y="196" width="150" height="50" rx="6"/>
+      <text class="ts" x="793" y="216" text-anchor="middle">AI Search</text>
+      <text class="s" x="793" y="233" text-anchor="middle">hybrid · filters · rerank</text>
+      <rect class="box" x="900" y="196" width="144" height="50" rx="6"/>
+      <text class="ts" x="972" y="216" text-anchor="middle">Lakebase</text>
+      <text class="s" x="972" y="233" text-anchor="middle">approvals · audit log</text>
+      <text class="zl" x="566" y="276">LOADING</text>
+      <rect class="box" x="566" y="286" width="120" height="50" rx="6"/>
+      <text class="ts" x="626" y="306" text-anchor="middle">UC Volume</text>
+      <text class="s" x="626" y="323" text-anchor="middle">raw files</text>
+      <path class="edge" d="M686 311 H716" marker-end="url(#f7-a)"/>
+      <rect class="box" x="718" y="286" width="150" height="50" rx="6"/>
+      <text class="ts" x="793" y="306" text-anchor="middle">Delta table</text>
+      <text class="s" x="793" y="323" text-anchor="middle">parsed chunks</text>
+      <path class="edge" d="M793 286 V248" marker-end="url(#f7-a)"/>
+      <text class="lbl" x="800" y="270">auto-sync</text>
+      <text class="s" x="566" y="368">Traces + evaluation: MLflow 3 · Permissions: Unity Catalog</text>
+    </svg>
+    </div>
+    <figcaption><b>The same two journeys on each platform: answering a question (top) and loading documents (bottom).</b> On AWS, the Knowledge Base reads files from S3, parses, chunks and embeds them into Aurora, and serves the Retrieve API that the app calls. The vectors and the app's own tables can share one Aurora cluster. On Databricks, a job parses files from a Unity Catalog volume into a Delta table (the <code>ai_parse_document</code> SQL function does the parsing), and AI Search keeps its index in step with that table on its own. In either case the LangGraph workflow, with its safety tiers and approvals, is the code you would carry over from GigaWhat.</figcaption>
+  </figure>
+
+  <div class="two">
+    <div>
+      <h3>Assemble it yourself (GigaWhat)</h3>
+      <ul>
+        <li>Pick when permissions, document versions and exact wording must stay under your control</li>
+        <li>Runs anywhere, including offline on a laptop</li>
+        <li>Cost: you write and run more of the code yourself</li>
+      </ul>
+    </div>
+    <div>
+      <h3>AWS managed</h3>
+      <ul>
+        <li>Pick when the company already runs on AWS and wants fewer moving parts to operate</li>
+        <li>Parsing, chunking, syncing and hybrid search come ready-made</li>
+        <li>Cost: who-sees-what is only as safe as the filter code in the app</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Databricks</h3>
+      <ul>
+        <li>Pick when asset registers, work orders and sensor history already live in Databricks</li>
+        <li>One catalog for permissions and lineage across data and AI</li>
+        <li>Cost: a whole platform with its own bill; heavy for a small demo</li>
+      </ul>
+    </div>
+  </div>
+  <p class="note prose">GigaWhat stays on the first stack. Three details are worth knowing when reading other material:</p>
+  <ul class="open-list">
+    <li>Bedrock's newer Managed Knowledge Base can filter results by each user's access list, copied from sources such as SharePoint or Confluence. It uses AWS-managed storage rather than Aurora, and AWS describes it as filtering, not a security boundary.</li>
+    <li>Databricks renamed Vector Search to AI Search in June 2026, and replaced AI Gateway with Unity Gateway in August 2026. Most tutorials still use the old names.</li>
+    <li>If the project Region is eu-north-1: Knowledge Bases, Guardrails, AgentCore and Bedrock evaluations are offered there, but Bedrock's Rerank API is not, so an AWS-managed version would keep reranking in the app.</li>
+  </ul>
+</section>
+
+<section>
   <h2>Before deployment</h2>
   <ol class="open-list">
     <li>Confirm the AWS project Region (the local config says eu-north-1, Stockholm)</li>
@@ -630,6 +1061,12 @@ Summary: Steps to purge a polyethylene main with nitrogen before commissioning.
     <li><a href="https://github.com/langchain-ai/langchain-postgres">langchain-postgres (PGVectorStore, hybrid search)</a></li>
     <li><a href="https://docs.nvidia.com/nemo/guardrails/integration-with-third-party-libraries/langchain/runnable-rails.md">NeMo Guardrails with LangChain</a></li>
     <li><a href="https://github.com/Chainlit/chainlit">Chainlit</a></li>
+    <li><a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/retrieval-augmented-generation-options/introduction.html">AWS Prescriptive Guidance: RAG options and architectures on AWS</a></li>
+    <li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/kb-chunking.html">Bedrock Knowledge Bases: chunking strategies, including hierarchical</a></li>
+    <li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/kb-managed-acl.html">Bedrock Managed Knowledge Base: access-list-aware retrieval</a></li>
+    <li><a href="https://docs.databricks.com/aws/en/agents/retrieval-augmented-generation">Databricks: RAG on Databricks</a></li>
+    <li><a href="https://docs.databricks.com/aws/en/ai-search/ai-search">Databricks AI Search (formerly Vector Search), including its permission model</a></li>
+    <li><a href="https://learn.microsoft.com/en-us/azure/architecture/ai-ml/guide/rag/rag-solution-design-and-evaluation-guide">Azure Architecture Center: Design and develop a RAG solution</a></li>
     <li><a href="https://www.hse.gov.uk/pubns/books/hsg250.htm">HSE HSG250: Guidance on permit-to-work systems</a></li>
     <li><a href="https://www.hse.gov.uk/pubns/books/hsg253.htm">HSE HSG253: The safe isolation of plant and equipment</a></li>
     <li><a href="https://www.hse.gov.uk/pubns/books/hsg85.htm">HSE HSG85: Electricity at work, safe working practices</a></li>

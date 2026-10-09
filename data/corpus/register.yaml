@@ -1,0 +1,289 @@
+# Harrowmere Energy document register (fictional).
+#
+# The register is the source of truth for document control. Ingestion copies
+# these statuses into the database; a file's own contents never decide whether
+# it is current.
+#
+# sites: [] means every site in the document's business unit.
+# asset_classes: [] means every asset class.
+
+documents:
+  # ---------------------------------------------------------------- electricity
+  - doc_id: PR-ELEC-001
+    title: Distribution Safety Rules - Summary for Operational Staff
+    business_unit: electricity
+    doc_type: procedure
+    owner: Electricity Safety Manager
+    versions:
+      - {version: 6, status: approved, effective_from: 2025-01-06, review_due: 2028-01-06, approver: Head of Electricity Network Operations, safety_critical: true, sites: [], asset_classes: [], file: procedures/electricity/PR-ELEC-001_v6.md}
+
+  - doc_id: PR-ELEC-012
+    title: Isolation and Earthing of 11 kV Circuits
+    business_unit: electricity
+    doc_type: procedure
+    owner: Head of Electricity Network Operations
+    versions:
+      - {version: 3, status: superseded, effective_from: 2023-02-01, review_due: 2026-02-01, approver: Electricity Safety Manager, safety_critical: true, sites: [], asset_classes: [switchgear, ring_main_unit, feeder], file: procedures/electricity/PR-ELEC-012_v3.md}
+      - {version: 4, status: approved, effective_from: 2026-03-02, review_due: 2029-03-02, approver: Electricity Safety Manager, safety_critical: true, sites: [], asset_classes: [switchgear, ring_main_unit, feeder], file: procedures/electricity/PR-ELEC-012_v4.md}
+
+  - doc_id: PR-ELEC-015
+    title: Switching Programmes on the 11 kV and 33 kV Networks
+    business_unit: electricity
+    doc_type: procedure
+    owner: Head of Electricity Network Operations
+    versions:
+      - {version: 5, status: approved, effective_from: 2025-06-02, review_due: 2028-06-02, approver: Electricity Safety Manager, safety_critical: true, sites: [], asset_classes: [switchgear, feeder, primary_transformer, grid_transformer], file: procedures/electricity/PR-ELEC-015_v5.md}
+
+  - doc_id: PR-ELEC-020
+    title: Permit-to-Work and Sanction-for-Test (Electrical)
+    business_unit: electricity
+    doc_type: procedure
+    owner: Electricity Safety Manager
+    versions:
+      - {version: 7, status: approved, effective_from: 2024-09-02, review_due: 2027-09-02, approver: Head of Electricity Network Operations, safety_critical: true, sites: [], asset_classes: [], file: procedures/electricity/PR-ELEC-020_v7.md}
+
+  - doc_id: PR-ELEC-031
+    title: Entry to Kingsmead Cable Tunnel (Confined Space)
+    business_unit: electricity
+    doc_type: procedure
+    owner: Head of Electricity Network Operations
+    versions:
+      - {version: 2, status: approved, effective_from: 2025-11-03, review_due: 2027-11-03, approver: Electricity Safety Manager, safety_critical: true, sites: [ESS-KGM], asset_classes: [cable_tunnel], file: procedures/electricity/PR-ELEC-031_v2.md}
+
+  - doc_id: PR-ELEC-044
+    title: Transformer Oil Sampling and Dissolved Gas Analysis
+    business_unit: electricity
+    doc_type: procedure
+    owner: Head of Electricity Network Operations
+    versions:
+      - {version: 3, status: approved, effective_from: 2025-04-01, review_due: 2028-04-01, approver: Senior Authorised Person (HV), safety_critical: false, sites: [], asset_classes: [grid_transformer, primary_transformer, distribution_transformer], file: procedures/electricity/PR-ELEC-044_v3.md}
+
+  - doc_id: PR-ELEC-047
+    title: Response to Transformer Temperature Alarms
+    business_unit: electricity
+    doc_type: procedure
+    owner: Head of Electricity Network Operations
+    versions:
+      - {version: 2, status: approved, effective_from: 2026-01-12, review_due: 2028-01-12, approver: Electricity Safety Manager, safety_critical: true, sites: [], asset_classes: [grid_transformer, primary_transformer], file: procedures/electricity/PR-ELEC-047_v2.md}
+
+  - doc_id: PR-ELEC-052
+    title: Routine Substation Inspection
+    business_unit: electricity
+    doc_type: procedure
+    owner: Head of Electricity Network Operations
+    versions:
+      # Review is overdue on purpose: answers citing it should say so.
+      - {version: 4, status: approved, effective_from: 2024-03-04, review_due: 2026-06-30, approver: Senior Authorised Person (HV), safety_critical: false, sites: [], asset_classes: [], file: procedures/electricity/PR-ELEC-052_v4.md}
+
+  - doc_id: PR-ELEC-058
+    title: Substation Battery Maintenance
+    business_unit: electricity
+    doc_type: procedure
+    owner: Head of Electricity Network Operations
+    versions:
+      - {version: 2, status: approved, effective_from: 2025-02-03, review_due: 2028-02-03, approver: Senior Authorised Person (HV), safety_critical: false, sites: [], asset_classes: [battery], file: procedures/electricity/PR-ELEC-058_v2.md}
+
+  - doc_id: PR-ELEC-063
+    title: Substation Access, Keys and Visitors
+    business_unit: electricity
+    doc_type: procedure
+    owner: Electricity Safety Manager
+    versions:
+      - {version: 3, status: approved, effective_from: 2024-10-07, review_due: 2027-10-07, approver: Head of Electricity Network Operations, safety_critical: false, sites: [], asset_classes: [], file: procedures/electricity/PR-ELEC-063_v3.md}
+
+  - doc_id: PR-ELEC-070
+    title: Live Working on Low Voltage Equipment
+    business_unit: electricity
+    doc_type: procedure
+    owner: Electricity Safety Manager
+    versions:
+      # A draft must never be used to answer questions.
+      - {version: 1, status: draft, effective_from: null, review_due: null, approver: null, safety_critical: true, sites: [], asset_classes: [distribution_transformer, ring_main_unit], file: procedures/electricity/PR-ELEC-070_v1.md}
+
+  - doc_id: PR-ELEC-075
+    title: Fault Restoration on 11 kV Feeders
+    business_unit: electricity
+    doc_type: procedure
+    owner: Head of Electricity Network Operations
+    versions:
+      - {version: 3, status: approved, effective_from: 2025-09-01, review_due: 2028-09-01, approver: Electricity Safety Manager, safety_critical: true, sites: [], asset_classes: [feeder, switchgear, ring_main_unit], file: procedures/electricity/PR-ELEC-075_v3.md}
+
+  # ------------------------------------------------------------------------ gas
+  - doc_id: PR-GAS-003
+    title: Response to Reported Gas Escapes
+    business_unit: gas
+    doc_type: procedure
+    owner: Head of Gas Network Operations
+    versions:
+      - {version: 8, status: approved, effective_from: 2025-10-01, review_due: 2027-10-01, approver: Gas Safety Manager, safety_critical: true, sites: [], asset_classes: [main_lp, main_mp, main_ip, district_governor], file: procedures/gas/PR-GAS-003_v8.md}
+
+  - doc_id: PR-GAS-010
+    title: District Governor Maintenance
+    business_unit: gas
+    doc_type: procedure
+    owner: Head of Gas Network Operations
+    versions:
+      - {version: 4, status: approved, effective_from: 2025-05-06, review_due: 2028-05-06, approver: Gas Safety Manager, safety_critical: true, sites: [], asset_classes: [district_governor, slam_shut_valve, filter], file: procedures/gas/PR-GAS-010_v4.md}
+
+  - doc_id: PR-GAS-014
+    title: Slam-Shut Valve Function Testing
+    business_unit: gas
+    doc_type: procedure
+    owner: Head of Gas Network Operations
+    versions:
+      - {version: 3, status: approved, effective_from: 2024-11-04, review_due: 2027-11-04, approver: Gas Safety Manager, safety_critical: true, sites: [], asset_classes: [slam_shut_valve], file: procedures/gas/PR-GAS-014_v3.md}
+
+  - doc_id: PR-GAS-021
+    title: Permit-to-Work for Gas Operations
+    business_unit: gas
+    doc_type: procedure
+    owner: Gas Safety Manager
+    versions:
+      - {version: 5, status: approved, effective_from: 2025-03-03, review_due: 2028-03-03, approver: Head of Gas Network Operations, safety_critical: true, sites: [], asset_classes: [], file: procedures/gas/PR-GAS-021_v5.md}
+
+  - doc_id: PR-GAS-031
+    title: Purging and Commissioning of Polyethylene Mains
+    business_unit: gas
+    doc_type: procedure
+    owner: Head of Gas Network Operations
+    versions:
+      - {version: 2, status: superseded, effective_from: 2022-07-01, review_due: 2025-07-01, approver: Gas Safety Manager, safety_critical: true, sites: [], asset_classes: [main_lp, main_mp], file: procedures/gas/PR-GAS-031_v2.md}
+      - {version: 3, status: approved, effective_from: 2026-04-01, review_due: 2029-04-01, approver: Gas Safety Manager, safety_critical: true, sites: [], asset_classes: [main_lp, main_mp], file: procedures/gas/PR-GAS-031_v3.md}
+
+  - doc_id: PR-GAS-036
+    title: Pressure Reduction Station Stream Changeover
+    business_unit: gas
+    doc_type: procedure
+    owner: Head of Gas Network Operations
+    versions:
+      - {version: 2, status: approved, effective_from: 2025-08-04, review_due: 2028-08-04, approver: Gas Safety Manager, safety_critical: true, sites: [GPR-HRW], asset_classes: [pressure_reduction_station, slam_shut_valve, filter], file: procedures/gas/PR-GAS-036_v2.md}
+
+  - doc_id: PR-GAS-040
+    title: Working in Hazardous Areas (DSEAR Zones)
+    business_unit: gas
+    doc_type: procedure
+    owner: Gas Safety Manager
+    versions:
+      - {version: 3, status: approved, effective_from: 2024-06-03, review_due: 2027-06-03, approver: Head of Gas Network Operations, safety_critical: true, sites: [], asset_classes: [], file: procedures/gas/PR-GAS-040_v3.md}
+
+  - doc_id: PR-GAS-045
+    title: Leakage Survey of Gas Mains
+    business_unit: gas
+    doc_type: procedure
+    owner: Head of Gas Network Operations
+    versions:
+      - {version: 2, status: approved, effective_from: 2025-01-13, review_due: 2028-01-13, approver: Gas Safety Manager, safety_critical: false, sites: [], asset_classes: [main_lp, main_mp, main_ip], file: procedures/gas/PR-GAS-045_v2.md}
+
+  - doc_id: PR-GAS-052
+    title: Safe Excavation Near Live Gas Mains
+    business_unit: gas
+    doc_type: procedure
+    owner: Head of Gas Network Operations
+    versions:
+      - {version: 4, status: approved, effective_from: 2024-02-05, review_due: 2027-02-05, approver: Gas Safety Manager, safety_critical: false, sites: [], asset_classes: [main_lp, main_mp, main_ip], file: procedures/gas/PR-GAS-052_v4.md}
+
+  - doc_id: PR-GAS-058
+    title: Governor Inspection and Pressure Recording
+    business_unit: gas
+    doc_type: procedure
+    owner: Head of Gas Network Operations
+    versions:
+      - {version: 3, status: approved, effective_from: 2025-07-07, review_due: 2028-07-07, approver: Gas Safety Manager, safety_critical: false, sites: [], asset_classes: [district_governor, slam_shut_valve], file: procedures/gas/PR-GAS-058_v3.md}
+
+  - doc_id: PR-GAS-066
+    title: Odorant Level Checks
+    business_unit: gas
+    doc_type: procedure
+    owner: Head of Gas Network Operations
+    versions:
+      - {version: 2, status: approved, effective_from: 2024-08-05, review_due: 2027-08-05, approver: Gas Safety Manager, safety_critical: false, sites: [GPR-HRW], asset_classes: [pressure_reduction_station], file: procedures/gas/PR-GAS-066_v2.md}
+
+  - doc_id: PR-GAS-071
+    title: Investigating Gas in Buildings
+    business_unit: gas
+    doc_type: procedure
+    owner: Head of Gas Network Operations
+    versions:
+      # Withdrawn: its content moved into PR-GAS-003 v8.
+      - {version: 2, status: withdrawn, effective_from: 2021-05-04, review_due: 2024-05-04, approver: Gas Safety Manager, safety_critical: true, sites: [], asset_classes: [main_lp], file: procedures/gas/PR-GAS-071_v2.md}
+
+  # --------------------------------------------------------------------- shared
+  - doc_id: PR-CORP-001
+    title: Reporting Incidents and Near Misses
+    business_unit: shared
+    doc_type: procedure
+    owner: Head of Health, Safety and Environment
+    versions:
+      - {version: 5, status: approved, effective_from: 2025-02-03, review_due: 2028-02-03, approver: Chief Operating Officer, safety_critical: false, sites: [], asset_classes: [], file: procedures/corporate/PR-CORP-001_v5.md}
+
+  - doc_id: PR-CORP-004
+    title: Lone Working
+    business_unit: shared
+    doc_type: procedure
+    owner: Head of Health, Safety and Environment
+    versions:
+      - {version: 3, status: approved, effective_from: 2024-05-07, review_due: 2027-05-07, approver: Chief Operating Officer, safety_critical: false, sites: [], asset_classes: [], file: procedures/corporate/PR-CORP-004_v3.md}
+
+  # -------------------------------------------- public HSE guidance (downloaded)
+  - doc_id: HSE-HSG250
+    title: Guidance on permit-to-work systems (HSG250)
+    business_unit: shared
+    doc_type: guidance
+    owner: Health and Safety Executive
+    source_url: https://www.hse.gov.uk/pubns/priced/hsg250.pdf
+    versions:
+      - {version: 1, status: approved, effective_from: null, review_due: null, approver: null, safety_critical: true, sites: [], asset_classes: [], file: ../raw/hse/hsg250.pdf}
+
+  - doc_id: HSE-HSG253
+    title: The safe isolation of plant and equipment (HSG253)
+    business_unit: shared
+    doc_type: guidance
+    owner: Health and Safety Executive
+    source_url: https://www.hse.gov.uk/pubns/priced/hsg253.pdf
+    versions:
+      - {version: 1, status: approved, effective_from: null, review_due: null, approver: null, safety_critical: true, sites: [], asset_classes: [], file: ../raw/hse/hsg253.pdf}
+
+  - doc_id: HSE-HSG85
+    title: "Electricity at work: Safe working practices (HSG85)"
+    business_unit: electricity
+    doc_type: guidance
+    owner: Health and Safety Executive
+    source_url: https://www.hse.gov.uk/pubns/priced/hsg85.pdf
+    versions:
+      - {version: 1, status: approved, effective_from: null, review_due: null, approver: null, safety_critical: true, sites: [], asset_classes: [], file: ../raw/hse/hsg85.pdf}
+
+  - doc_id: HSE-HSR25
+    title: Memorandum of guidance on the Electricity at Work Regulations 1989 (HSR25)
+    business_unit: electricity
+    doc_type: guidance
+    owner: Health and Safety Executive
+    source_url: https://www.hse.gov.uk/pubns/priced/hsr25.pdf
+    versions:
+      - {version: 1, status: approved, effective_from: null, review_due: null, approver: null, safety_critical: true, sites: [], asset_classes: [], file: ../raw/hse/hsr25.pdf}
+
+  - doc_id: HSE-L80
+    title: A guide to the Gas Safety (Management) Regulations 1996 (L80)
+    business_unit: gas
+    doc_type: guidance
+    owner: Health and Safety Executive
+    source_url: https://www.hse.gov.uk/pubns/priced/l80.pdf
+    versions:
+      - {version: 1, status: approved, effective_from: null, review_due: null, approver: null, safety_critical: true, sites: [], asset_classes: [], file: ../raw/hse/l80.pdf}
+
+  - doc_id: HSE-L122
+    title: Safety of pressure systems - Pressure Systems Safety Regulations 2000, Approved Code of Practice (L122)
+    business_unit: gas
+    doc_type: guidance
+    owner: Health and Safety Executive
+    source_url: https://www.hse.gov.uk/pubns/priced/l122.pdf
+    versions:
+      - {version: 1, status: approved, effective_from: null, review_due: null, approver: null, safety_critical: true, sites: [], asset_classes: [], file: ../raw/hse/l122.pdf}
+
+  - doc_id: HSE-L138
+    title: Dangerous substances and explosive atmospheres - DSEAR 2002, Approved Code of Practice (L138)
+    business_unit: gas
+    doc_type: guidance
+    owner: Health and Safety Executive
+    source_url: https://www.hse.gov.uk/pubns/priced/l138.pdf
+    versions:
+      - {version: 1, status: approved, effective_from: null, review_due: null, approver: null, safety_critical: true, sites: [], asset_classes: [], file: ../raw/hse/l138.pdf}

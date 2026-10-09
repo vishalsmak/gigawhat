@@ -1,0 +1,40 @@
+alarm_id,asset_id,raised_at,cleared_at,priority,code,message,value,unit
+1,SWG-KGM-11,2024-11-12T11:20:00+00:00,2024-11-12T13:20:00+00:00,1,CB_FAIL_TO_TRIP,"Circuit breaker failed to trip on test, panel 5",,
+2,FDR-ASH-07,2024-11-25T04:22:00+00:00,2024-11-25T06:15:00+00:00,1,FEEDER_TRIP,Feeder circuit breaker tripped on earth fault,,
+3,BAT-RVL,2025-03-04T15:11:00+00:00,2025-03-04T21:11:00+00:00,2,CHARGER_FAULT,Battery charger fault,,
+4,FDR-ASH-07,2025-03-12T17:00:00+00:00,2025-03-12T20:58:00+00:00,1,FEEDER_TRIP,Feeder circuit breaker tripped on earth fault,,
+5,FDR-KGM-03,2025-05-28T02:50:00+01:00,2025-05-28T04:01:00+01:00,1,FEEDER_TRIP,Feeder circuit breaker tripped on earth fault,,
+6,CT-KGM-01,2025-06-26T09:15:00+01:00,2025-06-26T10:05:00+01:00,1,GAS_DETECTOR_O2_LOW,Tunnel oxygen below 19.5%,19.0,%
+7,FDR-ASH-09,2025-07-08T07:54:00+01:00,2025-07-08T11:34:00+01:00,1,FEEDER_TRIP,Feeder circuit breaker tripped on earth fault,,
+8,T-104,2025-07-10T16:30:00+01:00,2025-07-10T18:04:00+01:00,2,OTI_STAGE_1,Top-oil temperature Stage 1,85.6,°C
+9,T-104,2025-07-12T17:54:00+01:00,2025-07-12T19:45:00+01:00,2,OTI_STAGE_1,Top-oil temperature Stage 1,85.1,°C
+10,T-104,2025-07-15T17:33:00+01:00,2025-07-15T18:56:00+01:00,2,OTI_STAGE_1,Top-oil temperature Stage 1,86.3,°C
+11,FDR-KGM-03,2025-07-21T01:28:00+01:00,2025-07-21T02:54:00+01:00,1,FEEDER_TRIP,Feeder circuit breaker tripped on earth fault,,
+12,FDR-KGM-03,2025-09-03T22:23:00+01:00,2025-09-03T23:35:00+01:00,1,FEEDER_TRIP,Feeder circuit breaker tripped on earth fault,,
+13,FDR-KGM-03,2025-12-17T08:41:00+00:00,2025-12-17T12:01:00+00:00,1,FEEDER_TRIP,Feeder circuit breaker tripped on earth fault,,
+14,FDR-ASH-09,2026-01-20T10:14:00+00:00,2026-01-20T12:02:00+00:00,1,FEEDER_TRIP,Feeder circuit breaker tripped on earth fault,,
+15,BAT-ASH,2026-02-26T06:35:00+00:00,2026-02-26T10:35:00+00:00,2,CHARGER_FAULT,Battery charger fault,,
+16,G-112,2026-03-01T03:46:00+00:00,2026-03-01T05:55:00+00:00,2,OUTLET_HIGH,Governor outlet pressure high,46.4,mbar
+17,G-112,2026-03-04T03:03:00+00:00,2026-03-04T05:48:00+00:00,2,OUTLET_HIGH,Governor outlet pressure high,46.1,mbar
+18,G-112,2026-03-06T03:32:00+00:00,2026-03-06T05:51:00+00:00,2,OUTLET_HIGH,Governor outlet pressure high,43.9,mbar
+19,G-112,2026-03-08T03:34:00+00:00,2026-03-08T05:41:00+00:00,2,OUTLET_HIGH,Governor outlet pressure high,43.4,mbar
+20,G-112,2026-03-09T03:43:00+00:00,2026-03-09T05:46:00+00:00,2,OUTLET_HIGH,Governor outlet pressure high,46.6,mbar
+21,SSV-112,2026-03-10T03:20:00+00:00,2026-03-10T07:25:00+00:00,1,SSV_CLOSED,Slam-shut closed on over-pressure,60.4,mbar
+22,BAT-KGM,2026-04-11T20:47:00+01:00,2026-04-12T04:47:00+01:00,2,CHARGER_FAULT,Battery charger fault,,
+23,FDR-KGM-03,2026-05-14T05:24:00+01:00,2026-05-14T08:22:00+01:00,1,FEEDER_TRIP,Feeder circuit breaker tripped on earth fault,,
+24,PRS-HRW-01,2026-06-23T10:30:00+01:00,2026-06-24T12:30:00+01:00,2,ODORANT_LOW,Outlet odorant concentration low,3.9,mg/m3
+25,T-104,2026-07-14T17:13:00+01:00,2026-07-14T20:22:00+01:00,2,OTI_STAGE_1,Top-oil temperature Stage 1,85.6,°C
+26,T-104,2026-07-15T16:05:00+01:00,2026-07-15T19:15:00+01:00,1,OTI_STAGE_2,Top-oil temperature Stage 2: cooling fan bank 2 not running,96.5,°C
+27,T-104,2026-07-16T17:52:00+01:00,2026-07-16T21:12:00+01:00,2,OTI_STAGE_1,Top-oil temperature Stage 1,85.3,°C
+28,T-104,2026-07-17T15:29:00+01:00,2026-07-17T18:07:00+01:00,2,OTI_STAGE_1,Top-oil temperature Stage 1,86.0,°C
+29,T-104,2026-07-19T16:48:00+01:00,2026-07-19T18:23:00+01:00,2,OTI_STAGE_1,Top-oil temperature Stage 1,88.6,°C
+30,T-104,2026-07-21T14:38:00+01:00,2026-07-21T15:58:00+01:00,2,OTI_STAGE_1,Top-oil temperature Stage 1,86.0,°C
+31,T-104,2026-07-22T16:46:00+01:00,2026-07-22T19:25:00+01:00,2,OTI_STAGE_1,Top-oil temperature Stage 1,85.5,°C
+32,T-104,2026-07-23T15:35:00+01:00,2026-07-23T17:39:00+01:00,2,OTI_STAGE_1,Top-oil temperature Stage 1,87.4,°C
+33,FDR-KGM-03,2026-07-27T22:59:00+01:00,2026-07-28T01:35:00+01:00,1,FEEDER_TRIP,Feeder circuit breaker tripped on earth fault,,
+34,G-112,2026-08-05T02:37:00+01:00,2026-08-05T05:37:00+01:00,2,OUTLET_HIGH,Governor outlet pressure high,43.5,mbar
+35,G-112,2026-08-12T02:00:00+01:00,2026-08-12T05:00:00+01:00,2,OUTLET_HIGH,Governor outlet pressure high,44.9,mbar
+36,G-112,2026-08-17T02:08:00+01:00,2026-08-17T05:08:00+01:00,2,OUTLET_HIGH,Governor outlet pressure high,43.8,mbar
+37,G-112,2026-08-26T02:48:00+01:00,2026-08-26T05:48:00+01:00,2,OUTLET_HIGH,Governor outlet pressure high,43.5,mbar
+38,G-112,2026-09-09T02:22:00+01:00,2026-09-09T05:22:00+01:00,2,OUTLET_HIGH,Governor outlet pressure high,44.2,mbar
+39,G-112,2026-09-23T02:54:00+01:00,2026-09-23T05:54:00+01:00,2,OUTLET_HIGH,Governor outlet pressure high,43.5,mbar

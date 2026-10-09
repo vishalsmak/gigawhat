@@ -19,3 +19,6 @@ wheels/
 
 # Downloaded source documents (fetched by script, not redistributed)
 data/raw/
+
+# Coverage data
+.coverage

@@ -11,7 +11,7 @@ See [`docs/architecture.html`](docs/architecture.html) for how it works: compone
 | Phase | | |
 |---|---|---|
 | 1 | Foundations: config, Postgres + pgvector, migrations, CI | ✅ |
-| 2 | Data: fictional multi-utility dataset, HSE guidance, Docling ingestion | |
+| 2 | Data: fictional multi-utility dataset, HSE guidance, Docling ingestion | ✅ |
 | 3 | Retrieval: hybrid search, row-level security, reranking | |
 | 4 | Workflow: guardrails, safety tiers, cited answers, approvals, audit | |
 | 5 | Chainlit UI with personas | |
@@ -29,7 +29,18 @@ docker compose up -d db       # Postgres 17 + pgvector
 uv sync
 uv run gigawhat db upgrade
 uv run gigawhat doctor        # shows what's ready and what's missing
+
+uv run gigawhat data fetch-hse      # download public HSE guidance (fetched, not redistributed)
+uv run gigawhat data ingest         # parse, chunk and embed every document in the register
+uv run gigawhat data load-records   # sites, assets, work orders, inspections, incidents, alarms
+uv run gigawhat data docs           # every stored version with its status and review date
 ```
+
+The first `ingest` downloads Docling's PDF layout models and takes a few minutes; later runs skip anything already stored. For the offline profile, run `ollama pull qwen3-embedding:0.6b` first.
+
+## Data
+
+[`data/README.md`](data/README.md) describes Harrowmere Energy, the fictional utility: its sites, assets, roles and document register, plus the deliberate test cases (superseded and draft procedures, an overdue review, two procedures that conflict) that the assistant must handle correctly.
 
 ## Profiles
 

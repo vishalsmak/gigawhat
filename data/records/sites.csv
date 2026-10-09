@@ -1,0 +1,13 @@
+site_id,name,business_unit,kind,rating
+ESS-RVL,Riverside Lane Grid Substation,electricity,grid_substation,132/33 kV
+ESS-ASH,Ashford Road Primary Substation,electricity,primary_substation,33/11 kV
+ESS-KGM,Kingsmead Primary Substation,electricity,primary_substation,33/11 kV
+ESS-BRK,Brookfield Secondary Substation,electricity,secondary_substation,11 kV/LV
+ESS-ORC,Orchard Way Secondary Substation,electricity,secondary_substation,11 kV/LV
+DEP-ASH,Ashford Road Electricity Depot,electricity,depot,
+GPR-HRW,Harrowmere Pressure Reduction Station,gas,pressure_reduction_station,IP 7 bar to MP 2 bar
+GPR-MLN,Mill Lane District Governor,gas,district_governor,MP to LP 75 mbar
+GPR-STN,Station Road District Governor,gas,district_governor,MP to LP 75 mbar
+GPR-KAV,Kingsmead Avenue District Governor,gas,district_governor,MP to LP 75 mbar
+GNA-HRW,Harrowmere gas network (mains),gas,network,
+DEP-VAL,Vale Gas Depot,gas,depot,

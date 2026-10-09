@@ -1,0 +1,541 @@
+# Harrowmere Energy incident reports (fictional).
+#
+# FICTIONAL DATA. Created for the GigaWhat demo. Not for real operational use.
+# Reported and categorised under PR-CORP-001. People are identified by role only.
+
+incidents:
+  - incident_id: INC-2024-006
+    occurred_at: 2024-10-17T16:20:00+01:00
+    business_unit: electricity
+    site_id: DEP-ASH
+    asset_id: null
+    category: security
+    severity: medium
+    riddor_reportable: false
+    summary: Operational substation key lost from a split ring; lock cylinders changed at all substations
+    description: >
+      At the end of the day shift, back at Ashford Road Electricity Depot, a Competent Person (HV) found that their operational key was missing from their key ring. The restricted-profile key opens the gates and buildings at all five Harrowmere Electricity substations. It had last been used at Kingsmead Primary Substation at about 11:30, and the split ring holding the keys had opened. The Competent Person and a colleague searched the van and retraced the route at Kingsmead without finding it. SCADA door alarms at ESS-RVL, ESS-ASH and ESS-KGM showed no openings other than recorded visits, and the key register entry for the key was correct. There was no evidence that anyone else had used the key.
+    immediate_actions: >
+      The loss was reported to the Control Engineer and the Electricity Safety Manager the same evening, in line with PR-ELEC-063. The Control Engineer flagged all five substations so that any unexpected door alarm would be attended as a possible intrusion. The Electricity Safety Manager decided to change the lock cylinders: ESS-RVL, ESS-ASH and ESS-KGM within 48 hours, and ESS-BRK and ESS-ORC within 7 days. New keys were issued to all holders against the key register.
+    root_cause: >
+      Operational keys were carried on ordinary split rings, which can open when snagged in a pocket. PR-ELEC-063 requires holders to keep the key on their person but did not say how it should be secured. Operational keys are now issued on a sealed key fob with a belt clip and lanyard, and the fob is recorded in the key register.
+    status: closed
+    linked_procedures: [PR-ELEC-063]
+
+  - incident_id: INC-2024-007
+    occurred_at: 2024-11-12T11:20:00+00:00
+    business_unit: electricity
+    site_id: ESS-KGM
+    asset_id: SWG-KGM-11
+    category: equipment_failure
+    severity: medium
+    riddor_reportable: false
+    summary: Oil circuit breaker on SWG-KGM-11 failed to trip during routine protection testing
+    description: >
+      Two Competent Persons (HV) were carrying out routine protection testing at Kingsmead Primary Substation under a sanction-for-test issued by an Authorised Person (HV). FDR-KGM-03 had been switched out by remote control, with its customers supplied from an alternative feed, and its oil circuit breaker on SWG-KGM-11 had been withdrawn to the test position. Secondary injection showed that the overcurrent and earth fault relays operated correctly and sent a trip signal, but the circuit breaker did not open. A repeat test gave the same result. The breaker opened normally when its manual trip button was pressed. Had a fault occurred on FDR-KGM-03 in service, it would have had to be cleared by back-up protection on the transformer incomer, disconnecting a whole section of the switchboard and the customers on it. SWG-KGM-11 was installed in 1974 and is due for replacement. Nobody was hurt and no customers lost supply.
+    immediate_actions: >
+      The circuit breaker was left open in the test position, locked and labelled defective, and FDR-KGM-03 stayed on its alternative feed. The Control Engineer recorded the defect and added it to the operational restrictions register. The trip mechanisms of the other circuit breakers on SWG-KGM-11 were tested over the following week, with each section of the switchboard taken out of service in turn, and all opened correctly.
+    root_cause: >
+      The trip coil plunger was sticking because the grease in the trip mechanism had hardened with age, so the energised coil could not release the trip latch. Mechanism servicing on SWG-KGM-11 had been deferred because the switchboard was due for replacement, and this breaker had not been serviced for 7 years. The mechanism was cleaned, re-greased and timing-tested before the breaker was returned to service, and mechanism servicing was reinstated for the whole switchboard until it is replaced.
+    status: closed
+    linked_procedures: [PR-ELEC-020, PR-ELEC-015]
+
+  - incident_id: INC-2024-009
+    occurred_at: 2024-12-03T10:15:00+00:00
+    business_unit: electricity
+    site_id: ESS-KGM
+    asset_id: BAT-KGM
+    category: injury
+    severity: low
+    riddor_reportable: false
+    summary: Battery acid splashed onto a Competent Person's wrist while topping up BAT-KGM cells
+    description: >
+      A Competent Person (HV) was topping up the vented lead-acid cells of the BAT-KGM 110 V battery at Kingsmead Primary Substation during quarterly battery maintenance, working with a second Competent Person (HV). As a vent plug was removed, a small amount of electrolyte that had collected under it splashed onto the inside of the left wrist, in the gap between the glove cuff and the overall sleeve. The Competent Person felt stinging, stopped work and irrigated the area at the battery room eyewash and drench station for 15 minutes, helped by the colleague. There was slight reddening of the skin and no blistering. The injured person was checked by a first aider at the depot, returned to normal duties the same day and lost no time from work. A face visor and acid-resistant gloves were being worn, but the gloves were a short-cuff type.
+    immediate_actions: >
+      First aid by irrigation at the drench station. Work stopped until the injury had been checked. Spilt electrolyte on the cell tops was neutralised with the sodium bicarbonate spill kit and cleaned up. The Control Engineer was told before the team left site, and the report was entered in the incident reporting system the same day.
+    root_cause: >
+      The short-cuff gloves left the wrist exposed when reaching across the cells. Gauntlet-style acid-resistant gloves were already used at other sites, but the battery maintenance kit kept at Kingsmead had not been updated. Gauntlet gloves and aprons were issued to every battery maintenance kit and the kit checklist was revised.
+    status: closed
+    linked_procedures: [PR-ELEC-058]
+
+  - incident_id: INC-2025-003
+    occurred_at: 2025-01-28T13:40:00+00:00
+    business_unit: gas
+    site_id: GPR-HRW
+    asset_id: SSV-HRW-B
+    category: equipment_failure
+    severity: medium
+    riddor_reportable: false
+    summary: Slam-shut SSV-HRW-B did not close fully during its over-pressure function test at GPR-HRW
+    description: >
+      A Competent Person (Pressure Systems) was carrying out the 6-monthly function test of the stream B slam-shut valve SSV-HRW-B at Harrowmere Pressure Reduction Station, under a permit issued by the Authorised Person (Gas). Stream B was the standby stream and had been isolated for the test, with stream A supplying the MP network. When over-pressure was applied to the sensing line, the trip mechanism released at the correct setting, but the valve stopped short of its fully closed position. Pressure on the isolated test section rose by about 40 mbar in 10 minutes, well above the let-by limit of 10 mbar in 10 minutes in PR-GAS-014. A second trip gave the same result, so the valve failed the test. Supply to the network was maintained on stream A throughout. Nobody was hurt.
+    immediate_actions: >
+      Stream B was left isolated, with its valves locked and tagged out of service. The Gas Network Controller was told that GPR-HRW was running on stream A with no standby, and the Gas Safety Manager was informed of the failed test. SSV-HRW-A, on the duty stream, was checked for correct latching and impulse line valve position. SSV-HRW-B was stripped and repaired within 5 days and passed a retest before stream B was returned to standby.
+    root_cause: >
+      Strip-down found black powder, a fine iron oxide and sulphide dust, packed around the valve stem and guide bush. This increased friction so the closing spring could not drive the disc fully onto its seat. Stream B had been on standby for most of the previous year, so the valve had seldom moved. The dust came from the upstream IP steel main and had passed the FLT-HRW-01 filter element, which was near the end of its life. The stem, bush and seals were replaced and the filter element renewed, and the duty and standby streams are now changed over every quarter so that both slam-shuts are exercised.
+    status: closed
+    linked_procedures: [PR-GAS-014, PR-GAS-036]
+
+  - incident_id: INC-2025-008
+    occurred_at: 2025-03-11T14:05:00+00:00
+    business_unit: electricity
+    site_id: ESS-ASH
+    asset_id: BAT-ASH
+    category: equipment_failure
+    severity: low
+    riddor_reportable: false
+    summary: Two cells of BAT-ASH found below the cell voltage limit at the quarterly battery check
+    description: >
+      During the quarterly battery check at Ashford Road Primary Substation, a Competent Person (HV) measured individual cell voltages on the BAT-ASH 110 V valve-regulated lead-acid battery while it was on float charge. Two cells, numbers 17 and 38, read 2.11 V and 2.13 V against a battery average of 2.26 V. Both were below the 2.18 V limit and more than 0.05 V from the average, so they were reported under PR-ELEC-058. Neither cell was swollen, leaking or warmer than the others. The charger output was within the normal float range and there were no charger or DC alarms. At the previous quarterly check all cells had been within limits. The battery could still supply the tripping and closing circuits of SWG-ASH-11, but the two weak cells reduced the capacity available if the charger supply were lost. Nobody was at risk.
+    immediate_actions: >
+      The readings were repeated 30 minutes later with the same result. The Control Engineer was told and the defect was recorded. The inter-cell connections were checked and found tight and clean. An impedance test of the whole battery was carried out the following week and replacement cells were ordered.
+    root_cause: >
+      The impedance test showed both cells more than 25% above their baseline impedance, consistent with dry-out of individual cells. The battery was installed in 2017, so the deterioration was earlier than expected, but the other cells were within limits and showed no similar trend. The two cells were replaced on 20 March 2025, and the battery then passed a discharge test with a temporary battery connected for the duration.
+    status: closed
+    linked_procedures: [PR-ELEC-058]
+
+  - incident_id: INC-2025-011
+    occurred_at: 2025-04-15T11:05:00+01:00
+    business_unit: electricity
+    site_id: ESS-RVL
+    asset_id: GT-2
+    category: near_miss
+    severity: medium
+    riddor_reportable: false
+    summary: Spanner dropped from a ladder at GT-2 bounced into the live GT-1 bay at Riverside Lane
+    description: >
+      A Competent Person (HV) was working from a ladder about 3.5 m above ground on the cooler of grid transformer GT-2 at Riverside Lane Grid Substation, under a permit-to-work issued by an Authorised Person (HV). GT-2 was isolated and earthed. GT-1, in the next bay, was in service, and its bay was separated from the work area by a barrier and danger notices. While loosening a fan guard bolt, the Competent Person dropped a ratchet spanner. It struck the cooler pipework, landed about 0.5 m from a second Competent Person who was footing the ladder, and bounced under the barrier into the live GT-1 bay. The Competent Person climbed down and walked towards the barrier to retrieve it, and was stopped by the Authorised Person before crossing it. Nobody was hurt and no equipment was damaged. The weather was dry with a light wind.
+    immediate_actions: >
+      Work stopped and the Authorised Person (HV) briefed the team on the limits of the work area. The Authorised Person retrieved the spanner from the GT-1 bay, keeping to the walkway and outside the safety distances. Work resumed with tool lanyards brought from the depot.
+    root_cause: >
+      Hand tools were not tethered while working at height, and the drop zone around the ladder was not considered when the work area was set out next to a live bay. Tool lanyards were carried in the van but the task risk assessment did not require them. Tool tethering is now required for all work at height in outdoor compounds, and the drop zone is marked out when the work area is set up. The attempt to cross the barrier was covered in a briefing on permit work areas for all field teams.
+    status: closed
+    linked_procedures: [PR-ELEC-020, PR-ELEC-001]
+
+  - incident_id: INC-2025-014
+    occurred_at: 2025-06-17T10:42:00+01:00
+    business_unit: electricity
+    site_id: ESS-ASH
+    asset_id: FDR-ASH-07
+    category: near_miss
+    severity: medium
+    riddor_reportable: false
+    summary: Voltage indicator failed unnoticed during isolation of FDR-ASH-07; circuit not proved dead
+    description: >
+      An Authorised Person (HV) and a Competent Person (HV) were isolating and earthing 11 kV feeder FDR-ASH-07 at Ashford Road Primary Substation so that a cable joint could be replaced. The feeder circuit breaker on SWG-ASH-11 had been opened, withdrawn and locked. The Competent Person proved the voltage indicator on a proving unit, tested each phase for dead at the point where the Circuit Main Earth was to be applied, saw no indication and took the circuit to be dead. PR-ELEC-012 v3 did not require the indicator to be proved again after the test. The Competent Person then moved to within about 1 m of the cable terminations with the earthing leads. The Authorised Person asked for the indicator to be re-proved first. It gave no indication on the proving unit, so the test for dead was invalid and the circuit had not been confirmed dead. The review also found that the remote point of isolation at the Kingsmead end had been opened and caution-noticed but not locked. Nobody was hurt.
+    immediate_actions: >
+      The Authorised Person stopped the work and the Competent Person moved back from the terminations. The Control Engineer was told, and the failed indicator was labelled defective and taken out of use. A second indicator was proved, used to test all three phases and proved again, and showed that the feeder was dead. The remote point of isolation was locked before the Circuit Main Earths were applied and the permit was issued. All indicators of the same model were withdrawn for checks, and two more were found with corroded battery contacts.
+    root_cause: >
+      The voltage indicator failed between being proved and the test for dead because of corrosion on its battery contacts. The failure was not detected because PR-ELEC-012 v3 required the indicator to be proved only before the test. The remote point of isolation was not locked because it had no locking facility, and v3 required a lock only where one was fitted. PR-ELEC-012 was revised: v4, effective 2 March 2026, requires the indicator to be proved immediately before and after every test for dead, a personal safety lock and Danger notice at every point of isolation, and Circuit Main Earths at all points of isolation before the permit is issued. Indicator battery checks were added to the monthly test equipment inspection.
+    status: closed
+    linked_procedures: [PR-ELEC-012]
+
+  - incident_id: INC-2025-019
+    occurred_at: 2025-06-26T09:15:00+01:00
+    business_unit: electricity
+    site_id: ESS-KGM
+    asset_id: CT-KGM-01
+    category: near_miss
+    severity: medium
+    riddor_reportable: false
+    summary: Oxygen alarm at 19.0% in CT-KGM-01; entry aborted after forced ventilation stalled
+    description: >
+      Two Competent Persons (HV) entered the Kingsmead cable tunnel CT-KGM-01 through Shaft A to inspect cable supports, under a confined space entry permit, with a third Competent Person (HV) as Top Person. The fixed supply fan at Shaft A had run for 30 minutes before entry, and the pre-entry tests at Shaft A and Shaft B had shown 20.9% oxygen. About 260 m into the 420 m tunnel, the lead entrant's personal gas monitor alarmed for low oxygen and read 19.0% when checked. Both entrants withdrew at once and were out of Shaft A 6 minutes later. Neither reported any symptoms. The Top Person then found a loose tarpaulin pressed against the fan intake screen. The fan motor was still running, so it sounded normal, but the fan had stalled and was moving very little air. It was windy, and there had been heavy rain for 3 days before the entry.
+    immediate_actions: >
+      Entry was aborted, the permit was suspended and the Control Engineer was told. No further entry was allowed until the investigation was complete. Before the next entry, 2 days later, loose materials were cleared from around Shaft A, the fan was checked, and the tunnel was ventilated and tested at Shaft A, at Shaft B and at 100 m intervals along the tunnel using a sampling line.
+    root_cause: >
+      A tarpaulin left on a cable drum near Shaft A was blown against the fan intake and restricted it, so the fan stalled. The airflow indicator is at Shaft B, so the Top Person at Shaft A could not see that airflow had stopped, and the fan had no stall or low-airflow alarm. With little airflow, oxygen fell in the low middle section of the tunnel, where standing water and corroding steel cable supports had depleted the air after prolonged rain. A low-airflow alarm sounding at Shaft A and a guard around the fan intake were fitted, and loose materials are now kept at least 10 m from the intake. The findings were considered in the review that produced PR-ELEC-031 v2 in November 2025.
+    status: closed
+    linked_procedures: [PR-ELEC-031]
+
+  - incident_id: INC-2025-022
+    occurred_at: 2025-07-09T07:50:00+01:00
+    business_unit: gas
+    site_id: DEP-VAL
+    asset_id: null
+    category: injury
+    severity: low
+    riddor_reportable: false
+    summary: Technician slipped on oily floor at Vale Gas Depot workshop; minor wrist sprain, 2 days off
+    description: >
+      At the start of the morning shift, a maintenance technician walking through the vehicle workshop at Vale Gas Depot slipped on a patch of hydraulic oil next to a parked trailer-mounted hydraulic power pack and fell, landing on their outstretched right hand. The oil had dripped overnight from a leaking hose coupling on the power pack. The patch was about 1 m across on smooth painted concrete and had not been seen, signed or covered. Lighting in the workshop was normal. The technician was seen at a minor injuries unit the same morning, where a minor wrist sprain was diagnosed, and was off work for 2 days before returning to normal duties. The absence was under the 7-day incapacitation threshold in the Reporting of Injuries, Diseases and Dangerous Occurrences Regulations 2013 and the injury was not a specified injury, so it was not reportable to the HSE. It was recorded in the accident book and the incident reporting system.
+    immediate_actions: >
+      A first aider applied a cold compress and a colleague drove the technician to the minor injuries unit. The oil was cleaned up with absorbent and the area was barriered until the floor was dry. The power pack was placed on a drip tray and taken out of use until the hose coupling was replaced.
+    root_cause: >
+      The hose coupling had been leaking slowly, but the leak had not been reported at the last pre-use check. The power pack was parked on the workshop floor without a drip tray, and the end-of-shift workshop check did not include looking for leaks under parked plant. Drip trays are now required under all parked hydraulic plant, the end-of-shift check has been updated, and an anti-slip coating has been applied to the workshop walkway.
+    status: closed
+    linked_procedures: [PR-CORP-001]
+
+  - incident_id: INC-2025-026
+    occurred_at: 2025-08-12T14:35:00+01:00
+    business_unit: gas
+    site_id: GNA-HRW
+    asset_id: MAIN-LP-17
+    category: near_miss
+    severity: medium
+    riddor_reportable: false
+    summary: Car ignored a red signal and drove into the gas works area on Mill Lane; nobody hurt
+    description: >
+      A gas mains team of three was replacing a service connection on the Mill Lane LP main MAIN-LP-17, working in an excavation in the carriageway behind a single-lane closure controlled by portable traffic signals. A car approaching on a red signal did not stop. It passed the signal head, swerved into the coned safety zone, knocked over 6 cones and stopped about 2 m from the edge of the excavation. An operative standing by the spoil heap stepped back onto the footway out of its path. The driver later told police they had been looking at a satellite navigation screen. Nobody was hurt and the excavation, plant and main were not damaged. The traffic management had been set out to the approved layout and checked that morning, and the signals were working correctly. The works were about 60 m beyond a bend.
+    immediate_actions: >
+      Work stopped and the team moved onto the footway. The team leader called 999 and the police attended. The cones were reset and the traffic management was checked before work resumed, with extra advance warning signs on the approach to the bend.
+    root_cause: >
+      The immediate cause was a driver failing to stop at a red signal. Contributory factors were the limited forward visibility of the signals from the bend and a safety zone of minimum width between the cones and the excavation. For works near bends, the layout now includes signal-ahead warning signs placed before the bend, and the safety zone is widened where the road allows.
+    status: closed
+    linked_procedures: [PR-GAS-052]
+
+  - incident_id: INC-2025-028
+    occurred_at: 2025-08-27T10:20:00+01:00
+    business_unit: electricity
+    site_id: ESS-RVL
+    asset_id: SWG-RVL-33
+    category: near_miss
+    severity: medium
+    riddor_reportable: false
+    summary: Wrong 33 kV panel selected during switching at Riverside Lane; caught at circuit name check
+    description: >
+      During an approved switching programme to take a 33 kV circuit out of service at Riverside Lane Grid Substation, the Control Engineer instructed an Authorised Person (HV) to open the circuit breaker on panel 6 of the SWG-RVL-33 switchboard. The Authorised Person, accompanied by a Competent Person (HV), went to panel 8, which controlled a circuit in service, and prepared to operate it. Before operating, the Authorised Person read the circuit name on the panel back to the Control Engineer, as the switching programme requires. The name did not match the instruction, the Control Engineer stopped the operation, and the correct panel was identified. The programme was then completed normally. Had panel 8 been opened, about 4,800 customers would have lost supply and the circuit that was meant to be isolated would have remained live. Nobody was hurt.
+    immediate_actions: >
+      The operation was stopped. The Authorised Person and the Competent Person identified panel 6 against the switching programme and the site diagram, and the Control Engineer repeated the instruction before the correct circuit breaker was opened. The panel numbers and circuit labels on SWG-RVL-33 were checked against the diagram the same day.
+    root_cause: >
+      The Authorised Person found the panel by counting from the switchroom door. A spare panel added at the door end of SWG-RVL-33 in 2019 meant the count no longer matched the panel numbers, and the panel number plates were small and fixed only at the top of each panel. The circuit name labels were correct, which allowed the error to be caught. Large panel numbers and circuit names were fitted at eye level on every panel, and all Authorised Persons (HV) were briefed to identify plant by circuit name and number, never by position.
+    status: closed
+    linked_procedures: [PR-ELEC-015]
+
+  - incident_id: INC-2025-031
+    occurred_at: 2025-09-16T13:30:00+01:00
+    business_unit: gas
+    site_id: GNA-HRW
+    asset_id: MAIN-MP-03
+    category: near_miss
+    severity: medium
+    riddor_reportable: false
+    summary: Purge gas from a 2 m vent stack drifted towards a parked car during purging of MAIN-MP-03
+    description: >
+      A team led by a Competent Person (Pressure Systems) was commissioning a new section of the Vale Road MP main MAIN-MP-03, under a permit issued by the Authorised Person (Gas) and following PR-GAS-031 v2. After the nitrogen purge, gas was being introduced and the nitrogen and gas mixture vented through a 2 m vent stack on the verge, inside the 3 m exclusion zone required by v2. The air was damp and almost still. Shortly after gas reached the vent, the operative at the vent noticed a smell of gas at ground level, and a hand-held gas detector read 15% LEL beside a parked car about 4 m from the stack. The car belonged to a resident and had been parked there before the work started, outside the exclusion zone. The operative was also operating the purge valve and had not been watching the plume. The purge was stopped and readings at the car fell to zero within 3 minutes. There was no ignition and nobody was hurt.
+    immediate_actions: >
+      The supply valve was closed and the area around the vent and the car was cleared. Once readings were zero, the resident moved the car. The exclusion zone was extended and kept free of vehicles, a second operative was given the sole task of watching the vent with a gas detector and an extinguisher, and the purge was restarted and completed.
+    root_cause: >
+      In damp, still air the vented gas drifted at low level beyond the 3 m exclusion zone before it dispersed. PR-GAS-031 v2 allowed a 2 m vent stack and a 3 m exclusion zone, did not require the zone to be kept free of parked vehicles, and did not require a standby person at the vent, so one operative was both controlling the purge and watching the vent. The findings led to PR-GAS-031 v3, effective 1 April 2026, which raises the vent stack to 2.5 m, increases the exclusion zone to 5 m and keeps it free of vehicles, and adds a standby person with a dry powder extinguisher at the vent.
+    status: closed
+    linked_procedures: [PR-GAS-031]
+
+  - incident_id: INC-2025-033
+    occurred_at: 2025-10-07T06:55:00+01:00
+    business_unit: electricity
+    site_id: DEP-ASH
+    asset_id: null
+    category: near_miss
+    severity: medium
+    riddor_reportable: false
+    summary: Reversing van hit a trailer at Ashford Road depot seconds after a colleague walked behind it
+    description: >
+      At the start of the morning shift, before sunrise and under the yard floodlights, a Competent Person (HV) reversed a crew van out of a parking bay at Ashford Road Electricity Depot. The van struck the drawbar of a parked cable drum trailer at low speed, about 3 seconds after a second Competent Person (HV) had walked behind the van carrying equipment to another vehicle. The driver had checked the mirrors before moving but did not see the pedestrian, who was in the blind spot behind the rear doors. The van had a working reversing alarm but no reversing camera. The yard was busy with crews loading at shift change. Nobody was hurt. The van's rear bumper and the trailer's jockey wheel were damaged.
+    immediate_actions: >
+      The driver stopped and both people were checked; neither was hurt. The depot supervisor was told and the trailer was taken out of use until the jockey wheel was replaced. A banksman was provided for vehicle movements in the yard at shift change from the next morning.
+    root_cause: >
+      The yard layout made vans reverse out of their bays across the main pedestrian route, and there was no banksman or separation of people and vehicles at shift change, when the yard was busiest. Bays were re-marked for reverse-in parking so that vans drive forwards out of them, a marked pedestrian walkway was added, and cable drum trailers were moved to a separate area of the yard.
+    status: closed
+    linked_procedures: [PR-CORP-001]
+
+  - incident_id: INC-2025-036
+    occurred_at: 2025-11-04T14:20:00+00:00
+    business_unit: gas
+    site_id: GNA-HRW
+    asset_id: MAIN-MP-03
+    category: gas_escape
+    severity: high
+    riddor_reportable: false
+    summary: Third-party excavator damaged a PE service off MAIN-MP-03 near Vale Road; uncontrolled escape
+    description: >
+      A third-party contractor laying telecoms ducting in the footway near Vale Road struck a 32 mm PE service pipe connected to the Vale Road MP main MAIN-MP-03 with an excavator bucket, about 2 m from the main and 0.5 m deep. The service was torn and gas escaped at MP pressure with a loud release. The contractor's supervisor moved the crew away and called the gas emergency number, 0800 111 999. A First Call Operative arrived 28 minutes after the call, set up a 25 m cordon, and asked for police support to close the road. Gas was found in the excavation and in a nearby telecoms chamber, but not inside any building. Occupants of the four nearest houses were asked to stay indoors with windows and doors closed. The contractor had Harrowmere plans showing the main and had scanned with a cable avoidance tool, but had not dug trial holes by hand. Nobody was hurt and there was no ignition.
+    immediate_actions: >
+      The First Call Operative removed ignition sources from the cordon, checked nearby properties and drains, and escalated the escape to the Gas Network Controller and the Authorised Person (Gas) under PR-GAS-003. A repair team hand-dug upstream of the damage and squeezed off the service, controlling the escape 1 hour 50 minutes after the first call. The damaged section was replaced and tested, and the one property supplied by the service was relit that evening. The cordon was lifted once readings were clear.
+    root_cause: >
+      The contractor used an excavator close to a buried PE service without first locating it by hand-dug trial holes. Services are not always shown on plans, and a cable avoidance tool cannot detect PE pipe without a tracer wire, so the scan gave false reassurance. Harrowmere Gas wrote to the contractor and its client setting out the safe digging requirements in PR-GAS-052, recovered the repair costs, and held a briefing on excavating near gas plant for contractors working in the area.
+    status: closed
+    linked_procedures: [PR-GAS-052, PR-GAS-003]
+
+  - incident_id: INC-2025-038
+    occurred_at: 2025-11-20T08:45:00+00:00
+    business_unit: gas
+    site_id: GPR-KAV
+    asset_id: G-124
+    category: security
+    severity: medium
+    riddor_reportable: false
+    summary: Kingsmead Avenue governor kiosk vandalised; door forced and outlet gauge smashed
+    description: >
+      A Competent Person (Pressure Systems) arriving for the monthly inspection at Kingsmead Avenue District Governor found the kiosk door forced open, its lock bent, and the outside of the kiosk sprayed with graffiti. Following PR-GAS-058, the Competent Person tested for gas before entering and found none. Inside, the glass of the G-124 outlet pressure gauge had been smashed and its pointer bent, and drinks cans and litter had been left on the floor. No valves had been moved: SSV-124 was open and latched and its impulse line isolation valve was open. The data logger showed the outlet pressure within its normal band of 37 to 43 mbar throughout the month. The kiosk is screened from the road by a hedge and is not lit. A neighbour said a group had been seen at the kiosk late on 18 November.
+    immediate_actions: >
+      All accessible joints and fittings were checked with a gas detector and leak detection fluid, and no leaks were found. The damaged gauge was isolated at its gauge valve and the door was secured with a chain and padlock. The Gas Network Controller and the police were told and a crime reference was obtained. The gauge was replaced the next day under a permit, and the site was visited daily for a week.
+    root_cause: >
+      The kiosk door had an old single-point lock that could be forced with a bar, and the hedge and lack of lighting meant intruders could not be seen from the road. The door was replaced with a three-point locking door, the hedge was cut back, and GPR-KAV was added to the out-of-hours patrol route for governor sites.
+    status: closed
+    linked_procedures: [PR-GAS-058, PR-GAS-010]
+
+  - incident_id: INC-2025-040
+    occurred_at: 2025-12-08T06:55:00+00:00
+    business_unit: gas
+    site_id: GNA-HRW
+    asset_id: MAIN-LP-22
+    category: gas_escape
+    severity: high
+    riddor_reportable: false
+    summary: Gas escape from fractured cast iron joint on MAIN-LP-22 Station Road; 2 properties evacuated
+    description: >
+      At 06:55 a member of the public called the gas emergency number to report a strong smell of gas in Station Road. A First Call Operative arrived at 07:20 and found high readings in bar holes along the line of the 6 inch cast iron LP main MAIN-LP-22. Gas at 25% LEL was found in the cellar of one terraced house, so under PR-GAS-003 its occupants were evacuated as a precaution, together with those of the adjoining house, which shares the cellar wall. Both supplies were turned off at the emergency control valves, and police and fire service support was requested. A repair team excavated at the highest bar hole reading and found a fractured socket on a lead-yarn joint. The ground had been frozen for a week, with minus 6 °C overnight. A frost survey of the main on 5 December had found no leaks. The escape was made safe at 09:50, within 3 hours of the report. Nobody was hurt and there was no ignition.
+    immediate_actions: >
+      The two houses were evacuated and their emergency control valves closed, the cellar was ventilated, and bar holes were opened to vent gas from the ground. The Authorised Person (Gas) took charge on site. The fractured joint was made safe with a repair clamp. The occupants returned after the Authorised Person confirmed that no gas had been detected in either house for 30 minutes, and supplies were restored and appliances relit by 13:30. The rest of the Station Road section was leakage-surveyed the next day and no further escapes were found.
+    root_cause: >
+      The socket of a 1932 lead-yarn joint fractured under ground movement from frost heave combined with traffic loading, on an ageing cast iron main already on the replacement programme. The fracture happened after the frost survey of 5 December, during continued frost. Replacement of the Station Road section of MAIN-LP-22 by PE insertion was brought forward to the 2026/27 programme.
+    status: closed
+    linked_procedures: [PR-GAS-003]
+
+  - incident_id: INC-2026-005
+    occurred_at: 2026-01-14T21:20:00+00:00
+    business_unit: gas
+    site_id: GPR-STN
+    asset_id: G-118
+    category: near_miss
+    severity: low
+    riddor_reportable: false
+    summary: Lone First Call Operative at GPR-STN missed two check-ins; found safe with no mobile signal
+    description: >
+      A First Call Operative was working alone at Station Road District Governor, taking peak-demand pressure readings at G-118 during a cold spell. The operative booked on with the Gas Network Controller at 20:50 with a 30-minute check-in interval, as PR-CORP-004 requires for out-of-hours lone work. The 21:20 check-in was missed. The controller called the operative's mobile phone and lone worker device every 5 minutes without reply, and at 21:35 told the Duty Manager, who sent the nearest available First Call Operative to the site. The 21:50 check-in was also missed. The second operative arrived at 21:58 and found the first working normally inside the brick governor house, unaware of the calls. There was no mobile signal inside the building. The call to 999, due at 22:05, was not needed. Nobody was hurt.
+    immediate_actions: >
+      The Gas Network Controller stood down the escalation and logged the times. The second operative stayed on site until the readings were complete. The event was reported as a near miss under PR-CORP-001 the same night.
+    root_cause: >
+      The mobile phone mast serving the GPR-STN area had been taken out of service in late 2025, and GPR-STN was not on the no-signal site list. The operative had checked for signal at the van, which had a weak signal, but not inside the governor house, where there was none. GPR-STN was added to the no-signal site list, satellite-enabled lone worker devices were issued to all First Call Operatives, and a signal survey of all gas and electricity sites is now repeated every year.
+    status: closed
+    linked_procedures: [PR-CORP-004]
+
+  - incident_id: INC-2026-007
+    occurred_at: 2026-01-20T07:40:00+00:00
+    business_unit: gas
+    site_id: GPR-HRW
+    asset_id: null
+    category: injury
+    severity: high
+    riddor_reportable: true
+    summary: Competent Person slipped on icy steps at GPR-HRW and fractured wrist; reported under RIDDOR
+    description: >
+      A Competent Person (Pressure Systems), arriving with a colleague for a planned filter inspection at Harrowmere Pressure Reduction Station, slipped on the external steel steps leading down into the station compound. The overnight temperature had been minus 4 °C, the steps were iced over, and they had not been gritted. The Competent Person fell down 3 steps and landed on their outstretched left hand. The colleague gave first aid and drove them to hospital, where a fracture of the left wrist was confirmed. The Competent Person was off work for 6 weeks and then on light duties for 4 weeks. A fracture other than to fingers, thumbs or toes is a specified injury under the Reporting of Injuries, Diseases and Dangerous Occurrences Regulations 2013, so the Head of Health, Safety and Environment reported it to the HSE the same day. The steps had a chequer plate surface with no anti-slip nosings and a handrail on one side only.
+    immediate_actions: >
+      First aid was given at the scene and the casualty was taken to hospital. The steps were closed with a barrier and gritted, and the filter inspection was postponed. The Gas Safety Manager told the Head of Health, Safety and Environment within 1 hour. The HSE was notified the same day and the full report was submitted within 10 days.
+    root_cause: >
+      Winter gritting at GPR-HRW was not part of the site's cold-weather checks, and the steel chequer plate steps became very slippery when iced. There were no anti-slip nosings and only one handrail. Anti-slip treads and a second handrail were fitted, grit bins were placed at the top of the steps, and all operational gas and electricity sites with external steps were added to the winter gritting rota.
+    status: closed
+    linked_procedures: [PR-CORP-001]
+
+  - incident_id: INC-2026-009
+    occurred_at: 2026-02-17T03:12:00+00:00
+    business_unit: electricity
+    site_id: ESS-BRK
+    asset_id: RMU-BRK-01
+    category: dangerous_occurrence
+    severity: high
+    riddor_reportable: true
+    summary: Cable termination flashover and fire in RMU-BRK-01 at Brookfield; reported under RIDDOR
+    description: >
+      At 03:12 the FDR-KGM-03 circuit breaker at Kingsmead Primary Substation tripped on earth fault protection. At 03:20 a member of the public called 105 to report smoke coming from Brookfield Secondary Substation, and the Control Engineer called the fire service on 999. An Authorised Person (HV) and a Competent Person (HV) were sent to site; the fire service had put the fire out by the time they arrived. A cable termination in a ring switch cable box of RMU-BRK-01 had flashed over to earth and caught fire, burning the termination and cable box and blackening the inside of the substation. Nobody was in the substation and nobody was hurt. About 2,100 customers on FDR-KGM-03 lost supply. All except the 380 fed from Brookfield were restored by switching by 05:40, and those 380 were supplied from a mobile generator from 09:30. Because the fire was caused by an electrical short circuit and RMU-BRK-01 was out of service for more than 24 hours, the event was reported to the HSE as a dangerous occurrence.
+    immediate_actions: >
+      No test close was attempted, because test closing on SWG-KGM-11 is prohibited under PR-ELEC-075. The Authorised Person and Competent Person isolated and earthed RMU-BRK-01 after the fire service left, and the rest of FDR-KGM-03 was restored by switching. A mobile generator was connected to the Brookfield LV board. The site was secured and the damaged equipment left in place for investigation. The Head of Health, Safety and Environment was told at 06:10 and notified the HSE the same day.
+    root_cause: >
+      Examination found long-term surface tracking on the failed heat-shrink termination, caused by moisture entering the cable box through a perished gasket. The termination eventually flashed over to earth and the burning insulation set fire to the cable box. The quarterly inspection in November 2025 had recorded condensation in the substation, but no defect was raised. The cable box and terminations were renewed and RMU-BRK-01 was returned to service after 9 days. A partial discharge survey was carried out at both secondary substations, and inspectors were briefed to raise a defect for any condensation or tracking near cable boxes.
+    status: closed
+    linked_procedures: [PR-ELEC-075, PR-ELEC-052]
+
+  - incident_id: INC-2026-011
+    occurred_at: 2026-03-10T03:20:00+00:00
+    business_unit: gas
+    site_id: GPR-MLN
+    asset_id: G-112
+    category: equipment_failure
+    severity: high
+    riddor_reportable: false
+    summary: SSV-112 tripped after G-112 outlet pressure crept up overnight; 340 properties lost supply
+    description: >
+      Overnight, as demand fell, the outlet pressure of district governor G-112 at Mill Lane District Governor rose above its 35 mbar set point from about 01:00. The creep relief valve began to discharge at about 47 mbar but could not hold the pressure. At 02:58 the Gas Network Controller received a high outlet pressure alarm from telemetry and began to call out a Competent Person (Pressure Systems). At 03:20 SSV-112 tripped at its 60 mbar over-pressure setting, as designed, and shut off gas to the part of the Mill Lane LP network that depends on G-112. Supply was lost to 340 properties. The Competent Person arrived at 04:05, confirmed the trip and, following the unplanned trip section of PR-GAS-014, did not reset the slam-shut until the cause was found. G-112 would not lock up. First Call Operatives visited every affected property to turn off the emergency control valve before the network was restored. Nobody was hurt.
+    immediate_actions: >
+      The Authorised Person (Gas) issued an emergency permit. The network was restored at 07:10 on bypass control under PR-GAS-010, after all emergency control valves had been closed and the extremity pressure checked, and properties were relit during the morning, most having gas back within about 4 hours of the trip. G-112 was stripped, a new main valve seat and diaphragm were fitted, and the governor passed a lock-up test. SSV-112 was function-tested before G-112 was returned to service at 12:30. The Gas Safety Manager was informed of the unplanned trip.
+    root_cause: >
+      The main valve seat of G-112 was worn and scored, so the valve could not close tightly at very low flow and the governor could not lock up. As demand fell overnight, gas passing the seat raised the outlet pressure until the slam-shut tripped. Pressure recordings from the previous 3 weeks showed small overnight rises that stayed within the 5 mbar flag limit in PR-GAS-058, so they were not flagged. FLT-112 was inspected and found serviceable. The G-112 data logger is now downloaded and reviewed weekly, looking for overnight rising trends as well as peak values.
+    status: closed
+    linked_procedures: [PR-GAS-010, PR-GAS-014, PR-GAS-058]
+
+  - incident_id: INC-2026-013
+    occurred_at: 2026-04-08T09:10:00+01:00
+    business_unit: gas
+    site_id: GPR-HRW
+    asset_id: FLT-HRW-01
+    category: near_miss
+    severity: low
+    riddor_reportable: false
+    summary: Contractor arrived at GPR-HRW to change a filter element without a permit; stopped at gate
+    description: >
+      A contractor's technician arrived at Harrowmere Pressure Reduction Station to change the filter element in FLT-HRW-01. The job had been booked directly with the contractor by the planning team. The Authorised Person (Gas), who was on site for other work, checked the technician at the gate and found that no permit-to-work had been requested, there was no isolation plan, and the technician had not been given a hazardous area briefing for the station. The technician said they had expected to start straight away and to be given a permit on arrival. The technician was not allowed into the station compound. No work had started and nobody had entered the hazardous area.
+    immediate_actions: >
+      The Authorised Person (Gas) turned the contractor away and told the planning team and the Gas Safety Manager. The filter change was rescheduled for 15 April 2026 and carried out under a permit issued in line with PR-GAS-021, with a hazardous area briefing given before work started.
+    root_cause: >
+      The planning team raised a purchase order directly with the contractor, outside the work planning process that sends a permit request to the Authorised Person (Gas). The contractor's induction did not make clear that no work may start at a Harrowmere gas installation until a permit has been issued on site. Purchase orders for work at gas installations now need a permit request reference, and the contractor induction has been updated.
+    status: closed
+    linked_procedures: [PR-GAS-021, PR-GAS-040]
+
+  - incident_id: INC-2026-016
+    occurred_at: 2026-05-11T01:30:00+01:00
+    business_unit: electricity
+    site_id: ESS-ORC
+    asset_id: null
+    category: security
+    severity: medium
+    riddor_reportable: false
+    summary: Padlock cut on ESS-ORC perimeter gate in attempted break-in; switchroom not entered
+    description: >
+      At 08:10, a Competent Person (HV) arriving at Orchard Way Secondary Substation for the quarterly inspection found the perimeter gate open and its padlock cut through and lying on the ground. The switchroom door had pry marks around the lock but had held. Following PR-ELEC-052, the Competent Person did not enter, withdrew and told the Control Engineer, who confirmed that FDR-ASH-09 had shown no faults or protection operations overnight. A resident later reported hearing noises at the site at about 01:30. An Authorised Person (HV) attended, checked the outside of the building and the earth conductors, then entered the switchroom and found no sign of interference with RMU-ORC-01 or TX-ORC-01. Nothing had been taken.
+    immediate_actions: >
+      The police were called and a crime reference was obtained. A temporary padlock was fitted to the gate and the Electricity Safety Manager was told. The site was visited daily for 2 weeks.
+    root_cause: >
+      An opportunistic attempted break-in, probably aimed at metal theft. The gate padlock was an open-shackle type that could be cut with bolt cutters, and the site has no lighting or intruder alarm. A closed-shackle padlock on the restricted-profile key system and a shrouded hasp were fitted to the gate, the switchroom door lock was upgraded, and the site was added to the security patrol route.
+    status: closed
+    linked_procedures: [PR-ELEC-063]
+
+  - incident_id: INC-2026-019
+    occurred_at: 2026-06-23T10:30:00+01:00
+    business_unit: gas
+    site_id: GPR-HRW
+    asset_id: PRS-HRW-01
+    category: equipment_failure
+    severity: medium
+    riddor_reportable: false
+    summary: Odorant level at GPR-HRW below the acceptable range; fault on the odorant injection pump
+    description: >
+      During the monthly odorant check at Harrowmere Pressure Reduction Station, a Competent Person (Pressure Systems) measured an average odorant concentration of 4.2 mg/m3 at the outlet sampling point, below the acceptable range of 5.0 to 10.0 mg/m3 in PR-GAS-066, and the odour intensity check found only a faint odour at 1% gas-in-air. The Gas Network Controller was told and the injection rate was increased by 20%. The re-sample the next morning read 4.0 mg/m3. The Authorised Person (Gas) then had the injection unit checked: the duty pump was running and its stroke counter advancing, but it was delivering very little odorant. Air temperatures had been above 28 °C for 4 days, and part of the pump suction line ran above ground in full sun. The concentration never fell below the 3.5 mg/m3 critical level. Nobody was hurt.
+    immediate_actions: >
+      The standby injection pump was brought into service under a permit and the duty pump was isolated. Odorant concentration was sampled every 4 hours and was back within range by the evening of 24 June. Daily sampling continued for 2 weeks. The Gas Safety Manager was informed, and odour checks at three points on the downstream network found a distinct odour.
+    root_cause: >
+      Vapour lock in the duty pump suction line. In the high air temperatures, odorant vapour formed in the exposed section of suction pipework, so the pump stroked but delivered little liquid. The suction check valve was also partly fouled, which made it harder for the pump to clear the vapour. The exposed pipework was shaded and lagged, the check valve was replaced, and a low-delivery alarm comparing pump strokes with tank level was added to the injection unit.
+    status: closed
+    linked_procedures: [PR-GAS-066]
+
+  - incident_id: INC-2026-022
+    occurred_at: 2026-07-15T16:05:00+01:00
+    business_unit: electricity
+    site_id: ESS-ASH
+    asset_id: T-104
+    category: equipment_failure
+    severity: medium
+    riddor_reportable: false
+    summary: T-104 reached Stage 2 top-oil temperature alarm in heatwave; failed cooling fan contactor
+    description: >
+      During the July heatwave, with an air temperature of 33 °C at Ashford Road Primary Substation, the Control Engineer received a Stage 1 top-oil temperature alarm (85 °C) from primary transformer T-104 at 15:20 and a Stage 2 alarm (95 °C) at 16:05. T-104 was carrying about 16 MVA, above its 12 MVA ONAN rating. Following PR-ELEC-047, the Control Engineer transferred about 5 MVA to T-105, which had capacity within its ONAF rating, by switching under PR-ELEC-015 carried out by remote control, and informed the Senior Authorised Person (HV). An Authorised Person (HV) arrived at 16:50 and found that one of the two cooling fan banks on T-104 was not running because its supply contactor coil had burnt out. The other fan bank was running normally. The maximum pointer showed 97 °C. Top-oil temperature fell below 85 °C by 18:40. No customers lost supply.
+    immediate_actions: >
+      Load was moved from T-104 to T-105, and the Control Engineer limited T-104 to its ONAN rating until the fans were repaired. The Authorised Person (HV) replaced the failed contactor from depot stock that evening and checked that every fan ran in MANUAL. The fans were returned to AUTO after the temperature had been below the Stage 1 setting for 2 hours, and normal loading resumed the next morning. An oil sample was taken from T-104 for dissolved gas analysis within 7 days, as PR-ELEC-047 requires.
+    root_cause: >
+      The contactor coil failed through heat ageing in the cooler control cabinet, which ran hot during the heatwave. Fan failure was shown only by a local indication in the cabinet and was not alarmed on SCADA, so the loss of forced cooling was not known until the top-oil alarms. The fan contactors on T-104 and T-105 were replaced, a fan failure alarm was wired to SCADA for both transformers, and ventilation was added to the cooler control cabinets.
+    status: closed
+    linked_procedures: [PR-ELEC-047, PR-ELEC-015]
+
+  - incident_id: INC-2026-024
+    occurred_at: 2026-07-28T13:15:00+01:00
+    business_unit: gas
+    site_id: DEP-VAL
+    asset_id: null
+    category: environmental
+    severity: low
+    riddor_reportable: false
+    summary: About 20 litres of diesel spilled while refuelling a generator at Vale Gas Depot; contained
+    description: >
+      A maintenance technician was refuelling a trailer-mounted generator from the depot fuel bowser in the yard at Vale Gas Depot. The technician latched the nozzle trigger open and walked to the stores to collect a part. The nozzle's automatic shut-off did not operate when the tank was full, and diesel overflowed from the filler onto the concrete yard. About 20 litres had spilled by the time the technician returned and stopped the flow. The diesel spread about 4 m towards a surface water gully. The technician used the spill kit kept at the bowser to dam the spill about 1.5 m short of the gully and covered the gully with a drain mat. No diesel reached the drain. The weather was dry. Nobody was hurt.
+    immediate_actions: >
+      The bowser was shut off, the spill was contained with booms and absorbent from the spill kit, and the gully was covered with a drain mat. The used absorbent was bagged and removed as hazardous waste. The gully and interceptor were checked and found free of diesel. The depot manager and the Head of Health, Safety and Environment were informed.
+    root_cause: >
+      The nozzle's automatic shut-off was faulty, and the technician had latched the trigger and left the nozzle unattended, so nobody was there to stop the overflow. Refuelling was taking place away from the bunded fuel point. The nozzle was replaced, latching clips were removed from all depot fuel nozzles, refuelling of portable plant now takes place only at the bunded fuel point, and drain mats are kept with every spill kit.
+    status: closed
+    linked_procedures: [PR-CORP-001]
+
+  - incident_id: INC-2026-025
+    occurred_at: 2026-08-04T11:30:00+01:00
+    business_unit: electricity
+    site_id: ESS-BRK
+    asset_id: TX-BRK-01
+    category: environmental
+    severity: medium
+    riddor_reportable: false
+    summary: Oil leak from TX-BRK-01 into bund at Brookfield; bund drain valve open, oil reached ground
+    description: >
+      During the quarterly inspection at Brookfield Secondary Substation, a Competent Person (HV) found oily water in the bund under distribution transformer TX-BRK-01. Oil had been weeping from the transformer's bottom drain valve. The bund drain valve, which should be kept closed, was found partly open, and oily water had been draining through it onto the gravel and soil beside the substation, especially after heavy rain on 30 and 31 July. An area of about 2 square metres was stained, and an estimated 15 litres of oil had been lost over several weeks. No oil reached a drain or watercourse; the nearest ditch is about 40 m away. The transformer oil level was still within its normal range and TX-BRK-01 stayed in service.
+    immediate_actions: >
+      The bund drain valve was closed, absorbent socks were placed in the bund and the oil was skimmed off. Contaminated gravel and soil were dug out and removed as hazardous waste. A blanking cap was fitted to the outlet of the transformer drain valve, and the Head of Health, Safety and Environment was informed.
+    root_cause: >
+      The bund drain valve had been opened to let rainwater out of the bund during the repair of RMU-BRK-01 in February 2026, after INC-2026-009, and was not fully closed afterwards. The valve had no lock and bund drainage was not recorded. Because the valve was open, the bund was dry at the May inspection, and neither the open valve nor the slow weep was noticed. A lockable bund drain valve was fitted, bunds are now drained only after checking for oil, and each drainage is recorded in the site log.
+    status: closed
+    linked_procedures: [PR-ELEC-052]
+
+  - incident_id: INC-2026-027
+    occurred_at: 2026-08-17T03:10:00+01:00
+    business_unit: gas
+    site_id: GPR-MLN
+    asset_id: G-112
+    category: equipment_failure
+    severity: medium
+    riddor_reportable: false
+    summary: G-112 outlet pressure creep recurred overnight, seen in pressure recordings; no trip
+    description: >
+      On 18 August 2026, during the weekly download of the G-112 data logger at Mill Lane District Governor, a Competent Person (Pressure Systems) saw that the outlet pressure had risen above the 35 mbar set point overnight on both 16 to 17 August and 17 to 18 August as demand fell. The highest pressure, 51 mbar at about 03:10 on 17 August, was above the 47 mbar creep relief setting but below the 60 mbar SSV-112 trip setting, so the slam-shut did not operate and no customers lost supply. The pattern was the same as before the slam-shut trip of 10 March 2026 (INC-2026-011). G-112 had been fitted with a new main valve seat and diaphragm in March and had passed a lock-up test then. Overnight demand in August is lower than in March, so the governor was working at very low flows.
+    immediate_actions: >
+      The Gas Network Controller and the Authorised Person (Gas) were told the same day. The data logger is now downloaded and reviewed daily, and the Gas Network Controller watches the G-112 outlet telemetry overnight. A lock-up test on 19 August showed slow pressure creep. SSV-112 was function-tested and passed, and the FLT-112 differential pressure was normal. A strip-down of G-112 under PR-GAS-010, with the network on bypass control, is being planned, and an engineering review has been asked to consider replacing the governor, which was installed in 2006.
+    root_cause: null
+    status: open
+    linked_procedures: [PR-GAS-010, PR-GAS-058]
+
+  - incident_id: INC-2026-029
+    occurred_at: 2026-09-08T11:00:00+01:00
+    business_unit: electricity
+    site_id: ESS-ASH
+    asset_id: T-104
+    category: equipment_failure
+    severity: medium
+    riddor_reportable: false
+    summary: T-104 dissolved gas analysis shows acetylene above action threshold, rising since spring
+    description: >
+      The laboratory report for the scheduled follow-up oil sample from primary transformer T-104 at Ashford Road Primary Substation, received on 8 September 2026, showed acetylene above the 5 ppm action threshold in PR-ELEC-044. Acetylene first appeared in the routine sample taken in the spring, which was reported to the Senior Authorised Person (HV) the same day, and it was higher again in the sample taken after the Stage 2 temperature alarm in July (INC-2026-022). Hydrogen and ethylene have also risen. Acetylene in transformer oil usually indicates arcing or a very hot spot. Possible sources include a fault in the main tank, a poor connection, or oil leaking into the main tank from the on-load tap changer compartment. T-104 was built in 1979. There have been no Buchholz alarms and the transformer remains in service.
+    immediate_actions: >
+      Following PR-ELEC-044, sampling of T-104 was increased to weekly, an engineering review led by the Senior Authorised Person (HV) was requested, and the Control Engineer limited T-104 to its 12 MVA ONAN rating, with the rest of the load carried by T-105 and adjacent primaries. The Control Engineer was asked to treat any Buchholz or temperature alarm on T-104 as urgent. The Head of Electricity Network Operations was informed.
+    root_cause: null
+    status: open
+    linked_procedures: [PR-ELEC-044]
+
+  - incident_id: INC-2026-031
+    occurred_at: 2026-09-22T05:45:00+01:00
+    business_unit: electricity
+    site_id: ESS-RVL
+    asset_id: BAT-RVL
+    category: equipment_failure
+    severity: medium
+    riddor_reportable: false
+    summary: BAT-RVL charger failed overnight; battery reached low volts alarm with no charger fail alarm
+    description: >
+      At 05:45 the Control Engineer received a DC low volts alarm (105 V) from Riverside Lane Grid Substation. No charger fail alarm had been received. Following PR-ELEC-058, the Control Engineer sent an Authorised Person (HV) at once and stopped all switching at the site. The Authorised Person arrived at 06:40 and found that the BAT-RVL charger had no output and that the 110 V DC system, which supplies protection and tripping for GT-1, GT-2 and SWG-RVL-33, had been running on the battery alone, probably since the previous evening. Protection and tripping supplies were still working. The charger AC supply breaker had tripped; when it was reset, the charger ran for about 20 minutes and then failed again. The charger's alarm relay operated when tested, but its alarm did not reach the control room, although the alarm path had been proved at the last quarterly check. Nobody was hurt and no customers lost supply.
+    immediate_actions: >
+      A temporary charger was connected at 08:15 and the battery voltage recovered over the following hours. Switching at Riverside Lane was limited to essential operations and the site is being visited twice a day. A charger specialist has been booked to repair the charger, and the alarm path from the charger to SCADA is being traced and tested. The battery will be given a capacity test once the permanent charger is back in service.
+    root_cause: null
+    status: open
+    linked_procedures: [PR-ELEC-058]
+
+  - incident_id: INC-2026-033
+    occurred_at: 2026-10-02T11:25:00+01:00
+    business_unit: gas
+    site_id: GNA-HRW
+    asset_id: MAIN-IP-01
+    category: gas_escape
+    severity: medium
+    riddor_reportable: false
+    summary: Leakage survey found a category 2 gas leak on MAIN-IP-01, the Harrowmere to Vale IP main
+    description: >
+      During the 12-monthly leakage survey of the Harrowmere to Vale IP steel main MAIN-IP-01 under PR-GAS-045, a First Call Operative found survey detector readings at the surface along the line of the main where it crosses farmland near the Vale. After scanning with a cable avoidance tool, bar holes found gas over about 4 m of the main, with a highest reading of 35% LEL. The nearest property is about 150 m away and no gas was found in nearby drains or chambers. As a confirmed leak on an IP main, it was classed as category 2 and reported to the Gas Network Controller the same day, for repair within 5 working days. MAIN-IP-01 is a 300 mm steel main laid in 1968 and operating at up to 7 bar. The source has not yet been exposed. Nobody was hurt and there was no loss of supply.
+    immediate_actions: >
+      The leak area was fenced off with barriers and warning signs, and bar hole readings are taken daily; they have not increased. The Authorised Person (Gas) is planning the repair under a permit issued under PR-GAS-021, with hand excavation within 1.5 m of the main and mechanical excavators kept at least 3 m away, as PR-GAS-052 requires. The repair is planned for 8 October 2026, within the 5 working day limit.
+    root_cause: null
+    status: open
+    linked_procedures: [PR-GAS-045, PR-GAS-021, PR-GAS-052]

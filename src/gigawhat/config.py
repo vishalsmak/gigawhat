@@ -1,5 +1,6 @@
 from enum import StrEnum
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -25,6 +26,7 @@ class Settings(BaseSettings):
     database_password: SecretStr = SecretStr("gigawhat")
     database_name: str | None = None
 
+    data_dir: Path = Path("data")
     ollama_url: str = "http://localhost:11434"
 
     # Standard names, so LangChain integrations can read the same variables.
@@ -38,6 +40,18 @@ class Settings(BaseSettings):
     @property
     def database(self) -> str:
         return self.database_name or f"gigawhat_{self.profile}"
+
+    @property
+    def corpus_dir(self) -> Path:
+        return self.data_dir / "corpus"
+
+    @property
+    def register_path(self) -> Path:
+        return self.corpus_dir / "register.yaml"
+
+    @property
+    def records_dir(self) -> Path:
+        return self.data_dir / "records"
 
     @property
     def tracing_enabled(self) -> bool:

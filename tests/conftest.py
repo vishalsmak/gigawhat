@@ -6,7 +6,7 @@ from sqlalchemy import Engine
 from sqlalchemy.exc import OperationalError
 
 from gigawhat.config import Settings
-from gigawhat.db import create_db_engine
+from gigawhat.db import create_db_engine, upgrade_to_head
 
 TEST_DATABASE = "gigawhat_test"
 KEY_VARIABLES = (
@@ -40,5 +40,6 @@ def database(test_settings: Settings) -> Iterator[Engine]:
         if os.environ.get("GIGAWHAT_REQUIRE_DB"):
             raise
         pytest.skip("Postgres isn't running. Start it with: docker compose up -d db")
+    upgrade_to_head(test_settings)
     yield engine
     engine.dispose()
