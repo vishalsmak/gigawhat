@@ -1,0 +1,638 @@
+<title>GigaWhat Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one reading column (68ch) inside a 1100px frame; figures use the full frame and scroll sideways on phones */
+:root {
+  --bg: #f2f5f4;
+  --surface: #ffffff;
+  --box: #f6f8f7;
+  --ink: #142120;
+  --ink-2: #3a4846;
+  --muted: #5a6866;
+  --line: #c7d0cd;
+  --accent: #0d6870;
+  --accent-soft: #e0efef;
+  --routine: #2b744a;
+  --relevant: #8f5d00;
+  --critical: #b83d0d;
+  --emergency: #ad241c;
+  --blocked: #5d666b;
+  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1312; --surface: #151e1d; --box: #1b2625; --ink: #e2e9e7; --ink-2: #c0ccc9;
+    --muted: #91a09d; --line: #2c3a38; --accent: #56b8bf; --accent-soft: #15302f;
+    --routine: #5fc48b; --relevant: #e0a43e; --critical: #f07d49; --emergency: #ef6a5f; --blocked: #9aa4a9;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1312; --surface: #151e1d; --box: #1b2625; --ink: #e2e9e7; --ink-2: #c0ccc9;
+  --muted: #91a09d; --line: #2c3a38; --accent: #56b8bf; --accent-soft: #15302f;
+  --routine: #5fc48b; --relevant: #e0a43e; --critical: #f07d49; --emergency: #ef6a5f; --blocked: #9aa4a9;
+  color-scheme: dark;
+}
+
+body { background: var(--bg); color: var(--ink); font: 400 16px/1.6 var(--sans); }
+.wrap { max-width: 1100px; margin: 0 auto; padding-inline: 20px; padding-block: 44px 88px; }
+.prose { max-width: 68ch; }
+p { margin: 0; }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+
+header { display: grid; gap: 18px; padding-bottom: 36px; }
+.eyebrow { font: 500 .74rem/1.2 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+h1 { font-family: var(--display); font-weight: 700; font-size: clamp(2rem, 4.4vw, 2.9rem); line-height: 1.08; letter-spacing: -.01em; margin: 0; text-wrap: balance; }
+.lede { font-size: 1.12rem; color: var(--ink-2); }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin: 6px 0 0; }
+.facts div { border-left: 2px solid var(--line); padding-left: 12px; min-width: 0; }
+.facts dt { font: 500 .7rem/1.4 var(--mono); letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+.facts dd { margin: 2px 0 0; font-size: .95rem; }
+
+section { display: grid; gap: 18px; padding-block: 40px; border-top: 1px solid var(--line); }
+h2 { font-family: var(--display); font-weight: 700; font-size: 1.55rem; line-height: 1.2; margin: 0; text-wrap: balance; }
+h3 { font: 600 1rem/1.3 var(--sans); margin: 0 0 6px; }
+
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 16px; }
+.two > div { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; min-width: 0; }
+.two ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: .95rem; }
+.wont h3 { color: var(--emergency); }
+.will h3 { color: var(--routine); }
+
+figure { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; min-width: 0; }
+.scroll { overflow-x: auto; }
+figure svg { display: block; width: 100%; height: auto; min-width: 780px; color: var(--ink); }
+figcaption { font-size: .9rem; color: var(--muted); margin-top: 14px; max-width: 82ch; }
+figcaption b { color: var(--ink); font-weight: 600; }
+
+/* SVG vocabulary */
+.box { fill: var(--box); stroke: var(--line); stroke-width: 1.3; }
+.core { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2; }
+.zone { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 6 5; }
+.panel { fill: none; stroke: var(--line); stroke-width: 1.2; }
+.zl { fill: var(--muted); font: 600 10.5px var(--mono); letter-spacing: .05em; }
+.t { fill: var(--ink); font: 600 12.5px var(--sans); }
+.ts { fill: var(--ink); font: 600 11.5px var(--sans); }
+.s { fill: var(--muted); font: 400 11px var(--sans); }
+.lbl { fill: var(--muted); font: 500 10.5px var(--mono); }
+.lbl-acc { fill: var(--accent); font: 600 11px var(--sans); }
+.edge { fill: none; stroke: var(--ink-2); stroke-width: 1.4; }
+.edge-acc { fill: none; stroke: var(--accent); stroke-width: 2; }
+.ah { fill: var(--ink-2); }
+.ah-acc { fill: var(--accent); }
+.ot { fill: none; stroke: var(--emergency); stroke-width: 1.4; stroke-dasharray: 5 4; }
+.none { fill: none; stroke: var(--emergency); stroke-width: 1.4; stroke-dasharray: 4 4; }
+.x { stroke: var(--emergency); stroke-width: 2.4; stroke-linecap: round; }
+.lbl-danger { fill: var(--emergency); font: 600 10.5px var(--mono); }
+.band { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1; }
+.lbl-band { fill: var(--accent); font: 500 10.5px var(--mono); }
+.abstain { fill: color-mix(in srgb, var(--critical) 12%, var(--surface)); stroke: var(--critical); stroke-width: 1.3; }
+.p-blocked { fill: color-mix(in srgb, var(--blocked) 16%, var(--surface)); stroke: var(--blocked); }
+.p-emergency { fill: color-mix(in srgb, var(--emergency) 16%, var(--surface)); stroke: var(--emergency); }
+.p-routine { fill: color-mix(in srgb, var(--routine) 16%, var(--surface)); stroke: var(--routine); }
+.p-critical { fill: color-mix(in srgb, var(--critical) 16%, var(--surface)); stroke: var(--critical); }
+.pt { font: 600 11.5px var(--sans); }
+.pt-blocked { fill: var(--blocked); } .pt-emergency { fill: var(--emergency); }
+.pt-routine { fill: var(--routine); } .pt-critical { fill: var(--critical); }
+
+/* Tables */
+.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; font-size: .92rem; min-width: 640px; }
+th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+th { font: 600 .7rem/1.3 var(--mono); letter-spacing: .07em; text-transform: uppercase; color: var(--muted); background: var(--box); }
+td.q { font-style: italic; color: var(--ink-2); }
+.chip { display: inline-block; white-space: nowrap; padding: 1px 10px; border-radius: 999px; font: 600 .78rem/1.6 var(--sans); border: 1px solid currentColor; }
+.c-routine { color: var(--routine); background: color-mix(in srgb, var(--routine) 12%, var(--surface)); }
+.c-relevant { color: var(--relevant); background: color-mix(in srgb, var(--relevant) 12%, var(--surface)); }
+.c-critical { color: var(--critical); background: color-mix(in srgb, var(--critical) 12%, var(--surface)); }
+.c-emergency { color: var(--emergency); background: color-mix(in srgb, var(--emergency) 12%, var(--surface)); }
+.st-dec { color: var(--accent); background: var(--accent-soft); }
+.st-prop { color: var(--relevant); background: color-mix(in srgb, var(--relevant) 12%, var(--surface)); }
+.st-open { color: var(--critical); background: color-mix(in srgb, var(--critical) 12%, var(--surface)); }
+
+ol.steps { margin: 0; padding-left: 22px; display: grid; gap: 10px; max-width: 74ch; }
+ol.steps li::marker { font: 600 .9rem var(--mono); color: var(--accent); }
+pre { margin: 0; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; overflow-x: auto; font: 400 .82rem/1.6 var(--mono); color: var(--ink-2); }
+pre .hl { color: var(--accent); font-weight: 600; }
+pre .warn { color: var(--critical); font-weight: 600; }
+code { font-family: var(--mono); font-size: .88em; }
+.note { font-size: .9rem; color: var(--muted); }
+.open-list { margin: 0; padding-left: 20px; display: grid; gap: 8px; max-width: 76ch; }
+.refs { margin: 0; padding-left: 20px; display: grid; gap: 4px; font-size: .9rem; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">GigaWhat · architecture draft · 9 October 2026</div>
+  <h1>How GigaWhat works</h1>
+  <p class="lede prose">GigaWhat helps gas and electricity staff find the approved procedure for the job, see the evidence behind it, and get suggested next steps. People make the decisions. It never decides anything safety-critical, and it has no connection to the plant.</p>
+  <dl class="facts">
+    <div><dt>Setting</dt><dd>Fictional UK multi-utility, gas and electricity</dd></div>
+    <div><dt>Users</dt><dd>Field engineers, control room, Authorised Persons, auditors</dd></div>
+    <div><dt>Data</dt><dd>Public HSE guidance plus fictional procedures and records</dd></div>
+    <div><dt>Status</dt><dd>Demo shared by link · Phase 1 of 8 built</dd></div>
+  </dl>
+</header>
+
+<section>
+  <h2>What it will and won't do</h2>
+  <div class="two">
+    <div class="will">
+      <h3>Will</h3>
+      <ul>
+        <li>Find the approved, current procedure for this asset, site and role</li>
+        <li>Summarise evidence from procedures, incidents, work orders, inspections and alarms, citing every claim</li>
+        <li>Suggest next steps, each tied to a source</li>
+        <li>Send safety-critical work to an Authorised Person for approval</li>
+      </ul>
+    </div>
+    <div class="wont">
+      <h3>Won't</h3>
+      <ul>
+        <li>Connect to or operate SCADA, switching or valves</li>
+        <li>Write its own steps for safety-critical work; it quotes the procedure instead</li>
+        <li>Use draft, withdrawn or superseded documents</li>
+        <li>Guess when evidence is thin; it says so and names the document owner</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>The whole system</h2>
+  <figure>
+    <div class="scroll">
+    <svg viewBox="0 0 1080 650" role="img" aria-label="System overview: staff use the Chainlit UI inside the GigaWhat app; a LangGraph workflow reads and writes one Postgres database, calls a language model, embeddings and Langfuse; an ingestion job loads documents; there is no connection to plant and OT systems.">
+      <defs>
+        <marker id="f1-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+        <marker id="f1-b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah-acc" d="M0,0 L10,5 L0,10 z"/></marker>
+      </defs>
+
+      <!-- People -->
+      <rect class="box" x="20" y="90" width="130" height="150" rx="6"/>
+      <text class="t" x="85" y="114" text-anchor="middle">Operational staff</text>
+      <text class="s" x="85" y="140" text-anchor="middle">Field engineer</text>
+      <text class="s" x="85" y="158" text-anchor="middle">Control room</text>
+      <text class="s" x="85" y="176" text-anchor="middle">Authorised Person</text>
+      <text class="s" x="85" y="194" text-anchor="middle">Doc controller</text>
+      <text class="s" x="85" y="212" text-anchor="middle">Auditor</text>
+      <path class="edge" d="M150 125 H238" marker-end="url(#f1-a)"/>
+      <text class="lbl" x="185" y="118" text-anchor="middle">asks</text>
+      <text class="lbl" x="185" y="141" text-anchor="middle">approves</text>
+
+      <!-- App -->
+      <rect class="zone" x="220" y="40" width="480" height="290" rx="10"/>
+      <text class="zl" x="236" y="62">GIGAWHAT APP · FASTAPI</text>
+      <rect class="box" x="240" y="90" width="170" height="70" rx="6"/>
+      <text class="t" x="325" y="117" text-anchor="middle">Chainlit UI</text>
+      <text class="s" x="325" y="136" text-anchor="middle">chat · sources</text>
+      <text class="s" x="325" y="152" text-anchor="middle">approval buttons</text>
+      <rect class="box" x="240" y="220" width="170" height="70" rx="6"/>
+      <text class="t" x="325" y="247" text-anchor="middle">Audit &amp; admin API</text>
+      <text class="s" x="325" y="266" text-anchor="middle">export · health</text>
+      <rect class="core" x="470" y="90" width="210" height="200" rx="6"/>
+      <text class="t" x="575" y="116" text-anchor="middle">LangGraph workflow</text>
+      <text class="s" x="575" y="142" text-anchor="middle">guardrails + safety tier</text>
+      <text class="s" x="575" y="162" text-anchor="middle">retrieve + rerank</text>
+      <text class="s" x="575" y="182" text-anchor="middle">evidence tools (read-only)</text>
+      <text class="s" x="575" y="202" text-anchor="middle">generate · verify</text>
+      <text class="s" x="575" y="222" text-anchor="middle">approval: interrupt()</text>
+      <text class="s" x="575" y="242" text-anchor="middle">checkpointed to Postgres</text>
+      <text class="lbl-acc" x="575" y="270" text-anchor="middle">detail in figure 2</text>
+      <path class="edge" d="M410 125 H468" marker-end="url(#f1-a)"/>
+      <text class="lbl" x="439" y="118" text-anchor="middle">runs</text>
+
+      <!-- Services -->
+      <rect class="box" x="760" y="50" width="240" height="80" rx="6"/>
+      <text class="t" x="880" y="76" text-anchor="middle">Language model</text>
+      <text class="s" x="880" y="96" text-anchor="middle">Claude (API or Bedrock)</text>
+      <text class="s" x="880" y="114" text-anchor="middle">or open model on Ollama</text>
+      <rect class="box" x="760" y="150" width="240" height="70" rx="6"/>
+      <text class="t" x="880" y="177" text-anchor="middle">Embeddings + reranker</text>
+      <text class="s" x="880" y="197" text-anchor="middle">Cohere, or local models</text>
+      <rect class="box" x="760" y="240" width="240" height="70" rx="6"/>
+      <text class="t" x="880" y="267" text-anchor="middle">Langfuse</text>
+      <text class="s" x="880" y="287" text-anchor="middle">traces · cost · feedback</text>
+      <path class="edge-acc" d="M680 110 H757" marker-end="url(#f1-b)"/>
+      <text class="lbl" x="719" y="103" text-anchor="middle">prompts</text>
+      <path class="edge" d="M680 185 H758" marker-end="url(#f1-a)"/>
+      <text class="lbl" x="719" y="178" text-anchor="middle">rerank</text>
+      <path class="edge" d="M680 265 H758" marker-end="url(#f1-a)"/>
+      <text class="lbl" x="719" y="258" text-anchor="middle">traces</text>
+
+      <!-- Database -->
+      <rect class="zone" x="220" y="400" width="480" height="140" rx="10"/>
+      <text class="zl" x="236" y="422">POSTGRESQL + PGVECTOR</text>
+      <rect class="box" x="236" y="436" width="84" height="62" rx="5"/>
+      <text class="ts" x="278" y="461" text-anchor="middle">Procedures</text>
+      <text class="s" x="278" y="480" text-anchor="middle">vector + text</text>
+      <rect class="box" x="328" y="436" width="84" height="62" rx="5"/>
+      <text class="ts" x="370" y="461" text-anchor="middle">Records</text>
+      <text class="s" x="370" y="480" text-anchor="middle">assets · WOs</text>
+      <rect class="box" x="420" y="436" width="84" height="62" rx="5"/>
+      <text class="ts" x="462" y="461" text-anchor="middle">Approvals</text>
+      <text class="s" x="462" y="480" text-anchor="middle">queue</text>
+      <rect class="box" x="512" y="436" width="84" height="62" rx="5"/>
+      <text class="ts" x="554" y="461" text-anchor="middle">Checkpoints</text>
+      <text class="s" x="554" y="480" text-anchor="middle">graph state</text>
+      <rect class="box" x="604" y="436" width="84" height="62" rx="5"/>
+      <text class="ts" x="646" y="461" text-anchor="middle">Audit log</text>
+      <text class="s" x="646" y="480" text-anchor="middle">append-only</text>
+      <text class="s" x="236" y="524">Row-level security filters every read by persona and business unit</text>
+      <path class="edge" d="M325 290 V398" marker-end="url(#f1-a)"/>
+      <text class="lbl" x="332" y="370">reads</text>
+      <path class="edge" d="M540 290 V398" marker-end="url(#f1-a)"/>
+      <text class="lbl" x="546" y="360">reads (RLS)</text>
+      <path class="edge" d="M630 290 V398" marker-end="url(#f1-a)"/>
+      <text class="lbl" x="636" y="372">writes</text>
+
+      <!-- Ingestion -->
+      <rect class="box" x="760" y="420" width="240" height="80" rx="6"/>
+      <text class="t" x="880" y="446" text-anchor="middle">Ingestion job</text>
+      <text class="s" x="880" y="466" text-anchor="middle">Docling · chunk · version</text>
+      <text class="s" x="880" y="484" text-anchor="middle">scan for injected text</text>
+      <path class="edge" d="M758 460 H702" marker-end="url(#f1-a)"/>
+      <text class="lbl" x="730" y="452" text-anchor="middle">chunks</text>
+      <path class="edge" d="M1000 440 H1030 V185 H1002" marker-end="url(#f1-a)"/>
+      <text class="lbl" x="1036" y="330">embed</text>
+      <rect class="box" x="760" y="560" width="240" height="72" rx="6"/>
+      <text class="t" x="880" y="585" text-anchor="middle">Document sources</text>
+      <text class="s" x="880" y="604" text-anchor="middle">HSE guidance (public)</text>
+      <text class="s" x="880" y="621" text-anchor="middle">fictional procedures + records</text>
+      <path class="edge" d="M880 560 V502" marker-end="url(#f1-a)"/>
+      <text class="lbl" x="888" y="536">parse</text>
+
+      <!-- OT boundary -->
+      <rect class="ot" x="20" y="420" width="130" height="80" rx="6"/>
+      <text class="t" x="85" y="446" text-anchor="middle">Plant &amp; OT</text>
+      <text class="s" x="85" y="466" text-anchor="middle">SCADA · switching</text>
+      <text class="s" x="85" y="482" text-anchor="middle">valves</text>
+      <path class="none" d="M85 420 V300 H218"/>
+      <line class="x" x1="78" y1="343" x2="92" y2="357"/>
+      <line class="x" x1="92" y1="343" x2="78" y2="357"/>
+      <text class="lbl-danger" x="96" y="384">no connection</text>
+      <text class="lbl-danger" x="96" y="398">by design</text>
+    </svg>
+    </div>
+    <figcaption><b>One app, one database, no route to the plant.</b> Everything stateful lives in a single Postgres: the documents, operational records, pending approvals, workflow checkpoints and the audit log. Row-level security means the model never receives a document the current persona isn't allowed to see. The red dashed line is the most important boundary: the assistant can read about switching and valves but has no way to operate them.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>What happens to a question</h2>
+  <figure>
+    <div class="scroll">
+    <svg viewBox="0 0 1080 360" role="img" aria-label="Request flow: personal data is masked, input rails and the safety-tier classifier run in parallel, then a router sends the question to one of four lanes: blocked, emergency, routine or safety-relevant, and safety-critical. Every lane writes to the audit log.">
+      <defs>
+        <marker id="f2-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+      </defs>
+      <rect class="box" x="20" y="175" width="80" height="50" rx="6"/>
+      <text class="t" x="60" y="204" text-anchor="middle">Question</text>
+      <path class="edge" d="M100 200 H123" marker-end="url(#f2-a)"/>
+      <rect class="box" x="125" y="175" width="105" height="50" rx="6"/>
+      <text class="ts" x="177.5" y="197" text-anchor="middle">Mask PII</text>
+      <text class="s" x="177.5" y="214" text-anchor="middle">Presidio</text>
+      <path class="edge" d="M230 200 H245 V155 H258" marker-end="url(#f2-a)"/>
+      <path class="edge" d="M245 200 V245 H258" marker-end="url(#f2-a)"/>
+      <rect class="box" x="260" y="130" width="125" height="50" rx="6"/>
+      <text class="ts" x="322.5" y="152" text-anchor="middle">Input rails</text>
+      <text class="s" x="322.5" y="169" text-anchor="middle">NeMo Guardrails</text>
+      <rect class="core" x="260" y="220" width="125" height="50" rx="6"/>
+      <text class="ts" x="322.5" y="242" text-anchor="middle">Safety tier</text>
+      <text class="s" x="322.5" y="259" text-anchor="middle">rules + classifier</text>
+      <text class="lbl" x="322.5" y="204" text-anchor="middle">in parallel</text>
+      <path class="edge" d="M385 155 H440 V173" marker-end="url(#f2-a)"/>
+      <path class="edge" d="M385 245 H440 V227" marker-end="url(#f2-a)"/>
+      <polygon class="core" points="440,175 465,200 440,225 415,200"/>
+      <text class="lbl" x="440" y="204" text-anchor="middle">route</text>
+      <text class="lbl" x="440" y="290" text-anchor="middle">emergency</text>
+      <text class="lbl" x="440" y="303" text-anchor="middle">wins</text>
+      <path class="edge" d="M465 200 H488"/>
+      <path class="edge" d="M488 50 V305"/>
+
+      <!-- Lane pills -->
+      <path class="edge" d="M488 50 H500" marker-end="url(#f2-a)"/>
+      <rect class="p-blocked" x="502" y="34" width="126" height="32" rx="16"/>
+      <text class="pt pt-blocked" x="565" y="54" text-anchor="middle">Blocked</text>
+      <path class="edge" d="M488 125 H500" marker-end="url(#f2-a)"/>
+      <rect class="p-emergency" x="502" y="109" width="126" height="32" rx="16"/>
+      <text class="pt pt-emergency" x="565" y="129" text-anchor="middle">Emergency</text>
+      <path class="edge" d="M488 210 H500" marker-end="url(#f2-a)"/>
+      <rect class="p-routine" x="502" y="194" width="126" height="32" rx="16"/>
+      <text class="pt pt-routine" x="565" y="214" text-anchor="middle">Routine · relevant</text>
+      <path class="edge" d="M488 305 H500" marker-end="url(#f2-a)"/>
+      <rect class="p-critical" x="502" y="289" width="126" height="32" rx="16"/>
+      <text class="pt pt-critical" x="565" y="309" text-anchor="middle">Safety-critical</text>
+
+      <!-- Lane 1 -->
+      <path class="edge" d="M628 50 H648" marker-end="url(#f2-a)"/>
+      <rect class="box" x="650" y="32" width="362" height="36" rx="6"/>
+      <text class="ts" x="831" y="54" text-anchor="middle">Refusal with reason · nothing generated</text>
+      <!-- Lane 2 -->
+      <path class="edge" d="M628 125 H648" marker-end="url(#f2-a)"/>
+      <rect class="box" x="650" y="101" width="362" height="48" rx="6"/>
+      <text class="ts" x="831" y="121" text-anchor="middle">Emergency card, then stop</text>
+      <text class="s" x="831" y="138" text-anchor="middle">999 · gas 0800 111 999 · power lines 105</text>
+      <!-- Lane 3 -->
+      <path class="edge" d="M628 210 H648" marker-end="url(#f2-a)"/>
+      <rect class="box" x="650" y="188" width="80" height="44" rx="6"/>
+      <text class="ts" x="690" y="206" text-anchor="middle">Retrieve</text>
+      <text class="s" x="690" y="222" text-anchor="middle">+ rerank</text>
+      <path class="edge" d="M730 210 H742" marker-end="url(#f2-a)"/>
+      <rect class="box" x="744" y="188" width="80" height="44" rx="6"/>
+      <text class="ts" x="784" y="206" text-anchor="middle">Evidence</text>
+      <text class="s" x="784" y="222" text-anchor="middle">tool calls</text>
+      <path class="edge" d="M824 210 H836" marker-end="url(#f2-a)"/>
+      <rect class="box" x="838" y="188" width="80" height="44" rx="6"/>
+      <text class="ts" x="878" y="206" text-anchor="middle">Generate</text>
+      <text class="s" x="878" y="222" text-anchor="middle">cited JSON</text>
+      <path class="edge" d="M918 210 H930" marker-end="url(#f2-a)"/>
+      <rect class="box" x="932" y="188" width="80" height="44" rx="6"/>
+      <text class="ts" x="972" y="206" text-anchor="middle">Verify</text>
+      <text class="s" x="972" y="222" text-anchor="middle">quotes match</text>
+      <!-- Lane 4 -->
+      <path class="edge" d="M628 305 H648" marker-end="url(#f2-a)"/>
+      <rect class="box" x="650" y="283" width="80" height="44" rx="6"/>
+      <text class="ts" x="690" y="301" text-anchor="middle">Retrieve</text>
+      <text class="s" x="690" y="317" text-anchor="middle">+ rerank</text>
+      <path class="edge" d="M730 305 H742" marker-end="url(#f2-a)"/>
+      <rect class="box" x="744" y="283" width="80" height="44" rx="6"/>
+      <text class="ts" x="784" y="301" text-anchor="middle">Verbatim</text>
+      <text class="s" x="784" y="317" text-anchor="middle">extract</text>
+      <path class="edge" d="M824 305 H836" marker-end="url(#f2-a)"/>
+      <rect class="core" x="838" y="283" width="80" height="44" rx="6"/>
+      <text class="ts" x="878" y="301" text-anchor="middle">Approval</text>
+      <text class="s" x="878" y="317" text-anchor="middle">interrupt()</text>
+      <path class="edge" d="M918 305 H930" marker-end="url(#f2-a)"/>
+      <rect class="box" x="932" y="283" width="80" height="44" rx="6"/>
+      <text class="ts" x="972" y="301" text-anchor="middle">Release</text>
+      <text class="s" x="972" y="317" text-anchor="middle">or decline</text>
+      <text class="lbl-acc" x="878" y="347" text-anchor="middle">Authorised Person decides</text>
+
+      <!-- Audit -->
+      <rect class="box" x="1040" y="30" width="30" height="300" rx="6"/>
+      <text class="ts" transform="translate(1059 180) rotate(-90)" text-anchor="middle">Audit log</text>
+      <path class="edge" d="M1012 50 H1038" marker-end="url(#f2-a)"/>
+      <path class="edge" d="M1012 125 H1038" marker-end="url(#f2-a)"/>
+      <path class="edge" d="M1012 210 H1038" marker-end="url(#f2-a)"/>
+      <path class="edge" d="M1012 305 H1038" marker-end="url(#f2-a)"/>
+    </svg>
+    </div>
+    <figcaption><b>The safety gate is part of the graph's structure, so no prompt can skip it.</b> Each box is a LangGraph node. The router takes the stricter answer when the rules and the classifier disagree, and an emergency beats everything, including a blocked jailbreak attempt. In the safety-critical lane, the steps shown are copied from the procedure by code, and the graph pauses at <code>interrupt()</code> until an Authorised Person releases or declines them. The routine lane stops and names the document owner if retrieval finds too little evidence.</figcaption>
+  </figure>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Tier</th><th>Gas example</th><th>Electricity example</th><th>What the assistant does</th></tr></thead>
+      <tbody>
+        <tr><td><span class="chip c-routine">Routine</span></td><td class="q">Who owns the meter-reading schedule procedure?</td><td class="q">Where is the substation access procedure?</td><td>Answers with citations</td></tr>
+        <tr><td><span class="chip c-relevant">Safety-relevant</span></td><td class="q">When was governor G-112 last inspected, and what was found?</td><td class="q">Summarise this month's oil-temperature alarms on transformer T-104</td><td>Answers with citations and a safety banner</td></tr>
+        <tr><td><span class="chip c-critical">Safety-critical</span></td><td class="q">How do I purge the 75 mbar main on Mill Lane?</td><td class="q">Steps to isolate and earth the 11 kV feeder at Ashford Road?</td><td>Quotes the procedure word for word, writes no steps of its own, needs Authorised Person approval</td></tr>
+        <tr><td><span class="chip c-emergency">Emergency</span></td><td class="q">Strong smell of gas outside number 14</td><td class="q">Someone has had a shock at the substation</td><td>Shows emergency numbers only: 999, gas 0800 111 999, power lines 105</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note prose">The list of safety-critical topics is a versioned YAML file owned by the safety team, not something buried in a prompt. Changing it is a reviewed change with its own tests.</p>
+</section>
+
+<section>
+  <h2>How retrieval works</h2>
+  <figure>
+    <div class="scroll">
+    <svg viewBox="0 0 1080 240" role="img" aria-label="Retrieval: the query fans out to keyword and vector search inside Postgres under the same approval, effective-date and row-level-security filters; results are merged by rank fusion, reranked to the top 8, expanded to whole sections, then checked for sufficiency: enough evidence goes to generation, too little ends in an abstention.">
+      <defs>
+        <marker id="f3-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+      </defs>
+      <rect class="box" x="20" y="127" width="110" height="50" rx="6"/>
+      <text class="ts" x="75" y="149" text-anchor="middle">Query</text>
+      <text class="s" x="75" y="166" text-anchor="middle">+ glossary terms</text>
+      <rect class="zone" x="160" y="20" width="360" height="210" rx="10"/>
+      <text class="zl" x="174" y="40">INSIDE POSTGRES</text>
+      <rect class="band" x="176" y="50" width="328" height="30" rx="4"/>
+      <text class="lbl-band" x="340" y="69" text-anchor="middle">approved · in effect · row-level security</text>
+      <path class="edge" d="M130 152 H185 V122 H198" marker-end="url(#f3-a)"/>
+      <path class="edge" d="M185 152 V182 H198" marker-end="url(#f3-a)"/>
+      <rect class="box" x="200" y="100" width="140" height="44" rx="6"/>
+      <text class="ts" x="270" y="118" text-anchor="middle">Keyword</text>
+      <text class="s" x="270" y="134" text-anchor="middle">full-text, top 20</text>
+      <rect class="box" x="200" y="160" width="140" height="44" rx="6"/>
+      <text class="ts" x="270" y="178" text-anchor="middle">Vector</text>
+      <text class="s" x="270" y="194" text-anchor="middle">pgvector, top 20</text>
+      <path class="edge" d="M340 122 H360 V152"/>
+      <path class="edge" d="M340 182 H360 V152"/>
+      <path class="edge" d="M360 152 H378" marker-end="url(#f3-a)"/>
+      <rect class="box" x="380" y="130" width="120" height="44" rx="6"/>
+      <text class="ts" x="440" y="148" text-anchor="middle">Merge</text>
+      <text class="s" x="440" y="164" text-anchor="middle">rank fusion</text>
+      <path class="edge" d="M500 152 H558" marker-end="url(#f3-a)"/>
+      <text class="lbl" x="529" y="145" text-anchor="middle">≤ 40</text>
+      <rect class="box" x="560" y="127" width="120" height="50" rx="6"/>
+      <text class="ts" x="620" y="148" text-anchor="middle">Rerank</text>
+      <text class="s" x="620" y="165" text-anchor="middle">keep top 8</text>
+      <path class="edge" d="M680 152 H708" marker-end="url(#f3-a)"/>
+      <rect class="box" x="710" y="127" width="120" height="50" rx="6"/>
+      <text class="ts" x="770" y="148" text-anchor="middle">Expand</text>
+      <text class="s" x="770" y="165" text-anchor="middle">to full section</text>
+      <path class="edge" d="M830 152 H858" marker-end="url(#f3-a)"/>
+      <polygon class="core" points="890,122 920,152 890,182 860,152"/>
+      <text class="lbl" x="890" y="156" text-anchor="middle">enough?</text>
+      <path class="edge" d="M920 152 H940 V110 H958" marker-end="url(#f3-a)"/>
+      <path class="edge" d="M940 152 V195 H958" marker-end="url(#f3-a)"/>
+      <text class="lbl" x="934" y="128" text-anchor="end">yes</text>
+      <text class="lbl" x="934" y="182" text-anchor="end">no</text>
+      <rect class="core" x="960" y="90" width="100" height="40" rx="6"/>
+      <text class="ts" x="1010" y="114" text-anchor="middle">Generate</text>
+      <rect class="abstain" x="960" y="175" width="100" height="40" rx="6"/>
+      <text class="ts" x="1010" y="192" text-anchor="middle">Abstain</text>
+      <text class="s" x="1010" y="207" text-anchor="middle">names owner</text>
+    </svg>
+    </div>
+    <figcaption><b>Both searches run under the same filters, inside the database.</b> Keyword search catches exact terms such as "PR-ELEC-012" or "11 kV". Vector search catches paraphrases, such as "make the feeder dead" for isolation. Because the approval, effective-date and permission filters live in SQL rather than in the app, a bug in the app can't surface a superseded or forbidden document. If the reranker's best scores are low, the assistant says so instead of letting the model fill the gap. A typed document or asset ID skips all of this and goes straight to an exact lookup.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Loading documents</h2>
+  <ol class="steps">
+    <li><b>Parse with Docling.</b> It keeps headings, numbered steps, tables and WARNING/CAUTION boxes as structure instead of flattening them to text.</li>
+    <li><b>Chunk by section.</b> A step is never separated from the warning that goes with it, and every small chunk links to its parent section, so the model sees the whole sequence of steps.</li>
+    <li><b>Add a context header.</b> Each chunk carries its breadcrumb and a one-line summary before it is embedded, so a chunk that only says "apply locks" still knows which equipment it is about.</li>
+    <li><b>Scan once for injected instructions.</b> Text like "ignore previous instructions" inside a document is flagged when the document is loaded, not on every question.</li>
+    <li><b>Version in one transaction.</b> Loading v4 of a procedure marks v3 as superseded at the same moment. v3 stays available for audit questions such as "what did it say on 3 March?"</li>
+  </ol>
+  <pre><code><span class="hl">PR-GAS-031 v3 · Approved · effective 2026-04-01 › 6 Purging › 6.2 Nitrogen purge of PE mains</span>
+Summary: Steps to purge a polyethylene main with nitrogen before commissioning.
+<span class="warn">WARNING  Do not vent purge gas within 5 m of an ignition source.</span>
+6.2.4  Confirm the main is isolated at both ends and the isolation is recorded on the permit.
+6.2.5  Connect the nitrogen supply through the purge saddle and open slowly ...</code></pre>
+  <p class="note">A fictional chunk as stored. The header in teal is what makes it findable, and the warning travels with its step.</p>
+</section>
+
+<section>
+  <h2>People and permissions</h2>
+  <p class="prose">Visitors pick a persona when they arrive, using Chainlit's chat profiles. No sign-up is needed. A random browser ID keeps each visitor's chats and approvals separate. A persona can't approve its own request, so to see both sides, ask as an engineer and then switch to the Authorised Person.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Persona</th><th>Business unit</th><th>Can see</th><th>Can do</th></tr></thead>
+      <tbody>
+        <tr><td>Field engineer</td><td>Gas</td><td>Approved gas procedures and gas records</td><td>Ask, request approval</td></tr>
+        <tr><td>Control room operator</td><td>Electricity</td><td>Approved electricity procedures and records</td><td>Ask, request approval</td></tr>
+        <tr><td>Authorised Person</td><td>Gas or Electricity</td><td>Everything in their unit</td><td>Release or decline safety-critical answers</td></tr>
+        <tr><td>Document controller</td><td>Both</td><td>All documents, including drafts</td><td>Load documents, edit the safety-topic list</td></tr>
+        <tr><td>Auditor</td><td>Both</td><td>The audit log</td><td>Read and export only</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note prose">For a real deployment, one config setting switches the persona picker off and Cognito single sign-on on, and the same roles come from Cognito groups.</p>
+</section>
+
+<section>
+  <h2>Guardrails, strongest first</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Layer</th><th>Stops</th><th>How</th></tr></thead>
+      <tbody>
+        <tr><td>Architecture</td><td>Prompt injection doing real harm</td><td>Read-only tools, no plant connection, row-level security</td></tr>
+        <tr><td>Personal data</td><td>Customer details reaching the model or the logs</td><td>Presidio, locally, before anything else</td></tr>
+        <tr><td>Input rails</td><td>Jailbreaks, off-topic use</td><td>NeMo Guardrails on a fast model, in parallel with the safety tier</td></tr>
+        <tr><td>Safety tier</td><td>Generated answers to safety-critical questions</td><td>Rules plus classifier; the stricter answer wins</td></tr>
+        <tr><td>Documents</td><td>Instructions hidden in a procedure</td><td>Scanned when loaded; marked as data in the prompt</td></tr>
+        <tr><td>Output</td><td>Invented claims or steps</td><td>Schema, citation and quote checks in code; verbatim copying in strict mode</td></tr>
+        <tr><td>Human</td><td>Anything that gets past the above</td><td>Authorised Person approval through <code>interrupt()</code></td></tr>
+        <tr><td>Testing</td><td>Problems coming back after changes</td><td>DeepEval red-team and faithfulness tests block releases in CI; Langfuse traces live use</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>Where it runs</h2>
+  <figure>
+    <div class="scroll">
+    <svg viewBox="0 0 1080 300" role="img" aria-label="Three ways to run GigaWhat. Local: Docker runs the app and Postgres, Ollama runs natively on the Mac's GPU. Lean hosted: one EC2 instance runs the app and Postgres and calls the Anthropic API over the internet. Full AWS: the app, RDS Postgres and Claude on Bedrock all sit inside your AWS account.">
+      <defs>
+        <marker id="f4-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+        <marker id="f4-b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah-acc" d="M0,0 L10,5 L0,10 z"/></marker>
+      </defs>
+      <!-- Panel 1: local -->
+      <rect class="panel" x="20" y="15" width="330" height="270" rx="10"/>
+      <text class="t" x="36" y="42">Local · your Mac</text>
+      <text class="s" x="36" y="60">docker compose + Ollama</text>
+      <rect class="zone" x="32" y="78" width="170" height="170" rx="8"/>
+      <text class="zl" x="42" y="96">DOCKER</text>
+      <rect class="box" x="48" y="106" width="138" height="46" rx="6"/>
+      <text class="ts" x="117" y="126" text-anchor="middle">GigaWhat app</text>
+      <text class="s" x="117" y="142" text-anchor="middle">Chainlit + LangGraph</text>
+      <path class="edge" d="M117 152 V188" marker-end="url(#f4-a)"/>
+      <text class="lbl" x="124" y="174">SQL</text>
+      <rect class="box" x="48" y="190" width="138" height="46" rx="6"/>
+      <text class="ts" x="117" y="210" text-anchor="middle">Postgres</text>
+      <text class="s" x="117" y="226" text-anchor="middle">container</text>
+      <path class="edge-acc" d="M186 129 H228" marker-end="url(#f4-b)"/>
+      <text class="lbl" x="207" y="121" text-anchor="middle">local</text>
+      <rect class="core" x="230" y="106" width="108" height="46" rx="6"/>
+      <text class="ts" x="284" y="126" text-anchor="middle">Ollama</text>
+      <text class="s" x="284" y="142" text-anchor="middle">native · GPU</text>
+      <text class="s" x="36" y="272">Free · works offline · only you</text>
+
+      <!-- Panel 2: lean -->
+      <rect class="panel" x="375" y="15" width="330" height="270" rx="10"/>
+      <text class="t" x="391" y="42">Hosted · lean EC2</text>
+      <text class="s" x="391" y="60">~$20/month + model use</text>
+      <rect class="zone" x="387" y="78" width="170" height="170" rx="8"/>
+      <text class="zl" x="397" y="96">EC2 INSTANCE</text>
+      <rect class="box" x="403" y="106" width="138" height="46" rx="6"/>
+      <text class="ts" x="472" y="126" text-anchor="middle">GigaWhat app</text>
+      <text class="s" x="472" y="142" text-anchor="middle">Chainlit + LangGraph</text>
+      <path class="edge" d="M472 152 V188" marker-end="url(#f4-a)"/>
+      <text class="lbl" x="479" y="174">SQL</text>
+      <rect class="box" x="403" y="190" width="138" height="46" rx="6"/>
+      <text class="ts" x="472" y="210" text-anchor="middle">Postgres</text>
+      <text class="s" x="472" y="226" text-anchor="middle">container</text>
+      <path class="edge-acc" d="M541 129 H583" marker-end="url(#f4-b)"/>
+      <text class="lbl" x="562" y="121" text-anchor="middle">HTTPS</text>
+      <rect class="core" x="585" y="106" width="108" height="46" rx="6"/>
+      <text class="ts" x="639" y="126" text-anchor="middle">Anthropic</text>
+      <text class="s" x="639" y="142" text-anchor="middle">API · internet</text>
+      <text class="s" x="391" y="272">Credits last about 5 months</text>
+
+      <!-- Panel 3: full -->
+      <rect class="panel" x="730" y="15" width="330" height="270" rx="10"/>
+      <text class="t" x="746" y="42">Hosted · full AWS</text>
+      <text class="s" x="746" y="60">~$60–80/month + model use</text>
+      <rect class="zone" x="742" y="78" width="312" height="170" rx="8"/>
+      <text class="zl" x="752" y="96">YOUR AWS ACCOUNT</text>
+      <rect class="box" x="758" y="106" width="138" height="46" rx="6"/>
+      <text class="ts" x="827" y="126" text-anchor="middle">GigaWhat app</text>
+      <text class="s" x="827" y="142" text-anchor="middle">ECS Fargate</text>
+      <path class="edge" d="M827 152 V188" marker-end="url(#f4-a)"/>
+      <text class="lbl" x="834" y="174">SQL</text>
+      <rect class="box" x="758" y="190" width="138" height="46" rx="6"/>
+      <text class="ts" x="827" y="210" text-anchor="middle">Postgres</text>
+      <text class="s" x="827" y="226" text-anchor="middle">RDS</text>
+      <path class="edge-acc" d="M896 129 H938" marker-end="url(#f4-b)"/>
+      <text class="lbl" x="917" y="121" text-anchor="middle">VPC</text>
+      <rect class="core" x="940" y="106" width="108" height="46" rx="6"/>
+      <text class="ts" x="994" y="126" text-anchor="middle">Bedrock</text>
+      <text class="s" x="994" y="142" text-anchor="middle">Claude</text>
+      <text class="s" x="994" y="214" text-anchor="middle">+ load balancer, WAF</text>
+      <text class="s" x="746" y="272">Credits last about 6 weeks</text>
+    </svg>
+    </div>
+    <figcaption><b>The code is the same in all three; what changes is where the model runs (the teal arrow).</b> Locally, Ollama runs outside Docker because Docker on a Mac can't use the GPU. The lean option sends prompts over the internet to Anthropic. The full option keeps everything inside your AWS account, which is what a regulated company would want in production. Running an open model on AWS would need a GPU server, which costs several hundred dollars a month if left on.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Stack</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Area</th><th>Choice</th><th>Why</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Workflow</td><td>LangGraph + LangChain 1.0</td><td>Most widely used; graph structure, interrupts, Postgres checkpoints</td><td><span class="chip st-dec">Decided</span></td></tr>
+        <tr><td>Interface</td><td>Chainlit inside FastAPI</td><td>Python only, built-in chat profiles, actions and LangChain integration</td><td><span class="chip st-dec">Decided</span></td></tr>
+        <tr><td>Storage + search</td><td>Postgres + pgvector, langchain-postgres</td><td>Built-in keyword-plus-vector search; one database for everything</td><td><span class="chip st-dec">Decided</span></td></tr>
+        <tr><td>Parsing</td><td>Docling</td><td>Keeps structure; official LangChain integration</td><td><span class="chip st-dec">Decided</span></td></tr>
+        <tr><td>Guardrails</td><td>Presidio, NeMo Guardrails, code checks</td><td>Layered; see the table above</td><td><span class="chip st-prop">Proposed</span></td></tr>
+        <tr><td>Evaluation</td><td>DeepEval in pytest</td><td>Tests run in CI and block releases</td><td><span class="chip st-prop">Proposed</span></td></tr>
+        <tr><td>Tracing</td><td>Langfuse Cloud (EU)</td><td>Open source; self-hosting documented for production</td><td><span class="chip st-prop">Proposed</span></td></tr>
+        <tr><td>Infrastructure</td><td>Terraform, GitHub Actions</td><td>Most widely used</td><td><span class="chip st-prop">Proposed</span></td></tr>
+        <tr><td>Model</td><td>Hosted: Claude (Sonnet for answers, Haiku for fast steps). Offline: open model on Ollama</td><td>Same code, chosen by <code>GIGAWHAT_PROFILE</code></td><td><span class="chip st-dec">Decided</span></td></tr>
+        <tr><td>Embeddings + rerank</td><td>Hosted: Cohere. Offline: local models</td><td>Each profile has its own database</td><td><span class="chip st-dec">Decided</span></td></tr>
+        <tr><td>Hosting</td><td>Lean EC2 in the project Region</td><td>Fits the $100 credit; full AWS setup kept as a documented Terraform module</td><td><span class="chip st-dec">Decided</span></td></tr>
+        <tr><td>Code</td><td>Public GitHub, Apache-2.0</td><td>Reviewers can clone and run it; free CI</td><td><span class="chip st-dec">Decided</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>Before deployment</h2>
+  <ol class="open-list">
+    <li>Confirm the AWS project Region (the local config says eu-north-1, Stockholm)</li>
+    <li>Upgrade the AWS project to the Paid plan before 9 April 2027, when the Free plan ends and the project would close</li>
+    <li>Choose the address for the shared link: a free hostname or a purchased domain</li>
+  </ol>
+</section>
+
+<section>
+  <h2>References</h2>
+  <ul class="refs">
+    <li><a href="https://docs.langchain.com/oss/python/langgraph/add-human-in-the-loop">LangGraph: human-in-the-loop with interrupt()</a></li>
+    <li><a href="https://docs.langchain.com/oss/python/langchain/guardrails">LangChain 1.0 guardrails and middleware</a></li>
+    <li><a href="https://github.com/langchain-ai/langchain-postgres">langchain-postgres (PGVectorStore, hybrid search)</a></li>
+    <li><a href="https://docs.nvidia.com/nemo/guardrails/integration-with-third-party-libraries/langchain/runnable-rails.md">NeMo Guardrails with LangChain</a></li>
+    <li><a href="https://github.com/Chainlit/chainlit">Chainlit</a></li>
+    <li><a href="https://www.hse.gov.uk/pubns/books/hsg250.htm">HSE HSG250: Guidance on permit-to-work systems</a></li>
+    <li><a href="https://www.hse.gov.uk/pubns/books/hsg253.htm">HSE HSG253: The safe isolation of plant and equipment</a></li>
+    <li><a href="https://www.hse.gov.uk/pubns/books/hsg85.htm">HSE HSG85: Electricity at work, safe working practices</a></li>
+  </ul>
+</section>
+</div>
