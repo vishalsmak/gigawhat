@@ -151,7 +151,7 @@ code { font-family: var(--mono); font-size: .88em; }
       <h3>Will</h3>
       <ul>
         <li>Find the approved, current procedure for this asset, site and role</li>
-        <li>Summarise evidence from procedures, incidents, work orders, inspections and alarms, citing every claim</li>
+        <li>Summarise evidence from procedures, the document register, incidents, work orders, inspections and alarms, citing every claim</li>
         <li>Suggest next steps, each tied to a source</li>
         <li>Send safety-critical work to an Authorised Person for approval</li>
       </ul>
@@ -162,7 +162,7 @@ code { font-family: var(--mono); font-size: .88em; }
         <li>Connect to or operate SCADA, switching or valves</li>
         <li>Write its own steps for safety-critical work; it quotes the procedure instead</li>
         <li>Use draft, withdrawn or superseded documents</li>
-        <li>Guess when evidence is thin; it says so and names the document owner</li>
+        <li>Guess when evidence is thin; it says so and points to an Authorised Person or the document controller</li>
       </ul>
     </div>
   </div>
@@ -282,19 +282,19 @@ code { font-family: var(--mono); font-size: .88em; }
         <tr><td>Load</td><td>HSE guidance plus fictional procedures and records, reloaded when the document controller publishes a version</td><td><span class="chip st-dec">Standard</span></td></tr>
         <tr><td>Parse + clean</td><td>Docling, keeping headings, numbered steps, tables and WARNING boxes</td><td><span class="chip st-dec">Standard</span></td></tr>
         <tr><td>Chunk</td><td>By section; a warning stays with its step; each chunk links to its parent section</td><td><span class="chip st-dec">Standard</span></td></tr>
-        <tr><td>Enrich</td><td>Breadcrumb and summary on every chunk (contextual retrieval); approval status, effective date, owner and business unit as metadata; scan for injected instructions</td><td><span class="chip st-dec">Standard</span></td></tr>
+        <tr><td>Enrich</td><td>A breadcrumb (document, version, section) on every chunk; approval status, effective date, owner and business unit as metadata. Per-chunk summaries and a load-time injection scan are not built yet</td><td><span class="chip st-dec">Standard</span></td></tr>
         <tr><td>Embed</td><td>Cohere, or a local model offline</td><td><span class="chip st-dec">Standard</span></td></tr>
         <tr><td>Index + store</td><td>pgvector and Postgres full-text in one database; a new version supersedes the old one in the same transaction</td><td><span class="chip st-dec">Standard</span></td></tr>
         <tr><td colspan="3" class="grp">Querying</td></tr>
         <tr><td>Intake</td><td>Presidio masks personal data; input rails check for jailbreaks and off-topic use</td><td><span class="chip st-dec">Standard</span></td></tr>
-        <tr><td>Transform</td><td>Safety-tier router: rules plus a classifier, the stricter answer wins, and an emergency overrides everything</td><td><span class="chip st-prop">GigaWhat adds</span></td></tr>
+        <tr><td>Transform</td><td>Safety-tier router: rules plus a classifier, the stricter answer wins, and an emergency overrides everything. A fast model also rewrites a chatty question into up to two search queries</td><td><span class="chip st-prop">GigaWhat adds</span></td></tr>
         <tr><td>Retrieve</td><td>Hybrid search inside SQL, under approval, effective-date and row-level-security filters</td><td><span class="chip st-dec">Standard</span></td></tr>
-        <tr><td>Fuse + rerank</td><td>Rank fusion, rerank to the top 8, then expand each hit to its whole section</td><td><span class="chip st-dec">Standard</span></td></tr>
+        <tr><td>Fuse + rerank</td><td>Rank fusion for each query, then every candidate is reranked against the original question to the top 6 and expanded to its whole section</td><td><span class="chip st-dec">Standard</span></td></tr>
         <tr><td>Augment + generate</td><td>Cited JSON for routine questions. For safety-critical ones, code copies the procedure word for word and the model writes no steps</td><td><span class="chip st-prop">GigaWhat adds</span></td></tr>
-        <tr><td>Check + respond</td><td>Quotes checked against the sources in code; abstains and names the document owner when evidence is thin</td><td><span class="chip st-dec">Standard</span></td></tr>
+        <tr><td>Check + respond</td><td>Quotes checked against the sources in code (long quotes may differ slightly in punctuation, never in a number); abstains and points to an Authorised Person when evidence is thin</td><td><span class="chip st-dec">Standard</span></td></tr>
         <tr><td>Human approval</td><td>An Authorised Person releases or declines safety-critical answers through <code>interrupt()</code></td><td><span class="chip st-prop">GigaWhat adds</span></td></tr>
         <tr><td colspan="3" class="grp">Across both</td></tr>
-        <tr><td>Evaluate</td><td>DeepEval tests in CI that block releases</td><td><span class="chip st-dec">Standard</span></td></tr>
+        <tr><td>Evaluate</td><td>Five release gates plus DeepEval, run from the CLI and a manual GitHub workflow; images are only built after CI passes</td><td><span class="chip st-dec">Standard</span></td></tr>
         <tr><td>Observe + feedback</td><td>Langfuse traces, cost and feedback, plus an append-only audit log</td><td><span class="chip st-dec">Standard</span></td></tr>
         <tr><td>Access control</td><td>Row-level security by persona and business unit, enforced by the database</td><td><span class="chip st-dec">Standard</span></td></tr>
         <tr><td>Security</td><td>Read-only tools, no route to the plant, documents scanned when loaded</td><td><span class="chip st-dec">Standard</span></td></tr>
@@ -432,7 +432,7 @@ code { font-family: var(--mono); font-size: .88em; }
       <rect class="box" x="760" y="420" width="240" height="80" rx="6"/>
       <text class="t" x="880" y="446" text-anchor="middle">Ingestion job</text>
       <text class="s" x="880" y="466" text-anchor="middle">Docling · chunk · version</text>
-      <text class="s" x="880" y="484" text-anchor="middle">scan for injected text</text>
+      <text class="s" x="880" y="484" text-anchor="middle">status from the register</text>
       <path class="edge" d="M758 460 H702" marker-end="url(#f1-a)"/>
       <text class="lbl" x="730" y="452" text-anchor="middle">chunks</text>
       <path class="edge" d="M1000 440 H1030 V185 H1002" marker-end="url(#f1-a)"/>
@@ -560,7 +560,7 @@ code { font-family: var(--mono); font-size: .88em; }
       <path class="edge" d="M1012 305 H1038" marker-end="url(#f2-a)"/>
     </svg>
     </div>
-    <figcaption><b>The safety gate is part of the graph's structure, so no prompt can skip it.</b> Each box is a LangGraph node. Personal data is masked before the question enters graph state, because state is saved to Postgres. The fixed rules run first: if they spot an emergency, the card is shown without waiting for any model. Otherwise the input rails and the classifier run in parallel and the stricter tier wins; an emergency beats everything, including a blocked jailbreak attempt. In the safety-critical lane the steps shown are copied from the procedure by code, and the graph pauses at <code>interrupt()</code> until an Authorised Person of the same unit, never the requester, releases or declines them. The routine lane gathers records only when the question is about an asset or its history, and abstains if retrieval finds too little evidence or no claim survives the quote check.</figcaption>
+    <figcaption><b>The safety gate is part of the graph's structure, so no prompt can skip it.</b> Each box is a LangGraph node. Personal data is masked before the question enters graph state, because state is saved to Postgres. The fixed rules run first: if they spot an emergency, the card is shown without waiting for any model. Otherwise the input rails and the classifier run in parallel and the stricter tier wins; an emergency beats everything, including a blocked jailbreak attempt. In the safety-critical lane the steps shown are copied from the procedure by code, and the graph pauses at <code>interrupt()</code> until an Authorised Person of the unit that owns the procedure, never the requester, releases or declines them; until then the requester sees only which sections were found. Only procedure sections the reranker scores at 0.3 or more are sent for release, so the loosest matches never reach an Authorised Person. The routine lane gathers records when the question is about an asset, its history or document control, even when no procedure matches, and abstains if neither procedures nor records give it anything to cite, or no claim survives the quote check.</figcaption>
   </figure>
 
   <div class="table-wrap">
@@ -581,13 +581,13 @@ code { font-family: var(--mono); font-size: .88em; }
   <h2>How retrieval works</h2>
   <figure>
     <div class="scroll">
-    <svg viewBox="0 0 1080 240" role="img" aria-label="Retrieval: the query fans out to keyword and vector search inside Postgres under the same approval, effective-date and row-level-security filters; results are merged by rank fusion, reranked to the top 8, expanded to whole sections, then checked for sufficiency: enough evidence goes to generation, too little ends in an abstention.">
+    <svg viewBox="0 0 1080 240" role="img" aria-label="Retrieval: the question and up to two rewrites of it each fan out to keyword and vector search inside Postgres under the same approval, effective-date and row-level-security filters; results are merged by rank fusion, reranked against the original question to the top 6, expanded to whole sections, then checked for sufficiency: enough evidence goes to generation, too little ends in an abstention unless the question is about records.">
       <defs>
         <marker id="f3-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
       </defs>
       <rect class="box" x="20" y="127" width="110" height="50" rx="6"/>
       <text class="ts" x="75" y="149" text-anchor="middle">Query</text>
-      <text class="s" x="75" y="166" text-anchor="middle">+ glossary terms</text>
+      <text class="s" x="75" y="166" text-anchor="middle">+ 2 rewrites</text>
       <rect class="zone" x="160" y="20" width="360" height="210" rx="10"/>
       <text class="zl" x="174" y="40">INSIDE POSTGRES</text>
       <rect class="band" x="176" y="50" width="328" height="30" rx="4"/>
@@ -607,10 +607,10 @@ code { font-family: var(--mono); font-size: .88em; }
       <text class="ts" x="440" y="148" text-anchor="middle">Merge</text>
       <text class="s" x="440" y="164" text-anchor="middle">rank fusion</text>
       <path class="edge" d="M500 152 H558" marker-end="url(#f3-a)"/>
-      <text class="lbl" x="529" y="145" text-anchor="middle">≤ 40</text>
+      <text class="lbl" x="529" y="145" text-anchor="middle">≤ 24 each</text>
       <rect class="box" x="560" y="127" width="120" height="50" rx="6"/>
       <text class="ts" x="620" y="148" text-anchor="middle">Rerank</text>
-      <text class="s" x="620" y="165" text-anchor="middle">keep top 8</text>
+      <text class="s" x="620" y="165" text-anchor="middle">vs question · top 6</text>
       <path class="edge" d="M680 152 H708" marker-end="url(#f3-a)"/>
       <rect class="box" x="710" y="127" width="120" height="50" rx="6"/>
       <text class="ts" x="770" y="148" text-anchor="middle">Expand</text>
@@ -626,10 +626,10 @@ code { font-family: var(--mono); font-size: .88em; }
       <text class="ts" x="1010" y="114" text-anchor="middle">Generate</text>
       <rect class="abstain" x="960" y="175" width="100" height="40" rx="6"/>
       <text class="ts" x="1010" y="192" text-anchor="middle">Abstain</text>
-      <text class="s" x="1010" y="207" text-anchor="middle">names owner</text>
+      <text class="s" x="1010" y="207" text-anchor="middle">refers to AP</text>
     </svg>
     </div>
-    <figcaption><b>Both searches run under the same filters, inside the database.</b> Keyword search catches exact terms such as "PR-ELEC-012" or "11 kV". Vector search catches paraphrases, such as "make the feeder dead" for isolation. Because the approval, effective-date and permission filters live in SQL rather than in the app, a bug in the app can't surface a superseded or forbidden document. If the reranker's best scores are low, the assistant says so instead of letting the model fill the gap. A typed document or asset ID skips all of this and goes straight to an exact lookup.</figcaption>
+    <figcaption><b>Both searches run under the same filters, inside the database.</b> Keyword search catches exact terms such as "PR-ELEC-012" or "11 kV". Vector search catches paraphrases, such as "make the feeder dead" for isolation. Because the approval, effective-date and permission filters live in SQL rather than in the app, a bug in the app can't surface a superseded or forbidden document. A fast model rewrites the question into up to two search queries ("vent stack how high again??" becomes "vent stack height above ground"), and each is searched the same way; every candidate is then reranked against the original question, so a rewrite can add candidates but never decide what counts as relevant. If no passage scores 0.2 or more, the assistant says so instead of letting the model fill the gap, unless the question is about an asset, its history or document control, in which case it goes to the records. Naming a document restricts the search to that document, an asset ID is searched as an exact keyword, and abbreviations such as "CME" or "LOTO" are expanded from a glossary.</figcaption>
   </figure>
 </section>
 
@@ -638,12 +638,10 @@ code { font-family: var(--mono); font-size: .88em; }
   <ol class="steps">
     <li><b>Parse with Docling.</b> It keeps headings, numbered steps, tables and WARNING/CAUTION boxes as structure instead of flattening them to text.</li>
     <li><b>Chunk by section.</b> A step is never separated from the warning that goes with it, and every small chunk links to its parent section, so the model sees the whole sequence of steps.</li>
-    <li><b>Add a context header.</b> Each chunk carries its breadcrumb and a one-line summary before it is embedded, so a chunk that only says "apply locks" still knows which equipment it is about.</li>
-    <li><b>Scan once for injected instructions.</b> Text like "ignore previous instructions" inside a document is flagged when the document is loaded, not on every question.</li>
+    <li><b>Add a context header.</b> Each chunk carries its breadcrumb (document, version and section) before it is embedded, so a chunk that only says "apply locks" still knows which procedure and section it belongs to.</li>
     <li><b>Version in one transaction.</b> Loading v4 of a procedure marks v3 as superseded at the same moment. v3 stays available for audit questions such as "what did it say on 3 March?"</li>
   </ol>
   <pre><code><span class="hl">PR-GAS-031 v3 · Approved · effective 2026-04-01 › 6 Purging › 6.2 Nitrogen purge of PE mains</span>
-Summary: Steps to purge a polyethylene main with nitrogen before commissioning.
 <span class="warn">WARNING  Do not vent purge gas within 5 m of an ignition source.</span>
 6.2.4  Confirm the main is isolated at both ends and the isolation is recorded on the permit.
 6.2.5  Connect the nitrogen supply through the purge saddle and open slowly ...</code></pre>
@@ -665,7 +663,7 @@ Summary: Steps to purge a polyethylene main with nitrogen before commissioning.
       </tbody>
     </table>
   </div>
-  <p class="note prose">For a real deployment, one config setting switches the persona picker off and Cognito single sign-on on, and the same roles come from Cognito groups.</p>
+  <p class="note prose">For a real deployment, the persona picker would be replaced by single sign-on, with roles and business units coming from identity-provider groups (for example Cognito). This demo doesn't include that, and separation of duties compares personas rather than people.</p>
 </section>
 
 <section>
@@ -678,7 +676,7 @@ Summary: Steps to purge a polyethylene main with nitrogen before commissioning.
         <tr><td>Personal data</td><td>Customer details reaching the model or the logs</td><td>Presidio, locally, before anything else</td></tr>
         <tr><td>Input rails</td><td>Jailbreaks, off-topic use</td><td>NeMo Guardrails on a fast model, in parallel with the safety tier</td></tr>
         <tr><td>Safety tier</td><td>Generated answers to safety-critical questions</td><td>Rules plus classifier; the stricter answer wins</td></tr>
-        <tr><td>Documents</td><td>Instructions hidden in a procedure</td><td>Scanned when loaded; marked as data in the prompt</td></tr>
+        <tr><td>Documents</td><td>Instructions hidden in a procedure</td><td>Marked as data in the prompt, never as instructions. A load-time scan is not built yet</td></tr>
         <tr><td>Output</td><td>Invented claims or steps</td><td>Schema, citation and quote checks in code; verbatim copying in strict mode</td></tr>
         <tr><td>Operations</td><td>A fault found in live use</td><td>A pause switch (<code>GIGAWHAT_PAUSED</code>) stops all answers without taking the site down; Langfuse traces every step when enabled</td></tr>
         <tr><td>Human</td><td>Anything that gets past the above</td><td>Authorised Person approval through <code>interrupt()</code></td></tr>

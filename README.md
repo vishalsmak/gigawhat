@@ -15,9 +15,9 @@ See [`docs/architecture.html`](docs/architecture.html) for how it works: compone
 | 3 | Retrieval: hybrid search, row-level security, reranking | ✅ |
 | 4 | Workflow: guardrails, safety tiers, cited answers, approvals, audit | ✅ |
 | 5 | Chainlit UI with personas | ✅ |
-| 6 | Evaluation in CI, Langfuse tracing | |
-| 7 | Deployment to AWS | |
-| 8 | Governance documents | |
+| 6 | Evaluation: golden and red-team sets, release gates, Langfuse tracing | ✅ |
+| 7 | Deployment: container, Terraform for AWS, GitHub Actions | ✅ code ready, not yet deployed |
+| 8 | Governance documents | ✅ |
 
 ## Quickstart
 
@@ -78,6 +78,19 @@ uv run pytest                 # unit + integration tests (integration needs the 
 uv run ruff check . && uv run ruff format --check .
 uv run mypy src tests
 ```
+
+## Evaluation
+
+```sh
+uv run gigawhat eval run --suite golden --suite redteam          # writes evals/reports/<date>-<profile>-....md
+uv run gigawhat eval run --suite golden --limit 10 --judge        # also scores answers with DeepEval
+```
+
+60 golden questions and 25 red-team attacks, scored in code against five release gates (never cite a forbidden version, every emergency gets the emergency card, no generated answer to a safety-critical question, no personal data repeated, no case failed to run) and five quality targets. The command exits non-zero if a gate fails. The method and the latest results are in [`docs/governance/evaluation-report.md`](docs/governance/evaluation-report.md).
+
+## Governance
+
+[`docs/governance/`](docs/governance/README.md) holds the system card, risk register, human-oversight design, data-protection assessment, change control, regulatory alignment and evaluation report, each pointing to the code and tests that back its claims, and listing the gaps that remain.
 
 ## Licence
 
