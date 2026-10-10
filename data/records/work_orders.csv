@@ -22,7 +22,7 @@ WO-00020,MAIN-LP-22,reactive,Remedy defect: 2 gas indication(s) recorded along t
 WO-00021,SWG-KGM-11,reactive,Remedy defect: Circuit breaker on panel 5 failed to trip on secondary injection test.,completed,1,2024-11-13,2024-11-20,2024-11-28,Raised from protection_test.
 WO-00022,SWG-KGM-11,reactive,Remedy defect: Partial discharge 29.5 dB TEV on panel 3; oil weep at a breaker tank seal.,completed,2,2025-01-12,2025-02-09,2025-02-06,Raised from routine_visual.
 WO-00023,SWG-KGM-11,planned,Replace 1974 oil switchboard with vacuum switchgear,open,2,2025-02-10,2027-06-30,,Capital project after INC-2024-007 and recurring partial discharge findings.
-WO-00024,BAT-ASH,reactive,"Remedy defect: Cells 17 and 41 at 2.11 V and 2.14 V, below 2.18 V (PR-ELEC-058).",completed,2,2025-03-12,2025-04-09,2025-03-15,Raised from battery_check.
+WO-00024,BAT-ASH,reactive,"Remedy defect: Cells 17 and 38 at 2.11 V and 2.13 V, below 2.18 V (PR-ELEC-058).",completed,2,2025-03-12,2025-04-09,2025-03-15,Raised from battery_check.
 WO-00025,GT-2,reactive,Remedy defect: Silica gel breather more than two-thirds discoloured; replacement requested.,completed,2,2025-04-07,2025-05-05,2025-04-24,Raised from routine_visual.
 WO-00026,SWG-KGM-11,reactive,Remedy defect: Partial discharge 30.2 dB TEV on panel 3; oil weep at a breaker tank seal.,completed,2,2025-04-12,2025-05-10,2025-04-14,Raised from routine_visual.
 WO-00027,MAIN-LP-22,reactive,Remedy defect: 1 gas indication(s) recorded along the route and reported for repair.,completed,2,2025-04-26,2025-05-24,2025-05-13,Raised from leakage_survey.
@@ -55,7 +55,7 @@ WO-00053,G-112,reactive,Replace worn main valve seat after SSV-112 over-pressure
 WO-00054,SWG-KGM-11,reactive,Remedy defect: Partial discharge 30.3 dB TEV on panel 3; oil weep at a breaker tank seal.,completed,2,2026-04-12,2026-05-10,2026-04-28,Raised from routine_visual.
 WO-00055,T-104,reactive,"Remedy defect: Acetylene 2.6 ppm, above the 2 ppm caution threshold (PR-ELEC-044). Increased sa",completed,2,2026-04-21,2026-05-19,2026-05-09,Raised from oil_sample_dga.
 WO-00056,MAIN-LP-22,reactive,Remedy defect: 2 gas indication(s) recorded along the route and reported for repair.,completed,2,2026-04-26,2026-05-24,2026-05-07,Raised from leakage_survey.
-WO-00057,PRS-HRW-01,reactive,"Remedy defect: Outlet odorant 3.9 mg/m3, below the 5.0 mg/m3 minimum (PR-GAS-066). Injection pu",completed,2,2026-06-24,2026-07-22,2026-06-30,Raised from monthly_station_check.
+WO-00057,PRS-HRW-01,reactive,"Remedy defect: Outlet odorant 4.2 mg/m3, below the 5.0 mg/m3 minimum (PR-GAS-066). Injection pu",completed,2,2026-06-24,2026-07-22,2026-06-30,Raised from monthly_station_check.
 WO-00058,G-112,reactive,"Remedy defect: Logger maximum outlet 42.4 mbar, more than 5 mbar above the 35 mbar set point (P",completed,2,2026-07-10,2026-08-07,2026-07-13,Raised from monthly_pressure_check.
 WO-00059,T-104,reactive,"Replace failed cooling fan contactor, bank 2",completed,1,2026-07-15,2026-07-16,2026-07-16,Linked to INC-2026-022.
 WO-00060,T-104,reactive,"Remedy defect: Acetylene 4.1 ppm, above the 2 ppm caution threshold (PR-ELEC-044). Increased sa",completed,2,2026-07-21,2026-08-18,2026-07-26,Raised from oil_sample_dga.

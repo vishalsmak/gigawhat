@@ -3,10 +3,13 @@ from alembic.config import Config
 from alembic.runtime.migration import MigrationContext
 from alembic.script import ScriptDirectory
 from sqlalchemy import URL, Connection, Engine, create_engine, text
+from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
 from gigawhat.config import Settings
+from gigawhat.personas import PersonaProfile
 
 MIGRATIONS_LOCATION = "gigawhat:migrations"
+READER_ROLE = "gigawhat_reader"
 
 
 def database_url(settings: Settings) -> URL:
@@ -22,6 +25,18 @@ def database_url(settings: Settings) -> URL:
 
 def create_db_engine(settings: Settings) -> Engine:
     return create_engine(database_url(settings), pool_pre_ping=True)
+
+
+def create_reader_engine(settings: Settings, profile: PersonaProfile) -> AsyncEngine:
+    """An engine whose every connection runs as the restricted reader role, scoped to the
+    persona's business units. Row-level security does the filtering; with no units, it
+    returns nothing."""
+    units = ",".join(unit.value for unit in profile.business_units)
+    drafts = "on" if profile.sees_drafts else "off"
+    options = f"-c role={READER_ROLE} -c app.business_units={units} -c app.include_drafts={drafts}"
+    return create_async_engine(
+        database_url(settings), pool_pre_ping=True, connect_args={"options": options}
+    )
 
 
 def alembic_config(settings: Settings) -> Config:

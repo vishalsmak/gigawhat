@@ -360,7 +360,7 @@ def battery_inspections(
             "battery_check",
             HV_INSPECTOR,
             "defects_found" if weak else "satisfactory",
-            f"Cells 17 and 41 at {lowest_cell} V and 2.14 V, below 2.18 V (PR-ELEC-058)."
+            f"Cells 17 and 38 at {lowest_cell} V and 2.13 V, below 2.18 V (PR-ELEC-058)."
             if weak
             else "Float voltage within 123 to 125 V; all cells within limits.",
             {"float_volts": round(rng.uniform(123.3, 124.7), 1), "lowest_cell_volts": lowest_cell},
@@ -372,7 +372,7 @@ def battery_inspections(
             "battery_check",
             HV_INSPECTOR,
             "defects_found",
-            "Cells 17 and 41 at 2.11 V and 2.14 V, below 2.18 V (PR-ELEC-058).",
+            "Cells 17 and 38 at 2.11 V and 2.13 V, below 2.18 V (PR-ELEC-058).",
             {"float_volts": 123.6, "lowest_cell_volts": 2.11},
         )
 
@@ -492,7 +492,7 @@ def station_inspections(
 ) -> Iterator[Inspection]:
     low_odorant = incidents["INC-2026-019"].date()
     for day in [*monthly(rng.randint(3, 12)), low_odorant]:
-        odorant = round(rng.uniform(5.8, 8.6), 1) if day != low_odorant else 3.9
+        odorant = round(rng.uniform(5.8, 8.6), 1) if day != low_odorant else 4.2
         low = odorant < ODORANT_NORMAL_MG_M3[0]
         yield Inspection(
             asset.asset_id,
@@ -596,7 +596,7 @@ def network_alarms(rng: random.Random, incidents: dict[str, datetime]) -> Iterat
         2,
         "ODORANT_LOW",
         "Outlet odorant concentration low",
-        3.9,
+        4.2,
         "mg/m3",
     )
     tunnel = incidents["INC-2025-019"]

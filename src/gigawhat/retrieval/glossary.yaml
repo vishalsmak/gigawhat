@@ -1,0 +1,24 @@
+# Abbreviations used on the network, with the words the procedures use for them.
+# Keyword search uses the spelled-out form, so a question asked either way finds the same text.
+abbreviations:
+  CME: circuit main earth
+  DGA: dissolved gas analysis
+  DSEAR: dangerous substances and explosive atmospheres
+  HV: high voltage
+  IP: intermediate pressure
+  LEL: lower explosive limit
+  LOTO: isolation
+  LP: low pressure
+  LV: low voltage
+  MP: medium pressure
+  OPSO: over-pressure shut-off
+  OTI: top-oil temperature
+  PE: polyethylene
+  PRS: pressure reduction station
+  PTW: permit-to-work
+  RIDDOR: reporting of injuries diseases and dangerous occurrences
+  RMU: ring main unit
+  SFT: sanction-for-test
+  SSV: slam-shut
+  UPSO: under-pressure shut-off
+  WTI: winding temperature

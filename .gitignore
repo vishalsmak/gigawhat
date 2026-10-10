@@ -22,3 +22,7 @@ data/raw/
 
 # Coverage data
 .coverage
+
+# Chainlit regenerates these on start
+.chainlit/translations/
+.files/

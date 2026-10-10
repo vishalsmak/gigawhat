@@ -22,7 +22,7 @@ alarm_id,asset_id,raised_at,cleared_at,priority,code,message,value,unit
 21,SSV-112,2026-03-10T03:20:00+00:00,2026-03-10T07:25:00+00:00,1,SSV_CLOSED,Slam-shut closed on over-pressure,60.4,mbar
 22,BAT-KGM,2026-04-11T20:47:00+01:00,2026-04-12T04:47:00+01:00,2,CHARGER_FAULT,Battery charger fault,,
 23,FDR-KGM-03,2026-05-14T05:24:00+01:00,2026-05-14T08:22:00+01:00,1,FEEDER_TRIP,Feeder circuit breaker tripped on earth fault,,
-24,PRS-HRW-01,2026-06-23T10:30:00+01:00,2026-06-24T12:30:00+01:00,2,ODORANT_LOW,Outlet odorant concentration low,3.9,mg/m3
+24,PRS-HRW-01,2026-06-23T10:30:00+01:00,2026-06-24T12:30:00+01:00,2,ODORANT_LOW,Outlet odorant concentration low,4.2,mg/m3
 25,T-104,2026-07-14T17:13:00+01:00,2026-07-14T20:22:00+01:00,2,OTI_STAGE_1,Top-oil temperature Stage 1,85.6,°C
 26,T-104,2026-07-15T16:05:00+01:00,2026-07-15T19:15:00+01:00,1,OTI_STAGE_2,Top-oil temperature Stage 2: cooling fan bank 2 not running,96.5,°C
 27,T-104,2026-07-16T17:52:00+01:00,2026-07-16T21:12:00+01:00,2,OTI_STAGE_1,Top-oil temperature Stage 1,85.3,°C

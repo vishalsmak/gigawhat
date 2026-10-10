@@ -12,9 +12,9 @@ See [`docs/architecture.html`](docs/architecture.html) for how it works: compone
 |---|---|---|
 | 1 | Foundations: config, Postgres + pgvector, migrations, CI | ✅ |
 | 2 | Data: fictional multi-utility dataset, HSE guidance, Docling ingestion | ✅ |
-| 3 | Retrieval: hybrid search, row-level security, reranking | |
-| 4 | Workflow: guardrails, safety tiers, cited answers, approvals, audit | |
-| 5 | Chainlit UI with personas | |
+| 3 | Retrieval: hybrid search, row-level security, reranking | ✅ |
+| 4 | Workflow: guardrails, safety tiers, cited answers, approvals, audit | ✅ |
+| 5 | Chainlit UI with personas | ✅ |
 | 6 | Evaluation in CI, Langfuse tracing | |
 | 7 | Deployment to AWS | |
 | 8 | Governance documents | |
@@ -37,6 +37,18 @@ uv run gigawhat data docs           # every stored version with its status and r
 ```
 
 The first `ingest` downloads Docling's PDF layout models and takes a few minutes; later runs skip anything already stored. For the offline profile, run `ollama pull qwen3-embedding:0.6b` first.
+
+## Run it
+
+```sh
+uv run uvicorn gigawhat.api:app --port 8000   # chat UI at http://localhost:8000
+uv run gigawhat ask "How do I purge the 75 mbar main on Mill Lane?" --persona gas_field_engineer
+uv run gigawhat search "vent stack height" --persona gas_field_engineer
+```
+
+Pick a persona at the top of the chat. Safety-critical questions wait for an Authorised Person: switch to the Authorised Person persona for the same business unit to release or decline them, then switch back to see the outcome. The Auditor persona shows this browser's audit trail.
+
+On the offline profile, answers take about a minute on a laptop; Claude on the cloud profile is much faster.
 
 ## Data
 

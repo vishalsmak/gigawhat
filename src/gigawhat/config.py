@@ -27,6 +27,9 @@ class Settings(BaseSettings):
     database_name: str | None = None
 
     data_dir: Path = Path("data")
+    # Demo mode: visitors pick personas without signing in and only see their own requests.
+    demo_mode: bool = True
+    questions_per_hour: int = 30
     ollama_url: str = "http://localhost:11434"
 
     # Standard names, so LangChain integrations can read the same variables.

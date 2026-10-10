@@ -157,3 +157,56 @@ alarms = Table(
     Column("value", Numeric),
     Column("unit", Text),
 )
+
+approvals = Table(
+    "approvals",
+    metadata,
+    Column("approval_id", Text, primary_key=True),
+    Column("thread_id", Text, nullable=False),
+    Column("created_at", DateTime(timezone=True), nullable=False, server_default=func.now()),
+    Column("requester_visitor", Text, nullable=False),
+    Column("requester_persona", Text, nullable=False),
+    Column("business_unit", Text, nullable=False),
+    Column("question", Text, nullable=False),
+    Column("citations", ARRAY(Text), nullable=False),
+    Column("extract", Text, nullable=False),
+    Column("status", Text, nullable=False),
+    Column("decided_at", DateTime(timezone=True)),
+    Column("decider_visitor", Text),
+    Column("decider_persona", Text),
+    Column("decision_note", Text),
+)
+
+audit_events = Table(
+    "audit_events",
+    metadata,
+    Column("event_id", BigInteger, primary_key=True),
+    Column("occurred_at", DateTime(timezone=True), nullable=False, server_default=func.now()),
+    Column("thread_id", Text, nullable=False),
+    Column("visitor_id", Text, nullable=False),
+    Column("persona", Text, nullable=False),
+    Column("event_type", Text, nullable=False),
+    Column("tier", Text),
+    Column("question", Text),
+    Column("pii_entities", ARRAY(Text), nullable=False),
+    Column("guardrails", JSONB, nullable=False),
+    Column("sources", JSONB, nullable=False),
+    Column("response_kind", Text),
+    Column("response", Text),
+    Column("verification", JSONB, nullable=False),
+    Column("models", JSONB, nullable=False),
+    Column("prompt_version", Text, nullable=False),
+    Column("latency_ms", Integer),
+)
+
+feedback = Table(
+    "feedback",
+    metadata,
+    Column("feedback_id", BigInteger, primary_key=True),
+    Column("created_at", DateTime(timezone=True), nullable=False, server_default=func.now()),
+    Column("thread_id", Text, nullable=False),
+    Column("visitor_id", Text, nullable=False),
+    Column("persona", Text, nullable=False),
+    Column("helpful", Boolean, nullable=False),
+    Column("comment", Text),
+)

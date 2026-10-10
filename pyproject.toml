@@ -11,19 +11,31 @@ authors = [
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "alembic>=1.20.0",
+    "chainlit>=2.12.0",
     "docling>=2.137.0",
+    "en-core-web-md",
+    "fastapi>=0.143.0",
     "httpx>=0.28.1",
+    "langchain>=1.4.4",
+    "langchain-anthropic>=1.7.5",
     "langchain-cohere>=0.6.0",
     "langchain-core>=1.6.9",
     "langchain-docling>=3.0.0",
     "langchain-ollama>=1.1.0",
     "langchain-postgres>=0.0.19",
+    "langgraph>=1.2.14",
+    "langgraph-checkpoint-postgres>=3.1.2",
+    "nemoguardrails>=0.24.1",
     "pgvector>=0.3.6",
+    "presidio-analyzer>=2.2.364",
+    "presidio-anonymizer>=2.2.364",
     "psycopg[binary]>=3.3.6",
     "pydantic-settings>=2.15.0",
     "pyyaml>=6.0.3",
+    "sentence-transformers>=6.1.0",
     "sqlalchemy>=2",
     "typer>=0.19",
+    "uvicorn>=0.54.0",
 ]
 
 [project.scripts]
@@ -37,6 +49,7 @@ build-backend = "uv_build"
 dev = [
     "mypy>=2.4.0",
     "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
     "pytest-cov>=7.1.0",
     "ruff>=0.16.10",
     "types-pyyaml>=6.0.12.20260906",
@@ -58,13 +71,17 @@ plugins = ["pydantic.mypy"]
 mypy_path = "src"
 files = ["src", "tests", "scripts"]
 
+untyped_calls_exclude = ["presidio_anonymizer", "chainlit"]
+
 [[tool.mypy.overrides]]
-module = ["pgvector.*"]
+module = ["pgvector.*", "nemoguardrails.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra --strict-markers"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 markers = [
     "integration: needs the Postgres container (docker compose up -d db)",
     "slow: loads Docling and a tokenizer; takes seconds rather than milliseconds",
@@ -80,6 +97,7 @@ environments = [
 [tool.uv.sources]
 torch = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]
 torchvision = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]
+en-core-web-md = { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.8.0/en_core_web_md-3.8.0-py3-none-any.whl" }
 
 [[tool.uv.index]]
 name = "pytorch-cpu"

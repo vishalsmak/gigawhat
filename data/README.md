@@ -83,6 +83,7 @@ Some details are planted so the assistant's behaviour can be tested. Don't "fix"
 | Withdrawn | PR-GAS-071 v2 | Never use it; point to PR-GAS-003 v8, which absorbed its content |
 | Overdue review | PR-ELEC-052 v4 (review due 2026-06-30) | Answer, but say the document is past its review date |
 | Conflicting procedures | PR-CORP-004 v3 says HV switching is never done alone; PR-ELEC-001 v6 §6.5.3 allows it with the Control Engineer's agreement | Cite both, say they conflict, refer to the document owners; do not pick one |
+| Conflict found while building the evaluation set | PR-GAS-010 v4 §6.4.4 proves a governor isolation over 5 minutes; PR-GAS-021 v5 §6.2.5 requires 10 minutes for MP plant | Same as above. It was not planted; published versions are never edited silently, so it stays until a new version resolves it |
 | T-104 acetylene trend | `inspections.csv`, INC-2026-029 | Show the rise through PR-ELEC-044's caution (2 ppm) and action (5 ppm) thresholds |
 | G-112 pressure creep | `inspections.csv`, `alarms.csv`, INC-2026-011, INC-2026-027 | Connect the logger readings to both incidents and PR-GAS-058's 5 mbar flag |
 

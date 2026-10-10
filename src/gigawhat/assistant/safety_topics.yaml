@@ -1,0 +1,44 @@
+# Safety-tier rules. Owned by the Electricity Safety Manager and the Gas Safety Manager.
+# Changes are reviewed like code and must pass the safety evaluation set before release.
+#
+# The rules set a floor. A language model also classifies every question, and the stricter
+# of the two results is used. Patterns are case-insensitive regular expressions.
+
+emergency:
+  # An active, current danger. Any one pattern is enough.
+  - id: smelling-gas-now
+    pattern: '\b(i|we|they|he|she|someone|customer|people|resident)\b[^.?!]{0,40}\b(can\s+)?(smell|smelling|smells)\b[^.?!]{0,25}\bgas\b'
+  - id: gas-escaping-now
+    pattern: '\bgas\b[^.?!]{0,20}\b(is\s+)?(escaping|leaking|hissing)\b[^.?!]{0,20}\b(now|right now|at the moment|everywhere)\b'
+  - id: electric-shock
+    pattern: '\b(electrocuted|electric shock|been shocked|got a shock|has had a shock|taken a shock)\b'
+  - id: casualty
+    pattern: '\b(collapsed|unconscious|not breathing|is injured|badly hurt|bleeding)\b'
+  - id: fire-or-explosion
+    pattern: '\b(on fire|fire in|smoke coming|explosion|exploded)\b'
+
+safety_critical:
+  # Hazardous work together with an intention to do it.
+  intent: '\b(how (do|should|can|would) (i|we|you)|how to|steps (to|for)|talk me through|walk me through|procedure (to|for)|process (to|for)|what do i do to|can i|am i allowed to|go ahead (and|with))\b'
+  topics:
+    - id: isolation-earthing
+      pattern: '\b(isolat\w*|earth(s|ing)?\b|circuit main earth|cme|prove (it )?dead|lock(ing)? off|loto)\b'
+    - id: switching
+      pattern: '\b(switch(ing)?( out| in| off)?|switching programme|close the breaker|open the breaker|rack(ing)? out)\b'
+    - id: permits
+      pattern: '\b(permit[- ]to[- ]work|ptw|sanction[- ]for[- ]test)\b'
+    - id: purging-commissioning
+      pattern: '\b(purg\w*|commission\w*|gas[- ]in|vent(ing)? (the )?gas)\b'
+    - id: confined-space
+      pattern: '\b(confined space|enter(ing)? (the |a )?(cable )?tunnel|tunnel entry|(go|going|get|getting) (in|into) the (cable )?tunnel)\b'
+    - id: pressure-work
+      pattern: '\b(stream changeover|change ?over|bypass|slam[- ]shut reset|reset the slam[- ]shut|break containment)\b'
+    - id: live-working
+      pattern: '\b(live work\w*|work(ing)? live|live (lv|hv) )\b'
+    - id: excavation
+      pattern: '\b(dig\w*|excavat\w*)\b[^.?!]{0,40}\b(main|cable|pipe)\b'
+
+safety_relevant:
+  # Safety information that isn't instructions for hazardous work.
+  - id: condition-and-history
+    pattern: '\b(alarm\w*|trip(ped|s)?|incident\w*|near miss\w*|defect\w*|inspection\w*|dga|acetylene|dissolved gas|creep\w*|overheat\w*|temperature|pressure|leak\w*|odou?rant|threshold\w*)\b'

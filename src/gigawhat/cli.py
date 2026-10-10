@@ -1,4 +1,7 @@
+import asyncio
+import time
 from datetime import date
+from typing import TYPE_CHECKING, Annotated
 
 import httpx
 import typer
@@ -11,7 +14,12 @@ from gigawhat.corpus.hse import fetch_guidance
 from gigawhat.corpus.register import DocumentStatus, load_register
 from gigawhat.db import create_db_engine, upgrade_to_head
 from gigawhat.doctor import Status, run_checks
+from gigawhat.personas import Persona
 from gigawhat.records.load import load_records
+
+if TYPE_CHECKING:
+    from gigawhat.assistant.service import Turn
+    from gigawhat.retrieval.search import RetrievalResult, Retriever
 
 HTTP_TIMEOUT_SECONDS = 3.0
 DOWNLOAD_TIMEOUT_SECONDS = 120.0
@@ -65,10 +73,13 @@ def data_fetch_hse() -> None:
 
 @data_app.command("ingest")
 def data_ingest(
-    only: str | None = typer.Option(None, help="Ingest a single document, e.g. PR-GAS-031."),
-    rebuild: bool = typer.Option(
-        False, help="Delete stored versions first, e.g. after changing chunking. Development only."
-    ),
+    only: Annotated[
+        str | None, typer.Option(help="Ingest a single document, e.g. PR-GAS-031.")
+    ] = None,
+    rebuild: Annotated[
+        bool,
+        typer.Option(help="Delete stored versions first, e.g. after changing chunking. Dev only."),
+    ] = False,
 ) -> None:
     """Parse, chunk and embed the register's documents, then apply their statuses."""
     # Imported here: Docling loads PyTorch, which would slow every other command.
@@ -130,3 +141,68 @@ def data_load_records() -> None:
     for loaded in load_records(engine, settings.records_dir):
         console.print(f"  {loaded.table:<12} {loaded.rows:>6} rows")
     engine.dispose()
+
+
+@app.command()
+def search(
+    question: str,
+    persona: Annotated[
+        Persona, typer.Option(help="Whose access to search with.")
+    ] = Persona.GAS_FIELD_ENGINEER,
+) -> None:
+    """Show the passages retrieval finds for a question, with relevance scores."""
+    from gigawhat.retrieval.service import build_retriever
+
+    settings = get_settings()
+    retriever = build_retriever(settings)
+    result = asyncio.run(_search_and_close(retriever, question, persona))
+    enough = "[green]enough evidence[/]" if result.sufficient else "[red]not enough evidence[/]"
+    console.print(f"Persona: {persona} · {enough}")
+    for passage in result.passages:
+        console.print(
+            f"\n[bold]{passage.citation}[/] {passage.title}  relevance {passage.relevance:.2f}"
+        )
+        console.print(passage.text[:400] + ("…" if len(passage.text) > 400 else ""))
+
+
+async def _search_and_close(
+    retriever: "Retriever", question: str, persona: Persona
+) -> "RetrievalResult":
+    try:
+        return await retriever.retrieve(question, persona)
+    finally:
+        await retriever.aclose()
+
+
+@app.command()
+def ask(
+    question: str,
+    persona: Annotated[
+        Persona, typer.Option(help="Whose role to ask as.")
+    ] = Persona.GAS_FIELD_ENGINEER,
+) -> None:
+    """Ask the assistant a question from the command line, showing each step."""
+    from rich.markdown import Markdown
+
+    turn = asyncio.run(_ask_and_close(question, persona))
+    console.print(f"\n[bold]Tier:[/] {turn.tier} · [bold]Response:[/] {turn.response.kind}\n")
+    console.print(Markdown(turn.response.text))
+    for notice in turn.response.notices:
+        console.print(f"[yellow]Notice:[/] {notice}")
+    for source in turn.response.sources:
+        console.print(f"[dim]Source:[/] {source.label} · {source.title}")
+
+
+async def _ask_and_close(question: str, persona: Persona) -> "Turn":
+    from gigawhat.assistant.service import Question, create_assistant
+
+    assistant = await create_assistant(get_settings())
+    started = time.monotonic()
+
+    async def show(label: str) -> None:
+        console.print(f"  [green]✓[/] {label} [dim]({time.monotonic() - started:.1f}s)[/]")
+
+    try:
+        return await assistant.ask(Question(question, persona, "cli"), on_step=show)
+    finally:
+        await assistant.aclose()

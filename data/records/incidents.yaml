@@ -360,7 +360,9 @@ incidents:
     immediate_actions: >
       The Authorised Person (Gas) issued an emergency permit. The network was restored at 07:10 on bypass control under PR-GAS-010, after all emergency control valves had been closed and the extremity pressure checked, and properties were relit during the morning, most having gas back within about 4 hours of the trip. G-112 was stripped, a new main valve seat and diaphragm were fitted, and the governor passed a lock-up test. SSV-112 was function-tested before G-112 was returned to service at 12:30. The Gas Safety Manager was informed of the unplanned trip.
     root_cause: >
-      The main valve seat of G-112 was worn and scored, so the valve could not close tightly at very low flow and the governor could not lock up. As demand fell overnight, gas passing the seat raised the outlet pressure until the slam-shut tripped. Pressure recordings from the previous 3 weeks showed small overnight rises that stayed within the 5 mbar flag limit in PR-GAS-058, so they were not flagged. FLT-112 was inspected and found serviceable. The G-112 data logger is now downloaded and reviewed weekly, looking for overnight rising trends as well as peak values.
+      The main valve seat of G-112 was worn and scored, so the valve could not close tightly at very low flow and the governor could not lock up. As demand fell overnight, gas passing the seat raised the outlet pressure until the slam-shut tripped. Monthly logger downloads in January, February and March had flagged overnight rises
+      more than 5 mbar above the set point under PR-GAS-058, and defect work orders were raised,
+      but the adjustments made under them treated the symptom and the worn seat was not found. FLT-112 was inspected and found serviceable. The G-112 data logger is now downloaded and reviewed weekly, looking for overnight rising trends as well as peak values.
     status: closed
     linked_procedures: [PR-GAS-010, PR-GAS-014, PR-GAS-058]
 
@@ -499,7 +501,9 @@ incidents:
     riddor_reportable: false
     summary: T-104 dissolved gas analysis shows acetylene above action threshold, rising since spring
     description: >
-      The laboratory report for the scheduled follow-up oil sample from primary transformer T-104 at Ashford Road Primary Substation, received on 8 September 2026, showed acetylene above the 5 ppm action threshold in PR-ELEC-044. Acetylene first appeared in the routine sample taken in the spring, which was reported to the Senior Authorised Person (HV) the same day, and it was higher again in the sample taken after the Stage 2 temperature alarm in July (INC-2026-022). Hydrogen and ethylene have also risen. Acetylene in transformer oil usually indicates arcing or a very hot spot. Possible sources include a fault in the main tank, a poor connection, or oil leaking into the main tank from the on-load tap changer compartment. T-104 was built in 1979. There have been no Buchholz alarms and the transformer remains in service.
+      The laboratory report for the scheduled follow-up oil sample from primary transformer T-104 at Ashford Road Primary Substation, received on 8 September 2026, showed acetylene above the 5 ppm action threshold in PR-ELEC-044. Acetylene first appeared at a low level in the routine sample of April 2025, which was
+      reported to the Senior Authorised Person (HV) the same day, crossed the 2 ppm caution
+      threshold in April 2026, and it was higher again in the sample taken after the Stage 2 temperature alarm in July (INC-2026-022). Hydrogen and ethylene have also risen. Acetylene in transformer oil usually indicates arcing or a very hot spot. Possible sources include a fault in the main tank, a poor connection, or oil leaking into the main tank from the on-load tap changer compartment. T-104 was built in 1979. There have been no Buchholz alarms and the transformer remains in service.
     immediate_actions: >
       Following PR-ELEC-044, sampling of T-104 was increased to weekly, an engineering review led by the Senior Authorised Person (HV) was requested, and the Control Engineer limited T-104 to its 12 MVA ONAN rating, with the rest of the load carried by T-105 and adjacent primaries. The Control Engineer was asked to treat any Buchholz or temperature alarm on T-104 as urgent. The Head of Electricity Network Operations was informed.
     root_cause: null
