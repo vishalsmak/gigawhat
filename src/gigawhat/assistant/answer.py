@@ -161,14 +161,21 @@ def quote_found(quote: str, source_text: str) -> bool:
 
 
 def _normalise(text: str) -> str:
-    # Typographic quotes and dashes, which models and documents use interchangeably.
+    # Typographic quotes, hyphens, dashes and spaces, which models and documents use
+    # interchangeably: "ESS\u2011BRK" with a non-breaking hyphen must match "ESS-BRK".
     replacements = {
         "\u2018": "'",
         "\u2019": "'",
         "\u201c": '"',
         "\u201d": '"',
+        "\u2010": "-",
+        "\u2011": "-",
+        "\u2012": "-",
         "\u2013": "-",
         "\u2014": "-",
+        "\u2212": "-",
+        "\u00a0": " ",
+        "\u202f": " ",
     }
     for old, new in replacements.items():
         text = text.replace(old, new)

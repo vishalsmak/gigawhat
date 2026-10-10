@@ -233,13 +233,13 @@ async def test_weak_evidence_means_abstaining(harness: Harness) -> None:
 
 
 async def test_routine_answer_cites_the_procedure(harness: Harness) -> None:
-    values = await harness.ask("How high is a purge vent stack?")
+    values = await harness.ask("Which procedure sets the vent stack height?")
 
     assert "[PR-GAS-031 v3 §6.2]" in values["response"].text
 
 
 async def test_routine_answer_is_audited(harness: Harness, database: Engine) -> None:
-    values = await harness.ask("How high is a purge vent stack?")
+    values = await harness.ask("Which procedure sets the vent stack height?")
 
     assert audit_types(database, values["thread_id"]) == ["answer"]
 
@@ -249,7 +249,7 @@ async def test_invented_quote_is_dropped_and_assistant_abstains(harness: Harness
     draft.claims[0].quote = "outlet is at least 4 m above ground level"
     harness.model.draft = draft
 
-    values = await harness.ask("How high is a purge vent stack?")
+    values = await harness.ask("Which procedure sets the vent stack height?")
 
     assert values["response"].kind is ResponseKind.ABSTAIN
 
@@ -276,7 +276,7 @@ async def test_conflict_between_documents_is_reported(harness: Harness) -> None:
 async def test_overdue_review_is_flagged(harness: Harness) -> None:
     harness.retriever.passages = (passage(review_due=date(2026, 6, 30)),)
 
-    values = await harness.ask("How high is a purge vent stack?")
+    values = await harness.ask("Which procedure sets the vent stack height?")
 
     assert "was due for review on 30 June 2026" in values["response"].notices[0]
 
@@ -388,3 +388,16 @@ async def test_release_event_names_the_decider(harness: Harness, database: Engin
     with database.connect() as connection:
         guardrails = connection.execute(query).scalar_one()
     assert guardrails["decision"]["decider_persona"] == "gas_authorised_person"
+
+
+async def test_paused_assistant_answers_nothing(harness: Harness) -> None:
+    from gigawhat.assistant.service import Assistant, Question, Runtime
+
+    components = Components(
+        harness.rails, harness.model, harness.model, harness.retriever, harness.oversight, {}
+    )
+    paused = Assistant(harness.graph, Runtime(components, pool=None, paused=True))  # type: ignore[arg-type]
+
+    turn = await paused.ask(Question("How do I purge the main?", Persona.GAS_FIELD_ENGINEER, "v"))
+
+    assert (turn.response.kind, harness.model.calls) == (ResponseKind.PAUSED, 0)

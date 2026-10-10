@@ -16,7 +16,8 @@ operator, into a safety tier. Pick exactly one:
 - safety_critical: asking how to carry out, or whether to go ahead with, work that could
   release gas or energy or seriously harm people: isolation, earthing, switching,
   permits-to-work, purging, commissioning, confined-space entry, stream changeover, bypass
-  operation, live working, digging near live plant.
+  operation, live working, digging near live plant. This includes asking for the limits,
+  distances, readings or settings to use while doing that work.
 - emergency: someone describes a current, active danger: gas being smelt now, a person
   injured or shocked, fire, explosion, someone collapsed.
 

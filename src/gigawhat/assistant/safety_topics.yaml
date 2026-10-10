@@ -19,7 +19,8 @@ emergency:
 
 safety_critical:
   # Hazardous work together with an intention to do it.
-  intent: '\b(how (do|should|can|would) (i|we|you)|how to|steps (to|for)|talk me through|walk me through|procedure (to|for)|process (to|for)|what do i do to|can i|am i allowed to|go ahead (and|with))\b'
+  # Includes asking for the limits, distances or settings used while doing the work.
+  intent: '\b(how (do|should|can|would) (i|we|you)|how to|steps (to|for)|talk me through|walk me through|procedure (to|for)|process (to|for)|what do i do to|can i|am i allowed to|go ahead (and|with)|how (high|far|long|close|many|much)|minimum|maximum|must (be|i|we))\b'
   topics:
     - id: isolation-earthing
       pattern: '\b(isolat\w*|earth(s|ing)?\b|circuit main earth|cme|prove (it )?dead|lock(ing)? off|loto)\b'

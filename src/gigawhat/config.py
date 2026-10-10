@@ -30,6 +30,8 @@ class Settings(BaseSettings):
     # Demo mode: visitors pick personas without signing in and only see their own requests.
     demo_mode: bool = True
     questions_per_hour: int = 30
+    # Operations' stop switch: when true the assistant answers nothing.
+    paused: bool = False
     ollama_url: str = "http://localhost:11434"
 
     # Standard names, so LangChain integrations can read the same variables.
@@ -38,6 +40,9 @@ class Settings(BaseSettings):
     langfuse_public_key: str | None = Field(default=None, validation_alias="LANGFUSE_PUBLIC_KEY")
     langfuse_secret_key: SecretStr | None = Field(
         default=None, validation_alias="LANGFUSE_SECRET_KEY"
+    )
+    langfuse_host: str = Field(
+        default="https://cloud.langfuse.com", validation_alias="LANGFUSE_HOST"
     )
 
     @property

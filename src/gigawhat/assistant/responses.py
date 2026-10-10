@@ -24,6 +24,7 @@ class ResponseKind(StrEnum):
     EMERGENCY = "emergency"
     REFUSAL = "refusal"
     ABSTAIN = "abstain"
+    PAUSED = "paused"
 
 
 class SourceView(BaseModel):
@@ -69,6 +70,10 @@ The extracts below are copied word for word from the approved procedure. GigaWha
 written, reordered or changed any step. Work to the full procedure and your permit, not to \
 these extracts alone."""
 
+PAUSED_TEXT = """\
+GigaWhat is paused by the operations team and is not answering questions at the moment. \
+Use your procedures and your Authorised Person as normal."""
+
 SAFETY_NOTE = "Safety-relevant: check the cited procedure before acting on this."
 
 
@@ -82,6 +87,10 @@ def refusal() -> Response:
 
 def abstain() -> Response:
     return Response(kind=ResponseKind.ABSTAIN, text=ABSTAIN_TEXT)
+
+
+def paused() -> Response:
+    return Response(kind=ResponseKind.PAUSED, text=PAUSED_TEXT)
 
 
 def strict_extracts(passages: tuple[Passage, ...]) -> list[Passage]:

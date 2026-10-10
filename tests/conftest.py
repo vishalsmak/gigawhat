@@ -5,7 +5,7 @@ import pytest
 from sqlalchemy import Engine
 from sqlalchemy.exc import OperationalError
 
-from gigawhat.config import Settings
+from gigawhat.config import Profile, Settings
 from gigawhat.db import create_db_engine, upgrade_to_head
 
 TEST_DATABASE = "gigawhat_test"
@@ -26,7 +26,8 @@ def clean_key_environment(monkeypatch: pytest.MonkeyPatch) -> None:
 
 @pytest.fixture(scope="session")
 def test_settings() -> Settings:
-    return Settings(_env_file=None, database_name=TEST_DATABASE)
+    """Pinned to the cloud profile, whose 1536-dimension schema the test database uses."""
+    return Settings(_env_file=None, database_name=TEST_DATABASE, profile=Profile.CLOUD)
 
 
 @pytest.fixture(scope="session")

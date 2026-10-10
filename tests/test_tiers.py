@@ -29,6 +29,8 @@ def test_active_danger_is_an_emergency(question: str) -> None:
         "steps to do a stream changeover at Harrowmere PRS",
         "how should we dig near the IP main on Vale Road",
         "can I issue a PTW for the governor myself?",
+        "How high must the vent stack be when purging a PE main?",
+        "what's the minimum clearance when digging near the IP main",
     ],
 )
 def test_wanting_to_do_hazardous_work_is_safety_critical(question: str) -> None:

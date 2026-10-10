@@ -6,6 +6,7 @@ from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from typing import Any
 
+from langchain_core.callbacks import BaseCallbackHandler
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
 from langgraph.graph.state import CompiledStateGraph
@@ -14,6 +15,7 @@ from psycopg.rows import dict_row
 from psycopg_pool import AsyncConnectionPool
 from sqlalchemy.ext.asyncio import create_async_engine
 
+from gigawhat.assistant import responses
 from gigawhat.assistant.graph import STATE_TYPES, AssistantState, Components, build_graph
 from gigawhat.assistant.oversight import Approval, DecisionRequest, Oversight
 from gigawhat.assistant.pii import pii_masker
@@ -30,6 +32,7 @@ from gigawhat.models import (
 )
 from gigawhat.personas import Persona
 from gigawhat.retrieval.service import build_retriever
+from gigawhat.tracing import create_tracer
 
 CHECKPOINT_POOL_SIZE = 10
 STEP_LABELS = {
@@ -60,13 +63,21 @@ class Turn:
     tier: str | None
 
 
+@dataclass(frozen=True)
+class Runtime:
+    """What the assistant needs besides the graph: its parts, the checkpoint pool, a tracer."""
+
+    components: Components
+    pool: AsyncConnectionPool
+    tracer: BaseCallbackHandler | None = None
+    paused: bool = False
+
+
 class Assistant:
-    def __init__(
-        self, graph: CompiledStateGraph[Any], components: Components, pool: AsyncConnectionPool
-    ) -> None:
+    def __init__(self, graph: CompiledStateGraph[Any], runtime: Runtime) -> None:
         self._graph = graph
-        self._components = components
-        self._pool = pool
+        self._runtime = runtime
+        self._components = runtime.components
 
     @property
     def oversight(self) -> Oversight:
@@ -75,6 +86,8 @@ class Assistant:
     async def ask(self, question: Question, on_step: StepListener | None = None) -> Turn:
         """Personal data is masked here, before the question enters graph state, which is
         saved to Postgres."""
+        if self._runtime.paused:
+            return Turn(thread_id="", response=responses.paused(), tier=None)
         masked = pii_masker().mask(question.text)
         thread_id = str(uuid.uuid4())
         state: AssistantState = {
@@ -85,7 +98,8 @@ class Assistant:
             "pii_entities": list(masked.entities),
             "started_at": time.time(),
         }
-        async for update in self._graph.astream(state, _config(thread_id), stream_mode="updates"):
+        config = self._config(thread_id, question.persona)
+        async for update in self._graph.astream(state, config, stream_mode="updates"):
             for node in update:
                 if on_step and node in STEP_LABELS:
                     await on_step(STEP_LABELS[node])
@@ -101,7 +115,8 @@ class Assistant:
             "decider_persona": request.decider_persona.value,
             "note": request.note,
         }
-        await self._graph.ainvoke(Command(resume=resume), _config(approval.thread_id))
+        config = self._config(approval.thread_id, request.decider_persona)
+        await self._graph.ainvoke(Command(resume=resume), config)
         return await self._turn(approval.thread_id)
 
     async def outcome(self, thread_id: str) -> Turn:
@@ -109,10 +124,20 @@ class Assistant:
 
     async def aclose(self) -> None:
         await self._components.retriever.aclose()
-        await self._pool.close()
+        await self._runtime.pool.close()
+
+    def _config(self, thread_id: str, persona: Persona | None = None) -> Any:
+        config: dict[str, Any] = {"configurable": {"thread_id": thread_id}}
+        if self._runtime.tracer is not None:
+            config["callbacks"] = [self._runtime.tracer]
+            config["metadata"] = {
+                "langfuse_session_id": thread_id,
+                "langfuse_tags": [str(persona)] if persona else [],
+            }
+        return config
 
     async def _turn(self, thread_id: str) -> Turn:
-        snapshot = await self._graph.aget_state(_config(thread_id))
+        snapshot = await self._graph.aget_state(self._config(thread_id))
         values: dict[str, Any] = snapshot.values
         tier = values.get("tier")
         return Turn(thread_id, values["response"], str(tier) if tier else None)
@@ -134,7 +159,8 @@ async def create_assistant(settings: Settings) -> Assistant:
     )
     checkpointer, pool = await open_checkpointer(settings)
     pii_masker()  # Load spaCy now rather than on the first question.
-    return Assistant(build_graph(components, checkpointer), components, pool)
+    runtime = Runtime(components, pool, create_tracer(settings), paused=settings.paused)
+    return Assistant(build_graph(components, checkpointer), runtime)
 
 
 async def open_checkpointer(settings: Settings) -> tuple[AsyncPostgresSaver, AsyncConnectionPool]:
@@ -150,10 +176,6 @@ async def open_checkpointer(settings: Settings) -> tuple[AsyncPostgresSaver, Asy
     checkpointer = AsyncPostgresSaver(pool, serde=serde)  # type: ignore[arg-type]
     await checkpointer.setup()
     return checkpointer, pool
-
-
-def _config(thread_id: str) -> Any:
-    return {"configurable": {"thread_id": thread_id}}
 
 
 def _conninfo(settings: Settings) -> str:

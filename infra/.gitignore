@@ -1,0 +1,11 @@
+# Terraform working files and local state. State holds account details: never commit it.
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+crash.*.log
+
+# Your own variable values (the .example files are committed)
+terraform.tfvars
+*.auto.tfvars

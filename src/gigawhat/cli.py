@@ -1,6 +1,7 @@
 import asyncio
 import time
 from datetime import date
+from pathlib import Path
 from typing import TYPE_CHECKING, Annotated
 
 import httpx
@@ -19,6 +20,8 @@ from gigawhat.records.load import load_records
 
 if TYPE_CHECKING:
     from gigawhat.assistant.service import Turn
+    from gigawhat.evaluation.cases import Case
+    from gigawhat.evaluation.checks import CaseResult
     from gigawhat.retrieval.search import RetrievalResult, Retriever
 
 HTTP_TIMEOUT_SECONDS = 3.0
@@ -204,5 +207,57 @@ async def _ask_and_close(question: str, persona: Persona) -> "Turn":
 
     try:
         return await assistant.ask(Question(question, persona, "cli"), on_step=show)
+    finally:
+        await assistant.aclose()
+
+
+eval_app = typer.Typer(
+    help="Evaluation against the golden and red-team sets.", no_args_is_help=True
+)
+app.add_typer(eval_app, name="eval")
+EVAL_SUITES = {"golden": Path("evals/golden.yaml"), "redteam": Path("evals/redteam.yaml")}
+EVAL_REPORTS = Path("evals/reports")
+
+
+# Each parameter is one of the command's options, so this is the one place more than three is fine.
+@eval_app.command("run")
+def eval_run(
+    suite: Annotated[list[str], typer.Option(help="golden, redteam, or both.")] = ["golden"],  # noqa: B006
+    limit: Annotated[int | None, typer.Option(help="Only the first N cases of each suite.")] = None,
+    concurrency: Annotated[int, typer.Option(help="Cases run at once.")] = 1,
+    judge: Annotated[bool, typer.Option(help="Also score answers with DeepEval.")] = False,
+) -> None:
+    """Run the evaluation, write a report to evals/reports, and fail if a release gate fails."""
+    from gigawhat.evaluation.cases import load_cases
+    from gigawhat.evaluation.report import all_gates_pass, markdown
+
+    settings = get_settings()
+    cases = [case for name in suite for case in load_cases(EVAL_SUITES[name])[:limit]]
+    results = asyncio.run(_evaluate(cases, concurrency, judge))
+    stamp = date.today().isoformat()
+    title = f"GigaWhat evaluation · {'+'.join(suite)} · {settings.profile} profile · {stamp}"
+    EVAL_REPORTS.mkdir(parents=True, exist_ok=True)
+    report = EVAL_REPORTS / f"{stamp}-{settings.profile}-{'-'.join(suite)}.md"
+    report.write_text(markdown(results, title))
+    console.print(f"Report: {report}")
+    if not all_gates_pass(results):
+        console.print("[bold red]A release gate failed.[/]")
+        raise typer.Exit(code=1)
+    console.print("[bold green]All release gates passed.[/]")
+
+
+async def _evaluate(cases: list["Case"], concurrency: int, judge: bool) -> list["CaseResult"]:
+    from gigawhat.assistant.service import create_assistant
+    from gigawhat.evaluation.judge import build_judge
+    from gigawhat.evaluation.runner import Evaluator, run_cases
+    from gigawhat.models import chat_model_name, create_answer_model
+
+    settings = get_settings()
+    assistant = await create_assistant(settings)
+    judge_model = (
+        build_judge(create_answer_model(settings), chat_model_name(settings)) if judge else None
+    )
+    try:
+        return await run_cases(Evaluator(assistant, judge_model), cases, concurrency)
     finally:
         await assistant.aclose()

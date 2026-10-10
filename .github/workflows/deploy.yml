@@ -1,0 +1,44 @@
+name: Deploy
+
+# Releases an image to the demo server through SSM. Needs the github-deploy Terraform module
+# applied and the repository variables AWS_DEPLOY_ROLE_ARN and AWS_REGION set.
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Image tag to deploy (main, or sha-xxxxxxx)
+        required: true
+        default: main
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: demo
+    steps:
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - name: Run deploy.sh on the instance
+        env:
+          TAG: ${{ inputs.tag }}
+        run: |
+          [[ "$TAG" =~ ^(main|sha-[0-9a-f]{7})$ ]] || { echo "Unexpected tag: $TAG"; exit 1; }
+          command_id=$(aws ssm send-command \
+            --document-name AWS-RunShellScript \
+            --targets Key=tag:Project,Values=gigawhat \
+            --parameters "commands=[\"/opt/gigawhat/deploy.sh $TAG\"]" \
+            --query Command.CommandId --output text)
+          instance=$(aws ec2 describe-instances \
+            --filters Name=tag:Project,Values=gigawhat Name=instance-state-name,Values=running \
+            --query 'Reservations[0].Instances[0].InstanceId' --output text)
+          aws ssm wait command-executed --command-id "$command_id" --instance-id "$instance" || true
+          aws ssm get-command-invocation --command-id "$command_id" --instance-id "$instance" \
+            --query '[Status, StandardOutputContent, StandardErrorContent]' --output text
+          status=$(aws ssm get-command-invocation --command-id "$command_id" \
+            --instance-id "$instance" --query Status --output text)
+          [ "$status" = "Success" ]

@@ -1,0 +1,12 @@
+# Copy to terraform.tfvars (git-ignored) and change what you need. Every value has a default.
+
+region        = "eu-north-1" # your project's Region: AWS Settings > View all projects > Overview
+instance_type = "t4g.small"
+cpu_credits   = "standard" # "unlimited" bursts without limit but bills surplus CPU credits
+
+github_repo = "vishalsmak/gigawhat"
+git_ref     = "main"
+
+root_volume_size_gb   = 20
+snapshot_retain_count = 7
+seed_expiry_days      = 30

@@ -96,6 +96,10 @@ class PiiMasker:
         )
         return MaskedText(masked.text, tuple(sorted({f.entity_type for f in findings})))
 
+    def find(self, text: str) -> list[str]:
+        """The personal data found in the text, as written. Used to check nothing leaks."""
+        return [text[finding.start : finding.end] for finding in self._analyze(text)]
+
     def _analyze(self, text: str) -> list[RecognizerResult]:
         findings = self._analyzer.analyze(
             text=text,

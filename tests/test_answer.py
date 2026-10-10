@@ -119,3 +119,18 @@ def test_next_step_citing_unknown_source_is_dropped() -> None:
     step = NextStep(text="Phone the AP.", source_ids=["S7"], needs_authorisation=True)
 
     assert verify(draft(next_steps=[step]), REFERENCES).next_steps == ()
+
+
+def test_quote_with_non_breaking_hyphens_matches_plain_hyphens() -> None:
+    assert quote_found(
+        "Fit the vent stack so that its outlet is at least 2.5\u2011m",
+        SOURCE.replace("2.5 m", "2.5-m"),
+    )
+
+
+def test_quote_with_non_breaking_spaces_matches() -> None:
+    assert quote_found("at least 2.5\u00a0m above ground level", SOURCE)
+
+
+def test_quote_with_minus_sign_matches_hyphen() -> None:
+    assert quote_found("readings of minus\u22125 are rejected", "Readings of minus-5 are rejected.")

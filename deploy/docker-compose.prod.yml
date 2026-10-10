@@ -1,0 +1,49 @@
+# The hosted demo on one EC2 instance: the app, Postgres with pgvector, and Caddy for HTTPS.
+# Secrets come from /opt/gigawhat/.env, written from SSM Parameter Store by fetch-env.sh.
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: gigawhat
+      POSTGRES_PASSWORD: ${GIGAWHAT_DATABASE_PASSWORD:?set in SSM}
+      POSTGRES_DB: gigawhat_cloud
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gigawhat -d gigawhat_cloud"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  app:
+    image: ghcr.io/vishalsmak/gigawhat:${GIGAWHAT_IMAGE_TAG:-main}
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      GIGAWHAT_PROFILE: cloud
+      GIGAWHAT_DATABASE_HOST: db
+    depends_on:
+      db:
+        condition: service_healthy
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      GIGAWHAT_DOMAIN: ${GIGAWHAT_DOMAIN:?set in SSM}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+
+volumes:
+  pgdata:
+  caddy_data:
+  caddy_config:

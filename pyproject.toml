@@ -12,7 +12,6 @@ requires-python = ">=3.12,<3.13"
 dependencies = [
     "alembic>=1.20.0",
     "chainlit>=2.12.0",
-    "docling>=2.137.0",
     "en-core-web-md",
     "fastapi>=0.143.0",
     "httpx>=0.28.1",
@@ -20,9 +19,9 @@ dependencies = [
     "langchain-anthropic>=1.7.5",
     "langchain-cohere>=0.6.0",
     "langchain-core>=1.6.9",
-    "langchain-docling>=3.0.0",
     "langchain-ollama>=1.1.0",
     "langchain-postgres>=0.0.19",
+    "langfuse>=4.17.0",
     "langgraph>=1.2.14",
     "langgraph-checkpoint-postgres>=3.1.2",
     "nemoguardrails>=0.24.1",
@@ -32,11 +31,16 @@ dependencies = [
     "psycopg[binary]>=3.3.6",
     "pydantic-settings>=2.15.0",
     "pyyaml>=6.0.3",
-    "sentence-transformers>=6.1.0",
     "sqlalchemy>=2",
     "typer>=0.19",
     "uvicorn>=0.54.0",
 ]
+
+[project.optional-dependencies]
+# Loading documents: Docling and its PDF layout models (PyTorch). Not needed to serve answers.
+ingest = ["docling>=2.137.0", "langchain-docling>=3.0.0"]
+# The offline profile's local reranker (PyTorch). The cloud profile reranks with Cohere.
+offline = ["sentence-transformers>=6.1.0"]
 
 [project.scripts]
 gigawhat = "gigawhat.cli:app"
@@ -47,6 +51,7 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
+    "deepeval>=4.2.8",
     "mypy>=2.4.0",
     "pytest>=9.1.1",
     "pytest-asyncio>=1.4.0",
@@ -71,7 +76,7 @@ plugins = ["pydantic.mypy"]
 mypy_path = "src"
 files = ["src", "tests", "scripts"]
 
-untyped_calls_exclude = ["presidio_anonymizer", "chainlit"]
+untyped_calls_exclude = ["presidio_anonymizer", "chainlit", "deepeval"]
 
 [[tool.mypy.overrides]]
 module = ["pgvector.*", "nemoguardrails.*"]
@@ -79,7 +84,8 @@ ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-ra --strict-markers"
+# DeepEval's plugin loads .env into the environment; evaluations run from our own CLI instead.
+addopts = "-ra --strict-markers -p no:deepeval"
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 markers = [

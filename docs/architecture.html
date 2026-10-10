@@ -140,7 +140,7 @@ code { font-family: var(--mono); font-size: .88em; }
     <div><dt>Setting</dt><dd>Fictional UK multi-utility, gas and electricity</dd></div>
     <div><dt>Users</dt><dd>Field engineers, control room, Authorised Persons, auditors</dd></div>
     <div><dt>Data</dt><dd>Public HSE guidance plus fictional procedures and records</dd></div>
-    <div><dt>Status</dt><dd>Demo shared by link · Phases 1–2 of 8 built</dd></div>
+    <div><dt>Status</dt><dd>Built and tested; ready to deploy once API keys are added</dd></div>
   </dl>
 </header>
 
@@ -560,7 +560,7 @@ code { font-family: var(--mono); font-size: .88em; }
       <path class="edge" d="M1012 305 H1038" marker-end="url(#f2-a)"/>
     </svg>
     </div>
-    <figcaption><b>The safety gate is part of the graph's structure, so no prompt can skip it.</b> Each box is a LangGraph node. The router takes the stricter answer when the rules and the classifier disagree, and an emergency beats everything, including a blocked jailbreak attempt. In the safety-critical lane, the steps shown are copied from the procedure by code, and the graph pauses at <code>interrupt()</code> until an Authorised Person releases or declines them. The routine lane stops and names the document owner if retrieval finds too little evidence.</figcaption>
+    <figcaption><b>The safety gate is part of the graph's structure, so no prompt can skip it.</b> Each box is a LangGraph node. Personal data is masked before the question enters graph state, because state is saved to Postgres. The fixed rules run first: if they spot an emergency, the card is shown without waiting for any model. Otherwise the input rails and the classifier run in parallel and the stricter tier wins; an emergency beats everything, including a blocked jailbreak attempt. In the safety-critical lane the steps shown are copied from the procedure by code, and the graph pauses at <code>interrupt()</code> until an Authorised Person of the same unit, never the requester, releases or declines them. The routine lane gathers records only when the question is about an asset or its history, and abstains if retrieval finds too little evidence or no claim survives the quote check.</figcaption>
   </figure>
 
   <div class="table-wrap">
@@ -680,8 +680,9 @@ Summary: Steps to purge a polyethylene main with nitrogen before commissioning.
         <tr><td>Safety tier</td><td>Generated answers to safety-critical questions</td><td>Rules plus classifier; the stricter answer wins</td></tr>
         <tr><td>Documents</td><td>Instructions hidden in a procedure</td><td>Scanned when loaded; marked as data in the prompt</td></tr>
         <tr><td>Output</td><td>Invented claims or steps</td><td>Schema, citation and quote checks in code; verbatim copying in strict mode</td></tr>
+        <tr><td>Operations</td><td>A fault found in live use</td><td>A pause switch (<code>GIGAWHAT_PAUSED</code>) stops all answers without taking the site down; Langfuse traces every step when enabled</td></tr>
         <tr><td>Human</td><td>Anything that gets past the above</td><td>Authorised Person approval through <code>interrupt()</code></td></tr>
-        <tr><td>Testing</td><td>Problems coming back after changes</td><td>DeepEval red-team and faithfulness tests block releases in CI; Langfuse traces live use</td></tr>
+<tr><td>Testing</td><td>Problems coming back after changes</td><td>279 automated tests in CI; a golden and red-team evaluation with five release gates (no forbidden version, every emergency recognised, no generated safety-critical answer, no personal data repeated, no crashes) plus DeepEval faithfulness and relevancy</td></tr>
       </tbody>
     </table>
   </div>
@@ -741,7 +742,7 @@ Summary: Steps to purge a polyethylene main with nitrogen before commissioning.
       <!-- Panel 3: full -->
       <rect class="panel" x="730" y="15" width="330" height="270" rx="10"/>
       <text class="t" x="746" y="42">Hosted · full AWS</text>
-      <text class="s" x="746" y="60">~$60–80/month + model use</text>
+      <text class="s" x="746" y="60">several hundred $/month + model use</text>
       <rect class="zone" x="742" y="78" width="312" height="170" rx="8"/>
       <text class="zl" x="752" y="96">YOUR AWS ACCOUNT</text>
       <rect class="box" x="758" y="106" width="138" height="46" rx="6"/>
@@ -758,10 +759,10 @@ Summary: Steps to purge a polyethylene main with nitrogen before commissioning.
       <text class="ts" x="994" y="126" text-anchor="middle">Bedrock</text>
       <text class="s" x="994" y="142" text-anchor="middle">Claude</text>
       <text class="s" x="994" y="214" text-anchor="middle">+ load balancer, WAF</text>
-      <text class="s" x="746" y="272">Credits last about 6 weeks</text>
+      <text class="s" x="746" y="272">Reference only, not deployed</text>
     </svg>
     </div>
-    <figcaption><b>The code is the same in all three; what changes is where the model runs (the teal arrow).</b> Locally, Ollama runs outside Docker because Docker on a Mac can't use the GPU. The lean option sends prompts over the internet to Anthropic. The full option keeps everything inside your AWS account, which is what a regulated company would want in production. Running an open model on AWS would need a GPU server, which costs several hundred dollars a month if left on.</figcaption>
+    <figcaption><b>The code is the same in all three; what changes is where the model runs (the teal arrow).</b> Locally, Ollama runs outside Docker because Docker on a Mac can't use the GPU. The lean option sends prompts over the internet to Anthropic. The full option keeps everything inside your AWS account, which is what a regulated company would want in production; with Multi-AZ RDS, NAT gateways, a load balancer and WAF it costs several hundred dollars a month, so it is kept as a validated Terraform reference rather than deployed. Running an open model on AWS would need a GPU server, which costs several hundred dollars a month if left on.</figcaption>
   </figure>
 </section>
 
@@ -771,18 +772,18 @@ Summary: Steps to purge a polyethylene main with nitrogen before commissioning.
     <table>
       <thead><tr><th>Area</th><th>Choice</th><th>Why</th><th>Status</th></tr></thead>
       <tbody>
-        <tr><td>Workflow</td><td>LangGraph + LangChain 1.0</td><td>Most widely used; graph structure, interrupts, Postgres checkpoints</td><td><span class="chip st-dec">Decided</span></td></tr>
-        <tr><td>Interface</td><td>Chainlit inside FastAPI</td><td>Python only, built-in chat profiles, actions and LangChain integration</td><td><span class="chip st-dec">Decided</span></td></tr>
-        <tr><td>Storage + search</td><td>Postgres + pgvector, langchain-postgres</td><td>Built-in keyword-plus-vector search; one database for everything</td><td><span class="chip st-dec">Decided</span></td></tr>
-        <tr><td>Parsing</td><td>Docling</td><td>Keeps structure; official LangChain integration</td><td><span class="chip st-dec">Decided</span></td></tr>
-        <tr><td>Guardrails</td><td>Presidio, NeMo Guardrails, code checks</td><td>Layered; see the table above</td><td><span class="chip st-prop">Proposed</span></td></tr>
-        <tr><td>Evaluation</td><td>DeepEval in pytest</td><td>Tests run in CI and block releases</td><td><span class="chip st-prop">Proposed</span></td></tr>
-        <tr><td>Tracing</td><td>Langfuse Cloud (EU)</td><td>Open source; self-hosting documented for production</td><td><span class="chip st-prop">Proposed</span></td></tr>
-        <tr><td>Infrastructure</td><td>Terraform, GitHub Actions</td><td>Most widely used</td><td><span class="chip st-prop">Proposed</span></td></tr>
-        <tr><td>Model</td><td>Hosted: Claude (Sonnet for answers, Haiku for fast steps). Offline: open model on Ollama</td><td>Same code, chosen by <code>GIGAWHAT_PROFILE</code></td><td><span class="chip st-dec">Decided</span></td></tr>
-        <tr><td>Embeddings + rerank</td><td>Hosted: Cohere. Offline: local models</td><td>Each profile has its own database</td><td><span class="chip st-dec">Decided</span></td></tr>
-        <tr><td>Hosting</td><td>Lean EC2 in the project Region</td><td>Fits the $100 credit; full AWS setup kept as a documented Terraform module</td><td><span class="chip st-dec">Decided</span></td></tr>
-        <tr><td>Code</td><td>Public GitHub, Apache-2.0</td><td>Reviewers can clone and run it; free CI</td><td><span class="chip st-dec">Decided</span></td></tr>
+        <tr><td>Workflow</td><td>LangGraph + LangChain 1.0</td><td>Most widely used; graph structure, interrupts, Postgres checkpoints</td><td><span class="chip st-dec">Built</span></td></tr>
+        <tr><td>Interface</td><td>Chainlit inside FastAPI</td><td>Python only, built-in chat profiles, actions and LangChain integration</td><td><span class="chip st-dec">Built</span></td></tr>
+        <tr><td>Storage + search</td><td>Postgres + pgvector, langchain-postgres</td><td>Built-in keyword-plus-vector search; one database for everything</td><td><span class="chip st-dec">Built</span></td></tr>
+        <tr><td>Parsing</td><td>Docling</td><td>Keeps structure; official LangChain integration</td><td><span class="chip st-dec">Built</span></td></tr>
+<tr><td>Guardrails</td><td>Presidio, NeMo Guardrails input rails, code checks</td><td>Layered; see the table above</td><td><span class="chip st-dec">Built</span></td></tr>
+<tr><td>Evaluation</td><td>Deterministic release gates plus DeepEval</td><td>Runs from the CLI and a manual GitHub workflow; fails on any gate</td><td><span class="chip st-dec">Built</span></td></tr>
+<tr><td>Tracing</td><td>Langfuse (EU cloud or self-hosted)</td><td>On when keys are set; every model, tool and graph step</td><td><span class="chip st-dec">Built</span></td></tr>
+<tr><td>Infrastructure</td><td>Terraform, GitHub Actions, Docker, Caddy</td><td>Image without PyTorch; deploy through SSM, no SSH</td><td><span class="chip st-dec">Built, not applied</span></td></tr>
+<tr><td>Model</td><td>Cloud: Claude Opus 5.5 (low effort for tiering and checks, high for answers). Offline: gpt-oss 20B on Ollama</td><td>Same code, chosen by <code>GIGAWHAT_PROFILE</code></td><td><span class="chip st-dec">Built</span></td></tr>
+<tr><td>Embeddings + rerank</td><td>Cloud: Cohere embed-v4.0 and rerank-v3.5. Offline: qwen3-embedding 0.6B and bge-reranker-v2-m3</td><td>Each profile has its own database</td><td><span class="chip st-dec">Built</span></td></tr>
+        <tr><td>Hosting</td><td>Lean EC2 in the project Region</td><td>Fits the $100 credit; full AWS setup kept as a documented Terraform module</td><td><span class="chip st-dec">Built</span></td></tr>
+        <tr><td>Code</td><td>Public GitHub, Apache-2.0</td><td>Reviewers can clone and run it; free CI</td><td><span class="chip st-dec">Built</span></td></tr>
       </tbody>
     </table>
   </div>
@@ -1049,7 +1050,8 @@ Summary: Steps to purge a polyethylene main with nitrogen before commissioning.
   <ol class="open-list">
     <li>Confirm the AWS project Region (the local config says eu-north-1, Stockholm)</li>
     <li>Upgrade the AWS project to the Paid plan before 9 April 2027, when the Free plan ends and the project would close</li>
-    <li>Choose the address for the shared link: a free hostname or a purchased domain</li>
+    <li>Choose the address for the shared link: the free sslip.io hostname Terraform outputs, or a purchased domain</li>
+    <li>Add the Anthropic and Cohere API keys to SSM Parameter Store, then follow <code>infra/README.md</code></li>
   </ol>
 </section>
 

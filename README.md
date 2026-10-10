@@ -26,7 +26,7 @@ Needs [uv](https://docs.astral.sh/uv/) and Docker.
 ```sh
 cp .env.example .env          # add your keys
 docker compose up -d db       # Postgres 17 + pgvector
-uv sync
+uv sync --all-extras          # extras: ingest (Docling) and offline (local reranker)
 uv run gigawhat db upgrade
 uv run gigawhat doctor        # shows what's ready and what's missing
 
@@ -49,6 +49,12 @@ uv run gigawhat search "vent stack height" --persona gas_field_engineer
 Pick a persona at the top of the chat. Safety-critical questions wait for an Authorised Person: switch to the Authorised Person persona for the same business unit to release or decline them, then switch back to see the outcome. The Auditor persona shows this browser's audit trail.
 
 On the offline profile, answers take about a minute on a laptop; Claude on the cloud profile is much faster.
+
+## Container
+
+`docker build -t gigawhat .` builds the hosted image: cloud profile only, no PyTorch or Docling. On an Apple M4 Mac, run it with `-e OPENSSL_armcap=0`: Linux VMs on M4 advertise CPU features that crash OpenSSL's start-up probe. Graviton and x86 servers don't need it.
+
+Deployment to AWS is described in [`infra/README.md`](infra/README.md).
 
 ## Data
 

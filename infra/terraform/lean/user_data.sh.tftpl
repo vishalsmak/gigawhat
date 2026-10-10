@@ -1,0 +1,116 @@
+#!/bin/bash
+# GigaWhat first-boot bootstrap. cloud-init runs it once, as root.
+# Output: /var/log/cloud-init-output.log
+# Holds no secrets: fetch-env.sh reads them from SSM Parameter Store at runtime.
+set -euo pipefail
+
+APP_DIR=/opt/gigawhat
+
+echo "== Docker"
+mkdir -p /etc/docker
+# Cap container logs so they can't fill the small root volume.
+cat > /etc/docker/daemon.json <<'JSON'
+{
+  "log-driver": "json-file",
+  "log-opts": { "max-size": "10m", "max-file": "3" }
+}
+JSON
+dnf install -y docker
+systemctl enable --now docker
+
+echo "== Docker Compose plugin ${compose_version}"
+arch=$(uname -m)
+compose_url="https://github.com/docker/compose/releases/download/${compose_version}/docker-compose-linux-$arch"
+curl -fsSL --retry 5 -o /tmp/docker-compose "$compose_url"
+curl -fsSL --retry 5 -o /tmp/docker-compose.sha256 "$compose_url.sha256"
+echo "$(cut -d' ' -f1 /tmp/docker-compose.sha256)  /tmp/docker-compose" | sha256sum -c -
+install -D -m 0755 /tmp/docker-compose /usr/local/lib/docker/cli-plugins/docker-compose
+rm -f /tmp/docker-compose /tmp/docker-compose.sha256
+docker compose version
+
+echo "== 2 GB swap file"
+if [ ! -f /swapfile ]; then
+  fallocate -l 2G /swapfile
+  chmod 600 /swapfile
+  mkswap /swapfile
+  swapon /swapfile
+  echo '/swapfile none swap defaults 0 0' >> /etc/fstab
+fi
+
+echo "== $APP_DIR"
+install -d -m 0750 "$APP_DIR"
+
+cat > "$APP_DIR/fetch-env.sh" <<'SCRIPT'
+#!/bin/bash
+# Rewrites /opt/gigawhat/.env from every SSM parameter under /gigawhat/, decrypting SecureStrings.
+# NAME is the part after the last slash, upper-cased: /gigawhat/ANTHROPIC_API_KEY -> ANTHROPIC_API_KEY.
+# If GIGAWHAT_DOMAIN isn't set in Parameter Store, the instance's sslip.io hostname is used.
+set -euo pipefail
+cd /opt/gigawhat
+tmp=$(mktemp .env.XXXXXX)
+trap 'rm -f "$tmp"' EXIT
+
+aws ssm get-parameters-by-path --region ${region} --path /gigawhat --recursive \
+    --with-decryption --output json \
+  | DEFAULT_DOMAIN=${default_domain} python3 -c '
+import json, os, sys
+
+parameters = json.load(sys.stdin)["Parameters"]
+if not parameters:
+    sys.exit("No parameters under /gigawhat in Parameter Store. See infra/README.md.")
+settings = {}
+for parameter in parameters:
+    name = parameter["Name"].rsplit("/", 1)[-1].upper()
+    if "\n" in parameter["Value"]:
+        sys.exit(f"{name}: values must fit on one line")
+    settings[name] = parameter["Value"]
+settings.setdefault("GIGAWHAT_DOMAIN", os.environ["DEFAULT_DOMAIN"])
+for name, value in sorted(settings.items()):
+    print(f"{name}={value}")
+' > "$tmp"
+
+chmod 600 "$tmp"
+mv "$tmp" .env
+echo "Wrote $(wc -l < .env) settings to /opt/gigawhat/.env"
+SCRIPT
+
+cat > "$APP_DIR/update.sh" <<'SCRIPT'
+#!/bin/bash
+# Downloads the deploy files, refreshes .env from Parameter Store, then runs deploy.sh.
+# Run it again to update the app: sudo /opt/gigawhat/update.sh
+set -euo pipefail
+cd /opt/gigawhat
+base="https://raw.githubusercontent.com/${github_repo}/${git_ref}/deploy"
+for file in docker-compose.prod.yml Caddyfile deploy.sh; do
+  curl -fsSL --retry 5 -o "$file.new" "$base/$file"
+  mv "$file.new" "$file"
+done
+chmod 0750 deploy.sh
+./fetch-env.sh
+./deploy.sh
+SCRIPT
+
+chmod 0750 "$APP_DIR/fetch-env.sh" "$APP_DIR/update.sh"
+
+echo "== Waiting for instance credentials"
+for _ in $(seq 30); do
+  aws sts get-caller-identity --region ${region} > /dev/null 2>&1 && break
+  sleep 5
+done
+
+# Caddy gets its certificate for the sslip.io name, which points at the Elastic IP, so wait until
+# the Elastic IP is attached before starting the app.
+echo "== Waiting for Elastic IP ${public_ip}"
+imds() {
+  local token
+  token=$(curl -sf -X PUT -H "X-aws-ec2-metadata-token-ttl-seconds: 60" http://169.254.169.254/latest/api/token)
+  curl -sf -H "X-aws-ec2-metadata-token: $token" "http://169.254.169.254/latest/meta-data/$1"
+}
+for _ in $(seq 60); do
+  [ "$(imds public-ipv4 || true)" = "${public_ip}" ] && break
+  sleep 5
+done
+
+echo "== Deploying GigaWhat"
+"$APP_DIR/update.sh"
+echo "== Done: https://${default_domain}"

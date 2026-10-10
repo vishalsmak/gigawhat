@@ -1,0 +1,5 @@
+# Reference module: not deployed. These are the values a real deployment would have to supply.
+
+region          = "eu-north-1"
+certificate_arn = "arn:aws:acm:eu-north-1:123456789012:certificate/00000000-0000-0000-0000-000000000000"
+container_image = "123456789012.dkr.ecr.eu-north-1.amazonaws.com/gigawhat@sha256:<digest>"
