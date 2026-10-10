@@ -8,7 +8,7 @@ can't be released by the persona that made it.
 import json
 import secrets
 from dataclasses import asdict, dataclass, field
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import StrEnum
 from typing import Any
 
@@ -19,6 +19,8 @@ from gigawhat.personas import Persona, profile_of
 from gigawhat.schema import approvals, audit_events, feedback
 
 RECENT_EVENTS = 50
+# A request nobody decides within this time can no longer be released; the requester asks again.
+APPROVAL_TTL = timedelta(hours=24)
 
 
 class ApprovalError(Exception):
@@ -35,13 +37,10 @@ class ApprovalRequest:
     thread_id: str
     requester_visitor: str
     requester_persona: Persona
+    business_unit: str
     question: str
     citations: tuple[str, ...]
     extract: str
-
-    @property
-    def business_unit(self) -> str:
-        return profile_of(self.requester_persona).business_units[0].value
 
 
 @dataclass(frozen=True)
@@ -132,7 +131,11 @@ class Oversight:
         unit = profile_of(persona).releases_for
         if unit is None:
             return []
-        conditions = [approvals.c.business_unit == unit.value, approvals.c.status == "pending"]
+        conditions = [
+            approvals.c.business_unit == unit.value,
+            approvals.c.status == "pending",
+            approvals.c.created_at > datetime.now().astimezone() - APPROVAL_TTL,
+        ]
         if visitor is not None:
             conditions.append(approvals.c.requester_visitor == visitor)
         return await self._approvals(*conditions)
@@ -144,7 +147,7 @@ class Oversight:
         approval = await self.get(request.approval_id)
         _check_may_decide(approval, request)
         async with self._engine.begin() as connection:
-            await connection.execute(
+            result = await connection.execute(
                 update(approvals)
                 .where(approvals.c.approval_id == request.approval_id)
                 .where(approvals.c.status == "pending")
@@ -156,6 +159,9 @@ class Oversight:
                     decision_note=request.note,
                 )
             )
+            # Another decision may have landed between the check and this update.
+            if result.rowcount != 1:
+                raise ApprovalError(f"{request.approval_id} was decided by someone else first")
         return await self.get(request.approval_id)
 
     async def record(self, event: AuditEvent) -> None:
@@ -187,6 +193,8 @@ def _check_may_decide(approval: Approval, request: DecisionRequest) -> None:
     profile = profile_of(request.decider_persona)
     if approval.status != "pending":
         raise ApprovalError(f"{approval.approval_id} was already {approval.status}")
+    if approval.created_at < datetime.now().astimezone() - APPROVAL_TTL:
+        raise ApprovalError(f"{approval.approval_id} has expired; the requester must ask again")
     if profile.releases_for is None or profile.releases_for.value != approval.business_unit:
         raise ApprovalError(f"{profile.title} can't decide {approval.business_unit} requests")
     if request.decider_persona.value == approval.requester_persona:

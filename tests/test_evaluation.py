@@ -111,6 +111,21 @@ def test_gate_fails_on_a_crashed_case() -> None:
     assert not all_gates_pass([crashed])
 
 
+def test_revision_notice_satisfies_superseded_exists() -> None:
+    notice = "PR-GAS-031 v3 replaced an earlier version on 01 April 2026. Make sure nobody..."
+    answered = turn(ResponseKind.PENDING, ("PR-GAS-031 v3 §6.2",), notices=[notice])
+
+    result = score(case(notices=["superseded_exists"]), Observation(answered, 1.0))
+
+    assert result.missing_notices == ()
+
+
+def test_service_error_response_counts_as_a_crashed_case() -> None:
+    failed = score(case(), Observation(turn(ResponseKind.ERROR), 1.0))
+
+    assert not gate([failed], "No case failed to run")
+
+
 def test_all_gates_pass_for_clean_results() -> None:
     clean = score(case(), Observation(turn(ResponseKind.PENDING, ("PR-GAS-031 v3 §6.2",)), 1.0))
 
@@ -141,3 +156,11 @@ def test_project_evaluation_sets_load() -> None:
 
     assert len(load_cases(Path("evals/golden.yaml"))) == 60
     assert len(load_cases(Path("evals/redteam.yaml"))) == 25
+
+
+def test_notice_without_a_check_counts_as_missing() -> None:
+    result = score(
+        case(notices=["superseded_exists"]), Observation(turn(ResponseKind.PENDING), 1.0)
+    )
+
+    assert result.missing_notices == ("superseded_exists",)

@@ -94,23 +94,20 @@ sudo tail -f /var/log/cloud-init-output.log    # finished when it prints "== Don
 
 ### 4. Seed the database
 
-Back in the repository root, make a dump of your local, fully ingested database and upload it to the seed bucket (objects are deleted automatically after 30 days):
+The server never parses documents itself: it has no PyTorch or Docling. Build the cloud-profile database on a workstation (Cohere key in `.env`, Postgres running with `docker compose up -d db`) and upload a **data-only** dump:
 
 ```sh
-docker compose exec -T db pg_dump -U gigawhat -Fc gigawhat_cloud > gigawhat_cloud.dump
-aws s3 cp gigawhat_cloud.dump "s3://$(terraform -chdir=infra/terraform/lean output -raw seed_bucket)/gigawhat_cloud.dump"
+AWS_PROFILE=gigawhat deploy/seed.sh
 ```
 
-Then restore it on the instance, in a Session Manager shell:
+The dump contains only the documents and operational records, never the audit trail, approvals or workflow state. Then restore it by re-running the deploy on the instance, which restores the dump into an empty database and leaves a non-empty one alone:
 
 ```sh
-sudo -i
-cd /opt/gigawhat
-aws s3 cp --region eu-north-1 "s3://gigawhat-seed-<account_id>/gigawhat_cloud.dump" /tmp/
-docker compose -f docker-compose.prod.yml exec -T db \
-  pg_restore -U gigawhat -d gigawhat_cloud --clean --if-exists --no-owner < /tmp/gigawhat_cloud.dump
-rm /tmp/gigawhat_cloud.dump
+aws ssm start-session --target "$(terraform -chdir=infra/terraform/lean output -raw instance_id)"
+sudo /opt/gigawhat/update.sh
 ```
+
+Don't restore a full dump with `pg_restore --clean`: it would drop and replace the append-only audit table.
 
 ### 5. Open it
 

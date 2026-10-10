@@ -19,7 +19,8 @@ RUN chown gigawhat:gigawhat /app
 COPY --from=build --chown=gigawhat:gigawhat /app /app
 COPY --chown=gigawhat:gigawhat .chainlit/config.toml ./.chainlit/config.toml
 COPY --chown=gigawhat:gigawhat chainlit.md ./
-ENV PATH="/app/.venv/bin:$PATH" PYTHONUNBUFFERED=1 GIGAWHAT_PROFILE=cloud
+ENV PATH="/app/.venv/bin:$PATH" PYTHONUNBUFFERED=1 GIGAWHAT_PROFILE=cloud \
+    NEMO_GUARDRAILS_NO_USAGE_STATS=1 HF_HUB_DISABLE_TELEMETRY=1
 USER gigawhat
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s \

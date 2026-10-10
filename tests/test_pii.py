@@ -53,6 +53,7 @@ def test_reports_entity_types_found(masker: PiiMasker) -> None:
         "Call the gas emergency line 0800 111 999",
         "Inspection INS-00412 on 2026-08-14 found 43.5 mbar; WO-00071 raised",
         "What does PR-GAS-031 say about the vent stack?",
+        "G-112 logger max keeps coming up high overnight again",
     ],
 )
 def test_leaves_company_names_ids_and_readings_alone(masker: PiiMasker, text: str) -> None:

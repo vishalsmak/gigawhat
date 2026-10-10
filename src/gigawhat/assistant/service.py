@@ -3,7 +3,7 @@
 import time
 import uuid
 from collections.abc import Awaitable, Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any
 
 from langchain_core.callbacks import BaseCallbackHandler
@@ -17,8 +17,15 @@ from sqlalchemy.ext.asyncio import create_async_engine
 
 from gigawhat.assistant import responses
 from gigawhat.assistant.graph import STATE_TYPES, AssistantState, Components, build_graph
-from gigawhat.assistant.oversight import Approval, DecisionRequest, Oversight
+from gigawhat.assistant.oversight import (
+    Approval,
+    ApprovalError,
+    AuditEvent,
+    DecisionRequest,
+    Oversight,
+)
 from gigawhat.assistant.pii import pii_masker
+from gigawhat.assistant.prompts import PROMPT_VERSION
 from gigawhat.assistant.rails import InputRails
 from gigawhat.assistant.responses import Response
 from gigawhat.config import Settings
@@ -99,20 +106,28 @@ class Assistant:
             "started_at": time.time(),
         }
         config = self._config(thread_id, question.persona)
-        async for update in self._graph.astream(state, config, stream_mode="updates"):
-            for node in update:
-                if on_step and node in STEP_LABELS:
-                    await on_step(STEP_LABELS[node])
+        try:
+            async for update in self._graph.astream(state, config, stream_mode="updates"):
+                for node in update:
+                    if on_step and node in STEP_LABELS:
+                        await on_step(STEP_LABELS[node])
+        except Exception as error:  # A failed model or API call must still leave an audit record.
+            await self.oversight.record(_failure_event(state, error))
+            return Turn(thread_id, responses.service_error(), None)
         return await self._turn(thread_id)
 
     async def pending_approvals(self, persona: Persona, visitor_id: str | None) -> list[Approval]:
         return await self.oversight.pending_for(persona, visitor_id)
 
     async def decide(self, request: DecisionRequest) -> Turn:
+        if self._runtime.paused:
+            raise ApprovalError("GigaWhat is paused, so nothing can be released or declined")
+        request = replace(request, note=pii_masker().mask(request.note).text)
         approval = await self.oversight.decide(request)
         resume = {
             "decision": request.decision.value,
             "decider_persona": request.decider_persona.value,
+            "decider_visitor": request.decider_visitor,
             "note": request.note,
         }
         config = self._config(approval.thread_id, request.decider_persona)
@@ -176,6 +191,21 @@ async def open_checkpointer(settings: Settings) -> tuple[AsyncPostgresSaver, Asy
     checkpointer = AsyncPostgresSaver(pool, serde=serde)  # type: ignore[arg-type]
     await checkpointer.setup()
     return checkpointer, pool
+
+
+def _failure_event(state: AssistantState, error: Exception) -> AuditEvent:
+    return AuditEvent(
+        thread_id=state["thread_id"],
+        visitor_id=state["visitor_id"],
+        persona=str(state["persona"]),
+        event_type="error",
+        prompt_version=PROMPT_VERSION,
+        question=state["question"],
+        pii_entities=tuple(state["pii_entities"]),
+        response_kind="error",
+        response=type(error).__name__,
+        latency_ms=int((time.time() - state["started_at"]) * 1000),
+    )
 
 
 def _conninfo(settings: Settings) -> str:

@@ -56,6 +56,7 @@ class DocumentEntry(BaseModel):
     doc_type: DocType
     owner: str
     source_url: str | None = None
+    source_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
     versions: tuple[VersionEntry, ...] = Field(min_length=1)
 
     @model_validator(mode="after")

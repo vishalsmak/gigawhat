@@ -20,7 +20,7 @@ emergency:
 safety_critical:
   # Hazardous work together with an intention to do it.
   # Includes asking for the limits, distances or settings used while doing the work.
-  intent: '\b(how (do|should|can|would) (i|we|you)|how to|steps (to|for)|talk me through|walk me through|procedure (to|for)|process (to|for)|what do i do to|can i|am i allowed to|go ahead (and|with)|how (high|far|long|close|many|much)|minimum|maximum|must (be|i|we))\b'
+  intent: '\b(how (do|should|can|would) (i|we|you)|how to|steps (to|for)|talk me through|walk me through|procedure (to|for)|process (to|for)|what do (i|we) (do|need)|can (i|we|the|they|he|she)|am i allowed to|is it (ok|okay|fine|safe)|ok to|go ahead (and|with)|before (i|we|they) (go|start)|planning|who (has|needs) to|how (high|far|long|close|many|much|fast|quick(ly)?)|minimum|maximum|must (be|i|we)|doing (the|a|an)|(set|trip(s)?) (at|to))\b'
   topics:
     - id: isolation-earthing
       pattern: '\b(isolat\w*|earth(s|ing)?\b|circuit main earth|cme|prove (it )?dead|lock(ing)? off|loto)\b'
@@ -29,11 +29,11 @@ safety_critical:
     - id: permits
       pattern: '\b(permit[- ]to[- ]work|ptw|sanction[- ]for[- ]test)\b'
     - id: purging-commissioning
-      pattern: '\b(purg\w*|commission\w*|gas[- ]in|vent(ing)? (the )?gas)\b'
+      pattern: '\b(purg\w*|commission\w*|gas[- ]in|vent(ing)? (the )?gas|vent stack|exclusion zone)\b'
     - id: confined-space
-      pattern: '\b(confined space|enter(ing)? (the |a )?(cable )?tunnel|tunnel entry|(go|going|get|getting) (in|into) the (cable )?tunnel)\b'
+      pattern: '\b(confined space|enter(ing)? (the |a )?(cable )?tunnel|tunnel entry|(go|going|get|getting) (in|into) the (cable )?tunnel|ct-[a-z]{3}-\d{2})\b'
     - id: pressure-work
-      pattern: '\b(stream changeover|change ?over|bypass|slam[- ]shut reset|reset the slam[- ]shut|break containment)\b'
+      pattern: '\b(stream changeover|change ?over|bypass|slam[- ]shut reset|reset the slam[- ]shut|break containment|function test\w*|ramp\w* (up )?the pressure)\b'
     - id: live-working
       pattern: '\b(live work\w*|work(ing)? live|live (lv|hv) )\b'
     - id: excavation

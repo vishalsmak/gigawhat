@@ -38,6 +38,7 @@ from gigawhat.assistant.oversight import ApprovalRequest, AuditEvent, Decision, 
 from gigawhat.assistant.prompts import PROMPT_VERSION
 from gigawhat.assistant.rails import RailsVerdict
 from gigawhat.assistant.responses import Response, ResponseKind, SourceView
+from gigawhat.assistant.rewrite import rewrite_queries
 from gigawhat.assistant.tiers import (
     RuleVerdict,
     Tier,
@@ -46,9 +47,10 @@ from gigawhat.assistant.tiers import (
     stricter,
     tier_rules,
 )
+from gigawhat.corpus.register import BusinessUnit
 from gigawhat.personas import Persona, profile_of
 from gigawhat.retrieval.query import QueryAnalysis
-from gigawhat.retrieval.search import Passage, RetrievalResult
+from gigawhat.retrieval.search import Passage, RetrievalResult, Revision
 
 
 class AssistantState(TypedDict, total=False):
@@ -67,11 +69,14 @@ class AssistantState(TypedDict, total=False):
     references: list[Reference]
     verification: Verification
     response: Response
+    extract: Response
     decision: dict[str, str]
 
 
 class PassageRetriever(Protocol):
-    async def retrieve(self, question: str, persona: Persona) -> RetrievalResult: ...
+    async def retrieve(
+        self, question: str, persona: Persona, rewrites: tuple[str, ...] = ()
+    ) -> RetrievalResult: ...
 
     def engine(self, persona: Persona) -> AsyncEngine: ...
 
@@ -96,6 +101,7 @@ STATE_TYPES = [
         SourceView,
         QueryAnalysis,
         Passage,
+        Revision,
         RetrievalResult,
         EvidenceItem,
         Reference,
@@ -166,11 +172,14 @@ def _after_tier(state: AssistantState) -> str:
 
 
 def _after_retrieve(state: AssistantState) -> str:
-    if not state["retrieval"].sufficient:
-        return "abstain"
+    """Safety-critical questions go to release, which abstains without strong extracts. Others
+    continue if the procedures help or the answer may be in the records."""
+    retrieval = state["retrieval"]
     if state["tier"] == Tier.SAFETY_CRITICAL:
         return "prepare_release"
-    return "gather_evidence"
+    if retrieval.sufficient or wants_records(state["question"], retrieval.analysis):
+        return "gather_evidence"
+    return "abstain"
 
 
 def _after_release(state: AssistantState) -> str:
@@ -206,19 +215,27 @@ class _Nodes:
         return {"response": responses.abstain()}
 
     async def retrieve(self, state: AssistantState) -> AssistantState:
-        result = await self._c.retriever.retrieve(state["question"], state["persona"])
+        try:
+            rewrites = await rewrite_queries(self._c.fast_model, state["question"])
+        except Exception:  # Rewriting only widens the search; the question alone still works.
+            rewrites = ()
+        result = await self._c.retriever.retrieve(state["question"], state["persona"], rewrites)
         return {"retrieval": result}
 
     async def gather_evidence(self, state: AssistantState) -> AssistantState:
         retrieval = state["retrieval"]
-        if not wants_records(state["question"], retrieval.analysis.asset_ids):
+        if not wants_records(state["question"], retrieval.analysis):
             return {"evidence": []}
         collector = EvidenceCollector(self._c.retriever.engine(state["persona"]))
         items = await gather_evidence(self._c.answer_model, collector, state["question"])
         return {"evidence": items}
 
     async def write_answer(self, state: AssistantState) -> AssistantState:
-        references = build_references(state["retrieval"].passages, state.get("evidence", []))
+        references = build_references(
+            state["retrieval"].relevant_passages, state.get("evidence", [])
+        )
+        if not references:
+            return {"response": responses.abstain()}
         draft = await draft_answer(self._c.answer_model, state["question"], references)
         verification = verify(draft, references)
         if not verification.has_content:
@@ -233,20 +250,21 @@ class _Nodes:
         extracts = responses.strict_extracts(state["retrieval"].passages)
         if not extracts:
             return {"response": responses.abstain()}
-        response = responses.render_strict(extracts, date.today())
+        extract = responses.render_extracts(extracts, date.today())
         approval_id = await self._c.oversight.request_approval(
             ApprovalRequest(
                 thread_id=state["thread_id"],
                 requester_visitor=state["visitor_id"],
-                requester_persona=state["persona"],
+                requester_persona=Persona(state["persona"]),
+                business_unit=_release_unit(extracts, Persona(state["persona"])),
                 question=state["question"],
-                citations=tuple(extract.citation for extract in extracts),
-                extract=response.text,
+                citations=tuple(passage.citation for passage in extracts),
+                extract=extract.text,
             )
         )
-        response = response.model_copy(update={"approval_id": approval_id})
+        response = responses.pending_notice(extract, approval_id)
         await self._c.oversight.record(self._event(state, "approval_requested", response))
-        return {"response": response}
+        return {"response": response, "extract": extract}
 
     def await_decision(self, state: AssistantState) -> AssistantState:
         decision: dict[str, str] = interrupt({"approval_id": state["response"].approval_id})
@@ -256,17 +274,9 @@ class _Nodes:
         decision = state["decision"]
         decider = profile_of(Persona(decision["decider_persona"])).title
         note = decision.get("note") or "No note given."
-        pending = state["response"]
         if decision["decision"] == Decision.RELEASED:
-            text = f"**Released by {decider}.** {note}\n\n{pending.text}"
-            kind = ResponseKind.RELEASED
-        else:
-            text = (
-                f"**Declined by {decider}.** {note}\n\nDo not start this work. "
-                "Speak to your Authorised Person before going any further."
-            )
-            kind = ResponseKind.DECLINED
-        return {"response": pending.model_copy(update={"kind": kind, "text": text})}
+            return {"response": responses.released(state["extract"], decider, note)}
+        return {"response": responses.declined(decider, note)}
 
     async def audit(self, state: AssistantState) -> AssistantState:
         response = state["response"]
@@ -304,3 +314,12 @@ class _Nodes:
             models=self._c.model_names,
             latency_ms=int((time.time() - state["started_at"]) * 1000),
         )
+
+
+def _release_unit(extracts: list[Passage], requester: Persona) -> str:
+    """Route to the Authorised Persons of the unit that owns the procedure; company-wide
+    procedures go to the requester's own unit."""
+    unit = extracts[0].business_unit
+    if unit == BusinessUnit.SHARED:
+        return profile_of(requester).business_units[0].value
+    return unit

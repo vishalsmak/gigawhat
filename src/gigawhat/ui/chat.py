@@ -23,7 +23,11 @@ from gigawhat.ui.runtime import get_assistant, limiter
 from gigawhat.ui.starters import STARTERS
 from gigawhat.ui.visitor import visitor_from_cookie_header
 
-DEMO_BANNER = "_Demo with fictional data. Harrowmere Energy and its records are invented._"
+DEMO_BANNER = (
+    "_Demo with fictional data. Harrowmere Energy and its records are invented. "
+    "Answers are written by AI from approved documents._"
+)
+NOTE_TIMEOUT_SECONDS = 600
 EXTRACT_PREVIEW = 600
 AUDIT_ROWS = 15
 
@@ -87,14 +91,29 @@ async def on_message(message: cl.Message) -> None:
 
 @cl.action_callback("release")
 async def on_release(action: cl.Action) -> None:
-    await _decide(action, Decision.RELEASED, "Checked against the permit and site conditions.")
+    note = await _ask_for_note(
+        "What did you check before releasing? For example the permit number and site conditions. "
+        "This is recorded in the audit trail."
+    )
+    if note:
+        await _decide(action, Decision.RELEASED, note)
 
 
 @cl.action_callback("decline")
 async def on_decline(action: cl.Action) -> None:
-    reply = await cl.AskUserMessage("Why are you declining? This goes to the requester.").send()
-    note = reply["output"] if reply else "No reason given."
-    await _decide(action, Decision.DECLINED, note)
+    note = await _ask_for_note("Why are you declining? This goes to the requester.")
+    if note:
+        await _decide(action, Decision.DECLINED, note)
+
+
+async def _ask_for_note(prompt: str) -> str | None:
+    """A decision always needs a note in the decider's own words; no reply means no decision."""
+    reply = await cl.AskUserMessage(prompt, timeout=NOTE_TIMEOUT_SECONDS).send()
+    note = (reply or {}).get("output", "").strip()
+    if not note:
+        await cl.Message("Nothing was decided: a note is needed.").send()
+        return None
+    return note
 
 
 @cl.action_callback("show_outcome")
@@ -137,21 +156,19 @@ async def _send_turn(turn: Turn) -> None:
     elements = [
         cl.Text(name=source.label, content=source.text, display="side")
         for source in response.sources
+        if source.text
     ]
     await cl.Message(
-        content=f"{response.text}{notices}{_pending_note(response)}",
+        content=f"{response.text}{notices}{_pending_hint(response)}",
         elements=elements,
         actions=_actions_for(turn),
     ).send()
 
 
-def _pending_note(response: Response) -> str:
+def _pending_hint(response: Response) -> str:
     if response.kind != ResponseKind.PENDING:
         return ""
-    return (
-        f"\n\n**Waiting for an Authorised Person ({response.approval_id}).** Switch to the "
-        "Authorised Person persona for your unit to release or decline it."
-    )
+    return "\n\n_In this demo, switch to the Authorised Person persona for that unit to decide._"
 
 
 def _actions_for(turn: Turn) -> list[cl.Action]:
@@ -178,6 +195,7 @@ async def _show_queue(profile: PersonaProfile) -> None:
     for approval in queue:
         await cl.Message(
             content=_approval_card(approval),
+            elements=[cl.Text(name=approval.approval_id, content=approval.extract, display="side")],
             actions=[
                 _action("release", "Release", approval_id=approval.approval_id),
                 _action("decline", "Decline", approval_id=approval.approval_id),
@@ -191,7 +209,8 @@ def _approval_card(approval: Approval) -> str:
     more = "…" if len(approval.extract) > EXTRACT_PREVIEW else ""
     return (
         f"**{approval.approval_id}** from {requester} at {approval.created_at:%H:%M}\n\n"
-        f"> {approval.question}\n\nCites {', '.join(approval.citations)}\n\n{extract}{more}"
+        f"> {approval.question}\n\nCites {', '.join(approval.citations)}. "
+        f"Read the full extract in {approval.approval_id} before deciding.\n\n{extract}{more}"
     )
 
 

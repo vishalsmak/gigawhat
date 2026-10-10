@@ -1,10 +1,11 @@
 """The assistant's safety routing, end to end through LangGraph, with scripted models."""
 
+import asyncio
 import time
 import uuid
 from collections.abc import Sequence
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import date, datetime, timedelta
 from typing import Any
 
 import pytest
@@ -14,22 +15,30 @@ from langchain_core.messages import AIMessage, BaseMessage
 from langchain_core.outputs import ChatGeneration, ChatResult
 from langchain_core.runnables import Runnable, RunnableLambda
 from langgraph.types import Command
-from sqlalchemy import Engine, select
+from pydantic import Field
+from sqlalchemy import Engine, select, update
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
 from gigawhat.assistant.answer import Claim, Conflict, DraftAnswer
 from gigawhat.assistant.graph import AssistantState, Components, build_graph
-from gigawhat.assistant.oversight import ApprovalError, Decision, DecisionRequest, Oversight
+from gigawhat.assistant.oversight import (
+    APPROVAL_TTL,
+    ApprovalError,
+    Decision,
+    DecisionRequest,
+    Oversight,
+)
 from gigawhat.assistant.rails import RailsVerdict
-from gigawhat.assistant.responses import ResponseKind
-from gigawhat.assistant.service import open_checkpointer
+from gigawhat.assistant.responses import STRICT_MIN_RELEVANCE, ResponseKind
+from gigawhat.assistant.rewrite import SearchQueries
+from gigawhat.assistant.service import Assistant, Question, Runtime, open_checkpointer
 from gigawhat.assistant.tiers import Tier, TierDecision
 from gigawhat.config import Settings
 from gigawhat.db import database_url
 from gigawhat.personas import Persona
 from gigawhat.retrieval.query import analyse_query
-from gigawhat.retrieval.search import Passage, RetrievalResult
-from gigawhat.schema import audit_events
+from gigawhat.retrieval.search import Passage, RetrievalResult, Revision
+from gigawhat.schema import approvals, audit_events
 
 pytestmark = pytest.mark.integration
 
@@ -41,7 +50,9 @@ class ScriptedModel(BaseChatModel):
 
     tier: Tier = Tier.ROUTINE
     draft: DraftAnswer | None = None
+    rewrite_fails: bool = False
     calls: int = 0
+    asked_for: list[str] = Field(default_factory=list)
 
     @property
     def _llm_type(self) -> str:
@@ -63,8 +74,13 @@ class ScriptedModel(BaseChatModel):
     def with_structured_output(self, schema: Any, **kwargs: Any) -> Runnable[Any, Any]:
         def answer(_: Any) -> Any:
             self.calls += 1
+            self.asked_for.append(schema.__name__)
             if schema is TierDecision:
                 return TierDecision(tier=self.tier, reason="scripted")
+            if schema is SearchQueries:
+                if self.rewrite_fails:
+                    raise TimeoutError("model timed out")
+                return SearchQueries(queries=["scripted rewrite"])
             return self.draft
 
         return RunnableLambda(answer)
@@ -74,9 +90,12 @@ class ScriptedModel(BaseChatModel):
 class ScriptedRails:
     blocked_words: tuple[str, ...] = ("ignore your instructions",)
     calls: int = 0
+    fail: bool = False
 
     async def check(self, question: str) -> RailsVerdict:
         self.calls += 1
+        if self.fail:
+            raise ConnectionError("model service unavailable")
         if any(word in question.lower() for word in self.blocked_words):
             return RailsVerdict(allowed=False, rail="self check input")
         return RailsVerdict(allowed=True)
@@ -104,9 +123,13 @@ class ScriptedRetriever:
     engine_for_tools: AsyncEngine
     passages: tuple[Passage, ...] = (passage(),)
     calls: int = field(default=0)
+    rewrites: tuple[str, ...] = ()
 
-    async def retrieve(self, question: str, persona: Persona) -> RetrievalResult:
+    async def retrieve(
+        self, question: str, persona: Persona, rewrites: tuple[str, ...] = ()
+    ) -> RetrievalResult:
         self.calls += 1
+        self.rewrites = rewrites
         return RetrievalResult(analyse_query(question), self.passages)
 
     def engine(self, persona: Persona) -> AsyncEngine:
@@ -232,6 +255,48 @@ async def test_weak_evidence_means_abstaining(harness: Harness) -> None:
     assert values["response"].kind is ResponseKind.ABSTAIN
 
 
+async def test_search_also_uses_the_rewritten_queries(harness: Harness) -> None:
+    await harness.ask("vent stack how high again??")
+
+    assert harness.retriever.rewrites == ("scripted rewrite",)
+
+
+async def test_failed_rewrite_still_searches_with_the_question(harness: Harness) -> None:
+    harness.model.rewrite_fails = True
+
+    values = await harness.ask("Which procedure sets the vent stack height?")
+
+    assert (values["response"].kind, harness.retriever.rewrites) == (ResponseKind.ANSWER, ())
+
+
+async def test_records_question_looks_at_records_when_no_procedure_matches(
+    harness: Harness,
+) -> None:
+    harness.retriever.passages = (passage(relevance=0.05),)
+
+    values = await harness.ask("What alarms has G-112 raised recently?")
+
+    assert "evidence" in values
+
+
+async def test_nothing_to_cite_means_abstaining_without_drafting(harness: Harness) -> None:
+    harness.retriever.passages = (passage(relevance=0.05),)
+
+    values = await harness.ask("What alarms has G-112 raised recently?")
+
+    assert values["response"].kind is ResponseKind.ABSTAIN
+    assert "DraftAnswer" not in harness.model.asked_for
+
+
+async def test_weakly_matching_procedure_is_not_sent_for_release(harness: Harness) -> None:
+    harness.model.tier = Tier.SAFETY_CRITICAL
+    harness.retriever.passages = (passage(relevance=STRICT_MIN_RELEVANCE - 0.05),)
+
+    values = await harness.ask("Talk me through purging the main")
+
+    assert values["response"].kind is ResponseKind.ABSTAIN
+
+
 async def test_routine_answer_cites_the_procedure(harness: Harness) -> None:
     values = await harness.ask("Which procedure sets the vent stack height?")
 
@@ -273,6 +338,14 @@ async def test_conflict_between_documents_is_reported(harness: Harness) -> None:
     assert "**The sources disagree**" in values["response"].text
 
 
+async def test_revision_survives_the_checkpoint(harness: Harness) -> None:
+    harness.retriever.passages = (passage(effective_from=date.today()),)
+
+    values = await harness.ask("Which procedure sets the vent stack height?")
+
+    assert values["references"][0].revision == Revision("PR-GAS-031 v3", date.today())
+
+
 async def test_overdue_review_is_flagged(harness: Harness) -> None:
     harness.retriever.passages = (passage(review_due=date(2026, 6, 30)),)
 
@@ -289,12 +362,101 @@ async def test_rules_escalate_when_the_model_underrates_the_question(harness: Ha
     assert values["response"].kind is ResponseKind.PENDING
 
 
-async def test_safety_critical_extract_is_the_procedure_word_for_word(harness: Harness) -> None:
+async def test_extract_for_the_authorised_person_is_the_procedure_word_for_word(
+    harness: Harness,
+) -> None:
+    harness.model.tier = Tier.SAFETY_CRITICAL
+    pending = await harness.ask("Talk me through purging the main")
+
+    approval = await harness.oversight.get(pending["response"].approval_id)
+
+    assert f"> {VENT_TEXT}" in approval.extract
+
+
+async def test_requester_does_not_see_the_extract_before_release(harness: Harness) -> None:
     harness.model.tier = Tier.SAFETY_CRITICAL
 
-    values = await harness.ask("Talk me through purging the main")
+    pending = await harness.ask("Talk me through purging the main")
 
-    assert f"> {VENT_TEXT}" in values["response"].text
+    assert VENT_TEXT not in pending["response"].text
+
+
+async def test_requester_is_told_which_sections_await_release(harness: Harness) -> None:
+    harness.model.tier = Tier.SAFETY_CRITICAL
+
+    pending = await harness.ask("Talk me through purging the main")
+
+    assert "PR-GAS-031 v3 §6.2" in pending["response"].text
+
+
+async def test_released_answer_contains_the_extract(harness: Harness) -> None:
+    harness.model.tier = Tier.SAFETY_CRITICAL
+    pending = await harness.ask("Talk me through purging the main")
+
+    released = await harness.decide(pending, Decision.RELEASED, Persona.GAS_AUTHORISED_PERSON)
+
+    assert f"> {VENT_TEXT}" in released["response"].text
+
+
+async def test_declined_answer_carries_no_sources(harness: Harness) -> None:
+    harness.model.tier = Tier.SAFETY_CRITICAL
+    pending = await harness.ask("Talk me through purging the main")
+
+    declined = await harness.decide(pending, Decision.DECLINED, Persona.GAS_AUTHORISED_PERSON)
+
+    assert declined["response"].sources == []
+
+
+async def test_request_goes_to_the_unit_that_owns_the_procedure(harness: Harness) -> None:
+    harness.model.tier = Tier.SAFETY_CRITICAL
+    harness.retriever.passages = (passage(doc_id="PR-ELEC-012", business_unit="electricity"),)
+    pending = await harness.ask("How do I isolate the feeder?", Persona.DOCUMENT_CONTROLLER)
+
+    approval = await harness.oversight.get(pending["response"].approval_id)
+
+    assert approval.business_unit == "electricity"
+
+
+async def test_company_wide_procedure_goes_to_the_requesters_unit(harness: Harness) -> None:
+    harness.model.tier = Tier.SAFETY_CRITICAL
+    harness.retriever.passages = (passage(doc_id="PR-CORP-004", business_unit="shared"),)
+    pending = await harness.ask("How do I work alone?", Persona.ELECTRICITY_CONTROL_ROOM)
+
+    approval = await harness.oversight.get(pending["response"].approval_id)
+
+    assert approval.business_unit == "electricity"
+
+
+async def test_only_one_of_two_simultaneous_decisions_succeeds(harness: Harness) -> None:
+    harness.model.tier = Tier.SAFETY_CRITICAL
+    pending = await harness.ask("Talk me through purging the main")
+    request = DecisionRequest(
+        pending["response"].approval_id,
+        Decision.RELEASED,
+        harness.visitor,
+        Persona.GAS_AUTHORISED_PERSON,
+        "Checked.",
+    )
+
+    outcomes = await asyncio.gather(
+        harness.oversight.decide(request), harness.oversight.decide(request), return_exceptions=True
+    )
+
+    assert sum(isinstance(outcome, ApprovalError) for outcome in outcomes) == 1
+
+
+async def test_expired_request_cannot_be_released(harness: Harness, database: Engine) -> None:
+    harness.model.tier = Tier.SAFETY_CRITICAL
+    pending = await harness.ask("Talk me through purging the main")
+    with database.begin() as connection:
+        connection.execute(
+            update(approvals)
+            .where(approvals.c.approval_id == pending["response"].approval_id)
+            .values(created_at=datetime.now().astimezone() - APPROVAL_TTL - timedelta(minutes=1))
+        )
+
+    with pytest.raises(ApprovalError, match="has expired"):
+        await harness.decide(pending, Decision.RELEASED, Persona.GAS_AUTHORISED_PERSON)
 
 
 async def test_safety_critical_answer_never_asks_the_model_to_write(harness: Harness) -> None:
@@ -390,14 +552,89 @@ async def test_release_event_names_the_decider(harness: Harness, database: Engin
     assert guardrails["decision"]["decider_persona"] == "gas_authorised_person"
 
 
-async def test_paused_assistant_answers_nothing(harness: Harness) -> None:
-    from gigawhat.assistant.service import Assistant, Question, Runtime
-
+def assistant_for(harness: Harness, paused: bool = False) -> Assistant:
     components = Components(
         harness.rails, harness.model, harness.model, harness.retriever, harness.oversight, {}
     )
-    paused = Assistant(harness.graph, Runtime(components, pool=None, paused=True))  # type: ignore[arg-type]
+    return Assistant(harness.graph, Runtime(components, pool=None, paused=paused))  # type: ignore[arg-type]
+
+
+async def test_failed_model_call_is_reported_as_a_service_error(harness: Harness) -> None:
+    harness.rails.fail = True
+
+    turn = await assistant_for(harness).ask(Question("Who owns PR-CORP-001?", Persona.AUDITOR, "v"))
+
+    assert turn.response.kind == ResponseKind.ERROR
+
+
+async def test_failed_model_call_is_audited(harness: Harness, database: Engine) -> None:
+    harness.rails.fail = True
+
+    turn = await assistant_for(harness).ask(Question("Who owns PR-CORP-001?", Persona.AUDITOR, "v"))
+
+    assert audit_types(database, turn.thread_id) == ["error"]
+
+
+async def test_paused_assistant_refuses_decisions(harness: Harness) -> None:
+    harness.model.tier = Tier.SAFETY_CRITICAL
+    pending = await harness.ask("Talk me through purging the main")
+    request = DecisionRequest(
+        pending["response"].approval_id,
+        Decision.RELEASED,
+        harness.visitor,
+        Persona.GAS_AUTHORISED_PERSON,
+        "Checked.",
+    )
+
+    with pytest.raises(ApprovalError, match="paused"):
+        await assistant_for(harness, paused=True).decide(request)
+
+
+@pytest.mark.slow
+async def test_decision_note_is_masked_before_it_is_stored(harness: Harness) -> None:
+    harness.model.tier = Tier.SAFETY_CRITICAL
+    pending = await harness.ask("Talk me through purging the main")
+    request = DecisionRequest(
+        pending["response"].approval_id,
+        Decision.DECLINED,
+        harness.visitor,
+        Persona.GAS_AUTHORISED_PERSON,
+        "Called the customer back on 07700 900461 first.",
+    )
+
+    await assistant_for(harness).decide(request)
+
+    approval = await harness.oversight.get(request.approval_id)
+    assert "07700 900461" not in (approval.decision_note or "")
+
+
+async def test_paused_assistant_answers_nothing(harness: Harness) -> None:
+    paused = assistant_for(harness, paused=True)
 
     turn = await paused.ask(Question("How do I purge the main?", Persona.GAS_FIELD_ENGINEER, "v"))
 
     assert (turn.response.kind, harness.model.calls) == (ResponseKind.PAUSED, 0)
+
+
+@pytest.mark.slow
+async def test_release_through_the_service_records_who_released(
+    harness: Harness, database: Engine
+) -> None:
+    harness.model.tier = Tier.SAFETY_CRITICAL
+    pending = await harness.ask("Talk me through purging the main")
+    request = DecisionRequest(
+        pending["response"].approval_id,
+        Decision.RELEASED,
+        "visitor-authorised-person",
+        Persona.GAS_AUTHORISED_PERSON,
+        "Checked against the permit.",
+    )
+
+    await assistant_for(harness).decide(request)
+
+    query = select(audit_events.c.guardrails).where(
+        audit_events.c.thread_id == pending["thread_id"], audit_events.c.event_type == "released"
+    )
+    with database.connect() as connection:
+        guardrails = connection.execute(query).scalar_one()
+    assert guardrails["decision"]["decider_visitor"] == "visitor-authorised-person"

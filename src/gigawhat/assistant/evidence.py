@@ -4,8 +4,10 @@ Every query runs on the persona's row-level-security engine, so the tools can on
 in the persona's business units. None of them can change anything.
 """
 
+from collections import Counter
 from collections.abc import Sequence
 from dataclasses import dataclass, field
+from datetime import date
 
 from langchain.agents import create_agent
 from langchain.agents.middleware import ToolCallLimitMiddleware
@@ -16,6 +18,7 @@ from sqlalchemy import Row, text
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from gigawhat.assistant.prompts import EVIDENCE_PROMPT
+from gigawhat.retrieval.query import QueryAnalysis
 
 MAX_TOOL_CALLS = 5
 INSPECTIONS_SHOWN = 6
@@ -37,6 +40,17 @@ RECORDS_INTENT = (
     "creep",
     "defect",
     "summar",
+    "happened",
+    "problem",
+    "review",
+    "revis",
+    "version",
+    "supersed",
+    "withdrawn",
+    "still the",
+    "current",
+    "overdue",
+    "register",
 )
 
 
@@ -61,6 +75,11 @@ class EvidenceCollector:
             _tool(self.recent_alarms, f"Alarms on an asset in the last {ALARM_DAYS} days."),
             _tool(self.work_orders, "Open work orders and the latest closed ones for an asset."),
             _tool(self.search_incidents, "Search incident reports by words, optionally by asset."),
+            _tool(
+                self.document_register,
+                "Every version of a document with its status, effective date and review date. "
+                "Leave doc_id empty to list all documents.",
+            ),
         ]
 
     async def asset_details(self, asset_id: str) -> str:
@@ -102,6 +121,7 @@ class EvidenceCollector:
         )
 
     async def recent_alarms(self, asset_id: str) -> str:
+        """Each alarm, plus a summary line with counts, so a count can be quoted and checked."""
         rows = await self._query(
             "SELECT alarm_id, raised_at, cleared_at, code, message, value, unit FROM alarms"
             " WHERE asset_id = :asset_id"
@@ -109,9 +129,16 @@ class EvidenceCollector:
             " ORDER BY raised_at DESC",
             {"asset_id": asset_id.upper(), "days": ALARM_DAYS},
         )
+        counts = Counter(row.code for row in rows)
+        summary = (
+            f"{asset_id.upper()} alarms in the last {ALARM_DAYS} days: {len(rows)} in total ("
+            + ", ".join(f"{code} x{count}" for code, count in sorted(counts.items()))
+            + ")"
+        )
         return self._keep(
             "alarm",
-            [
+            [(f"ALM-SUMMARY-{asset_id.upper()}", summary)]
+            + [
                 (
                     f"ALM-{row.alarm_id:05d}",
                     f"ALM-{row.alarm_id:05d} {row.raised_at:%Y-%m-%d %H:%M} {row.code}: "
@@ -163,6 +190,32 @@ class EvidenceCollector:
             ],
         )
 
+    async def document_register(self, doc_id: str = "") -> str:
+        """Document control: what is current, superseded, withdrawn or overdue for review."""
+        rows = await self._query(
+            "SELECT d.doc_id, d.title, v.version, v.status, v.effective_from, v.review_due"
+            " FROM documents d JOIN document_versions v USING (doc_id)"
+            " WHERE (:doc_id = '' OR d.doc_id = :doc_id) ORDER BY d.doc_id, v.version",
+            {"doc_id": doc_id.upper()},
+        )
+        today = date.today()
+        return self._keep(
+            "register",
+            [
+                (
+                    f"REG-{row.doc_id}-v{row.version}",
+                    f"{row.doc_id} v{row.version} {row.title}: {row.status}, effective "
+                    f"{row.effective_from or 'n/a'}, review due {row.review_due or 'n/a'}"
+                    + (
+                        " (review overdue)"
+                        if row.status == "approved" and row.review_due and row.review_due < today
+                        else ""
+                    ),
+                )
+                for row in rows
+            ],
+        )
+
     async def _query(self, sql: str, parameters: dict[str, object]) -> Sequence[Row[object]]:
         async with self.engine.connect() as connection:
             return (await connection.execute(text(sql), parameters)).all()
@@ -175,10 +228,11 @@ class EvidenceCollector:
         return "\n".join(description for _, description in records) or "No matching records."
 
 
-def wants_records(question: str, asset_ids: tuple[str, ...]) -> bool:
-    """Gather records only when the question is about an asset or its history."""
+def wants_records(question: str, analysis: QueryAnalysis) -> bool:
+    """Gather records only when the question is about an asset, its history, or document
+    control."""
     lowered = question.lower()
-    return bool(asset_ids) or any(word in lowered for word in RECORDS_INTENT)
+    return bool(analysis.asset_ids) or any(word in lowered for word in RECORDS_INTENT)
 
 
 async def gather_evidence(

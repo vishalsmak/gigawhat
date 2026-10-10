@@ -94,6 +94,11 @@ def data_ingest(
     if not selected:
         raise typer.BadParameter(f"{only} is not in the register", param_hint="--only")
 
+    if rebuild:
+        typer.confirm(
+            f"Delete every stored version of {only or 'all documents'} in {settings.database}?",
+            abort=True,
+        )
     ingestor = build_ingestor(settings)
     for document in selected:
         if rebuild:

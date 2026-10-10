@@ -1,15 +1,16 @@
+import hashlib
 from pathlib import Path
 
 import httpx
 import pytest
 
-from gigawhat.corpus.hse import NotAPdfError, fetch_guidance
+from gigawhat.corpus.hse import ChecksumMismatchError, NotAPdfError, fetch_guidance
 from gigawhat.corpus.register import Register
 
 PDF_BYTES = b"%PDF-1.7 fake"
 
 
-def guidance_register() -> Register:
+def guidance_register(sha256: str | None = None) -> Register:
     return Register.model_validate(
         {
             "documents": [
@@ -20,6 +21,7 @@ def guidance_register() -> Register:
                     "doc_type": "guidance",
                     "owner": "Health and Safety Executive",
                     "source_url": "https://example.test/hsg250.pdf",
+                    "source_sha256": sha256,
                     "versions": [
                         {
                             "version": 1,
@@ -77,3 +79,18 @@ def test_refused_response_leaves_no_file(tmp_path: Path) -> None:
         fetch_guidance(guidance_register(), tmp_path / "corpus", client_returning(b"<html>"))
 
     assert not (tmp_path / "raw/hse/hsg250.pdf").exists()
+
+
+def test_refuses_a_download_that_does_not_match_the_registered_checksum(tmp_path: Path) -> None:
+    register = guidance_register(sha256="0" * 64)
+
+    with pytest.raises(ChecksumMismatchError):
+        fetch_guidance(register, tmp_path / "corpus", client_returning(PDF_BYTES))
+
+
+def test_accepts_a_download_that_matches_the_registered_checksum(tmp_path: Path) -> None:
+    register = guidance_register(sha256=hashlib.sha256(PDF_BYTES).hexdigest())
+
+    [result] = fetch_guidance(register, tmp_path / "corpus", client_returning(PDF_BYTES))
+
+    assert result.downloaded

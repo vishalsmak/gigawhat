@@ -2,15 +2,22 @@
 copied source text; only the cited answer contains model-written words."""
 
 import re
-from datetime import date
+from collections.abc import Iterable
+from datetime import date, timedelta
 from enum import StrEnum
 
 from pydantic import BaseModel
 
 from gigawhat.assistant.answer import Reference, Verification
-from gigawhat.retrieval.search import MIN_RELEVANCE, Passage
+from gigawhat.retrieval.search import Passage, Revision
 
 STRICT_EXTRACTS = 2
+# Extracts put in front of an Authorised Person must clearly match the question, so the bar is
+# higher than for an ordinary cited answer. Set on the offline reranker from the evaluation; a
+# chatty but genuine question scores its right section at about 0.35, a near miss at about 0.29.
+STRICT_MIN_RELEVANCE = 0.3
+# How long after a new version takes effect people are warned that older copies may be about.
+REVISION_NOTICE_PERIOD = timedelta(days=365)
 NOT_STEPS = re.compile(
     r"revision history|references|records|definitions|purpose|scope|responsibilities", re.I
 )
@@ -25,6 +32,7 @@ class ResponseKind(StrEnum):
     REFUSAL = "refusal"
     ABSTAIN = "abstain"
     PAUSED = "paused"
+    ERROR = "error"
 
 
 class SourceView(BaseModel):
@@ -74,6 +82,12 @@ PAUSED_TEXT = """\
 GigaWhat is paused by the operations team and is not answering questions at the moment. \
 Use your procedures and your Authorised Person as normal."""
 
+SERVICE_ERROR_TEXT = """\
+GigaWhat couldn't finish this answer because a service it depends on failed. Nothing was \
+decided. Please try again, or use your procedures and your Authorised Person as normal."""
+
+AI_NOTE = "Written by AI from approved documents; check the cited sources."
+
 SAFETY_NOTE = "Safety-relevant: check the cited procedure before acting on this."
 
 
@@ -93,6 +107,10 @@ def paused() -> Response:
     return Response(kind=ResponseKind.PAUSED, text=PAUSED_TEXT)
 
 
+def service_error() -> Response:
+    return Response(kind=ResponseKind.ERROR, text=SERVICE_ERROR_TEXT)
+
+
 def strict_extracts(passages: tuple[Passage, ...]) -> list[Passage]:
     """The most relevant approved procedure steps. Guidance alone is not enough to act on, and
     revision history, references or records sections are not steps."""
@@ -100,13 +118,14 @@ def strict_extracts(passages: tuple[Passage, ...]) -> list[Passage]:
         p
         for p in passages
         if p.doc_type == "procedure"
-        and p.relevance >= MIN_RELEVANCE
+        and p.relevance >= STRICT_MIN_RELEVANCE
         and not NOT_STEPS.search(p.section_path.split(" › ")[-1])
     ]
     return steps[:STRICT_EXTRACTS]
 
 
-def render_strict(extracts: list[Passage], today: date) -> Response:
+def render_extracts(extracts: list[Passage], today: date) -> Response:
+    """The word-for-word procedure text. Only the Authorised Person sees it before release."""
     sections = [STRICT_PREFACE]
     for passage in extracts:
         # A blank quoted line between steps keeps each step its own paragraph when rendered.
@@ -118,7 +137,46 @@ def render_strict(extracts: list[Passage], today: date) -> Response:
         sources=[SourceView(label=p.citation, title=p.title, text=p.text) for p in extracts],
         notices=[
             _overdue_notice(p.citation, p.review_due) for p in extracts if p.review_overdue(today)
-        ],
+        ]
+        + _revision_notices((p.revision for p in extracts), today),
+    )
+
+
+def pending_notice(extract: Response, approval_id: str) -> Response:
+    """What the requester sees while waiting: which sections were found, not their text."""
+    found = "\n".join(f"- {source.label} · {source.title}" for source in extract.sources)
+    text = (
+        f"**Waiting for an Authorised Person ({approval_id}).** This is safety-critical work, "
+        f"so GigaWhat has sent these sections of the approved procedure for release:\n\n{found}"
+        "\n\nThey will be shown here word for word once an Authorised Person releases them. "
+        "Do not start the work until then."
+    )
+    sources = [source.model_copy(update={"text": ""}) for source in extract.sources]
+    return Response(
+        kind=ResponseKind.PENDING,
+        text=text,
+        sources=sources,
+        notices=extract.notices,
+        approval_id=approval_id,
+    )
+
+
+def released(extract: Response, decider: str, note: str) -> Response:
+    return extract.model_copy(
+        update={
+            "kind": ResponseKind.RELEASED,
+            "text": f"**Released by {decider}.** {note}\n\n{extract.text}",
+        }
+    )
+
+
+def declined(decider: str, note: str) -> Response:
+    return Response(
+        kind=ResponseKind.DECLINED,
+        text=(
+            f"**Declined by {decider}.** {note}\n\nDo not start this work. "
+            "Speak to your Authorised Person before going any further."
+        ),
     )
 
 
@@ -145,6 +203,10 @@ def render_answer(verification: Verification, references: list[Reference], today
             f"- {c.description} {_cite(c.source_ids, by_id)} Ask the document owners which applies."
             for c in verification.conflicts
         ]
+    if verification.gaps:
+        lines += ["", "**Not covered by the sources**"]
+        lines += [f"- {gap}" for gap in verification.gaps]
+    lines += ["", f"_{AI_NOTE}_"]
     cited = [by_id[ref_id] for ref_id in cited_ids]
     return Response(
         kind=ResponseKind.ANSWER,
@@ -154,7 +216,8 @@ def render_answer(verification: Verification, references: list[Reference], today
             _overdue_notice(r.label, r.review_due)
             for r in cited
             if r.review_due is not None and r.review_due < today
-        ],
+        ]
+        + _revision_notices((r.revision for r in cited), today),
     )
 
 
@@ -173,4 +236,19 @@ def _overdue_notice(label: str, review_due: date | None) -> str:
     return (
         f"{label} was due for review on {review_due:%d %B %Y} and hasn't been reviewed. "
         "Check with the document owner before relying on it."
+    )
+
+
+def _revision_notices(revisions: Iterable[Revision | None], today: date) -> list[str]:
+    """One notice per document that replaced an earlier version in the last year: someone may
+    still be working from a printed or saved copy of the old one."""
+    recent = [
+        r for r in revisions if r is not None and today - r.effective_from <= REVISION_NOTICE_PERIOD
+    ]
+    return list(
+        dict.fromkeys(
+            f"{r.document} replaced an earlier version on {r.effective_from:%d %B %Y}. "
+            "Make sure nobody is working from an older printed or saved copy."
+            for r in recent
+        )
     )

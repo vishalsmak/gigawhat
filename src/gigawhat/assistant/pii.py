@@ -111,7 +111,11 @@ class PiiMasker:
             regex_flags=CASE_SENSITIVE,
         )
         identifiers = [m.span() for m in IDENTIFIER.finditer(text)]
-        return [f for f in findings if not _overlaps_any(f, identifiers)]
+        return [
+            finding
+            for finding in findings
+            if not _overlaps_any(finding, identifiers) and not _lowercase_name(finding, text)
+        ]
 
 
 @cache
@@ -130,3 +134,9 @@ def _pattern(entity: str, regex: str) -> PatternRecognizer:
 def _overlaps_any(finding: RecognizerResult, spans: list[tuple[int, int]]) -> bool:
     """Asset and document IDs (FDR-ASH-07, PR-GAS-031) are never personal data."""
     return any(finding.start < end and start < finding.end for start, end in spans)
+
+
+def _lowercase_name(finding: RecognizerResult, text: str) -> bool:
+    """spaCy sometimes tags ordinary words ("logger max") as names; real names are capitalised."""
+    span = text[finding.start : finding.end]
+    return finding.entity_type == "PERSON" and span == span.lower()

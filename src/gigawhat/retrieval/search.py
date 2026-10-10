@@ -39,12 +39,21 @@ METADATA_COLUMNS = [
     "safety_critical",
     "review_due",
     "owner",
+    "effective_from",
 ]
 SECTION_NUMBER = re.compile(r"^(\d+(?:\.\d+)*)\s")
 SECTION_TEXT = text(
     "SELECT body FROM current_chunks "
     "WHERE version_id = :version_id AND section_path = :section_path ORDER BY ordinal"
 )
+
+
+@dataclass(frozen=True)
+class Revision:
+    """A document version that replaced an earlier one."""
+
+    document: str
+    effective_from: date
 
 
 @dataclass(frozen=True)
@@ -60,6 +69,13 @@ class Passage:
     safety_critical: bool
     review_due: date | None
     owner: str
+    effective_from: date | None = None
+
+    @property
+    def revision(self) -> Revision | None:
+        if self.version == 1 or self.effective_from is None:
+            return None
+        return Revision(f"{self.doc_id} v{self.version}", self.effective_from)
 
     @property
     def citation(self) -> str:
@@ -80,7 +96,11 @@ class RetrievalResult:
 
     @property
     def sufficient(self) -> bool:
-        return bool(self.passages) and self.passages[0].relevance >= MIN_RELEVANCE
+        return bool(self.relevant_passages)
+
+    @property
+    def relevant_passages(self) -> tuple[Passage, ...]:
+        return tuple(p for p in self.passages if p.relevance >= MIN_RELEVANCE)
 
 
 def hybrid_config(analysis: QueryAnalysis) -> HybridSearchConfig | None:
@@ -106,9 +126,16 @@ class Retriever:
         self._engines: dict[Persona, AsyncEngine] = {}
         self._stores: dict[Persona, PGVectorStore] = {}
 
-    async def retrieve(self, question: str, persona: Persona) -> RetrievalResult:
+    async def retrieve(
+        self, question: str, persona: Persona, rewrites: tuple[str, ...] = ()
+    ) -> RetrievalResult:
+        """Searches with the question and any rewrites of it, then reranks every candidate
+        against the original question, so a rewrite can only add candidates."""
         analysis = analyse_query(question)
         candidates = await self._search(analysis, persona)
+        for rewrite in rewrites:
+            candidates += await self._search(analyse_query(rewrite), persona)
+        candidates = _unique_by_id(candidates)
         scores = await asyncio.to_thread(self._reranker.score, question, candidates)
         ranked = sorted(zip(candidates, scores, strict=True), key=lambda pair: -pair[1])
         async with self.engine(persona).connect() as connection:
@@ -154,6 +181,10 @@ class Retriever:
         return self._stores[persona]
 
 
+def _unique_by_id(candidates: list[Document]) -> list[Document]:
+    return list({str(candidate.id): candidate for candidate in candidates}.values())
+
+
 def _best_per_section(ranked: list[tuple[Document, float]]) -> list[tuple[Document, float]]:
     """Keep the highest-scoring hit from each section; the rest would repeat its text."""
     best: dict[tuple[str, str], tuple[Document, float]] = {}
@@ -181,4 +212,5 @@ async def _whole_section(connection: AsyncConnection, document: Document, score:
         safety_critical=metadata["safety_critical"],
         review_due=metadata["review_due"],
         owner=metadata["owner"],
+        effective_from=metadata["effective_from"],
     )

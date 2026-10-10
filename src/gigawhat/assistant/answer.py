@@ -4,6 +4,7 @@ may cite. The model never decides what counts as verified."""
 import re
 from dataclasses import dataclass
 from datetime import date
+from difflib import SequenceMatcher
 
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import HumanMessage, SystemMessage
@@ -11,9 +12,12 @@ from pydantic import BaseModel, Field
 
 from gigawhat.assistant.evidence import EvidenceItem
 from gigawhat.assistant.prompts import ANSWER_PROMPT
-from gigawhat.retrieval.search import Passage
+from gigawhat.retrieval.search import Passage, Revision
 
 MIN_QUOTE_FRAGMENT = 12
+# Near-exact matching for long quotes: most of the quote must be one unbroken match.
+NEAR_MATCH_MIN_LENGTH = 40
+NEAR_MATCH_SHARE = 0.85
 ELLIPSIS = re.compile(r"\s*(?:\.\.\.|…)\s*")
 NUMBER = re.compile(r"\d+(?:\.\d+)?")
 
@@ -56,6 +60,7 @@ class Reference:
     kind: str
     doc_id: str | None = None
     review_due: date | None = None
+    revision: Revision | None = None
 
 
 @dataclass(frozen=True)
@@ -65,6 +70,7 @@ class Verification:
     conflicts: tuple[Conflict, ...]
     summary: str
     dropped: tuple[str, ...]
+    gaps: tuple[str, ...] = ()
 
     @property
     def has_content(self) -> bool:
@@ -75,7 +81,9 @@ def build_references(
     passages: tuple[Passage, ...], evidence: list[EvidenceItem]
 ) -> list[Reference]:
     sources = [
-        Reference(f"S{n}", p.citation, p.title, p.text, p.doc_type, p.doc_id, p.review_due)
+        Reference(
+            f"S{n}", p.citation, p.title, p.text, p.doc_type, p.doc_id, p.review_due, p.revision
+        )
         for n, p in enumerate(passages, start=1)
     ]
     records = [
@@ -132,7 +140,9 @@ def verify(draft: DraftAnswer, references: list[Reference]) -> Verification:
     if draft.summary and not summary:
         dropped.append("summary: contains numbers not found in any kept claim")
 
-    return Verification(tuple(claims), tuple(steps), tuple(conflicts), summary, tuple(dropped))
+    return Verification(
+        tuple(claims), tuple(steps), tuple(conflicts), summary, tuple(dropped), tuple(draft.gaps)
+    )
 
 
 def _claim_problem(claim: Claim, by_id: dict[str, Reference]) -> str | None:
@@ -146,18 +156,35 @@ def _claim_problem(claim: Claim, by_id: dict[str, Reference]) -> str | None:
 
 
 def quote_found(quote: str, source_text: str) -> bool:
-    """True when every fragment of the quote (split at ellipses) appears in the source, in order."""
+    """True when every fragment of the quote (split at ellipses) appears in the source, in order,
+    exactly or near-exactly; and every number in the quote appears in the source."""
     fragments = [f for f in ELLIPSIS.split(_normalise(quote)) if f]
     if not fragments or any(len(f) < MIN_QUOTE_FRAGMENT for f in fragments):
         return False
     haystack = _normalise(source_text)
+    if not set(NUMBER.findall(quote)) <= set(NUMBER.findall(source_text)):
+        return False
     position = 0
     for fragment in fragments:
-        position = haystack.find(fragment, position)
+        position = _find_near(fragment, haystack, position)
         if position < 0:
             return False
-        position += len(fragment)
     return True
+
+
+def _find_near(fragment: str, haystack: str, start: int) -> int:
+    """End of the fragment's match at or after start, or -1. Long fragments may differ slightly
+    (PDF hyphenation, punctuation) as long as most of them is one unbroken match."""
+    exact = haystack.find(fragment, start)
+    if exact >= 0:
+        return exact + len(fragment)
+    if len(fragment) < NEAR_MATCH_MIN_LENGTH:
+        return -1
+    matcher = SequenceMatcher(None, fragment, haystack, autojunk=False)
+    block = matcher.find_longest_match(0, len(fragment), start, len(haystack))
+    if block.size / len(fragment) < NEAR_MATCH_SHARE:
+        return -1
+    return block.b + block.size
 
 
 def _normalise(text: str) -> str:

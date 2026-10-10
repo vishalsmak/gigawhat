@@ -1,5 +1,6 @@
 """Download public HSE guidance named in the register. The PDFs are fetched, not redistributed."""
 
+import hashlib
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -12,6 +13,10 @@ PDF_MAGIC = b"%PDF"
 
 class NotAPdfError(Exception):
     pass
+
+
+class ChecksumMismatchError(Exception):
+    """The download isn't the file the register vouches for."""
 
 
 @dataclass(frozen=True)
@@ -31,16 +36,22 @@ def fetch_guidance(register: Register, corpus_dir: Path, http: httpx.Client) -> 
         if target.exists():
             results.append(GuidanceFile(document.doc_id, target, downloaded=False))
             continue
-        _download_pdf(http, document.source_url, target)
+        _download_pdf(http, document.source_url, target, document.source_sha256)
         results.append(GuidanceFile(document.doc_id, target, downloaded=True))
     return results
 
 
-def _download_pdf(http: httpx.Client, url: str, target: Path) -> None:
+def _download_pdf(http: httpx.Client, url: str, target: Path, expected_sha256: str | None) -> None:
     response = http.get(url, follow_redirects=True)
     response.raise_for_status()
     if not response.content.startswith(PDF_MAGIC):
         raise NotAPdfError(f"{url} did not return a PDF")
+    digest = hashlib.sha256(response.content).hexdigest()
+    if expected_sha256 is not None and digest != expected_sha256:
+        raise ChecksumMismatchError(
+            f"{url} has changed since it was registered (sha256 {digest}). Review the new "
+            "edition, then update source_sha256 in the register."
+        )
     target.parent.mkdir(parents=True, exist_ok=True)
     partial = target.with_suffix(".part")
     partial.write_bytes(response.content)

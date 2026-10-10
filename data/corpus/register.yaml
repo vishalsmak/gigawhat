@@ -231,6 +231,7 @@ documents:
     doc_type: guidance
     owner: Health and Safety Executive
     source_url: https://www.hse.gov.uk/pubns/priced/hsg250.pdf
+    source_sha256: 1677c767bc03a55a1a685318437d7289a6e927d71a5c305b62ab6a84d98a541a
     versions:
       - {version: 1, status: approved, effective_from: null, review_due: null, approver: null, safety_critical: true, sites: [], asset_classes: [], file: ../raw/hse/hsg250.pdf}
 
@@ -240,6 +241,7 @@ documents:
     doc_type: guidance
     owner: Health and Safety Executive
     source_url: https://www.hse.gov.uk/pubns/priced/hsg253.pdf
+    source_sha256: 0afd8f789b66de60488905db0f61f260276b680c4e9a17543a1fc6c6b13ec7ba
     versions:
       - {version: 1, status: approved, effective_from: null, review_due: null, approver: null, safety_critical: true, sites: [], asset_classes: [], file: ../raw/hse/hsg253.pdf}
 
@@ -249,6 +251,7 @@ documents:
     doc_type: guidance
     owner: Health and Safety Executive
     source_url: https://www.hse.gov.uk/pubns/priced/hsg85.pdf
+    source_sha256: dbdc937e41eb4bd516947f90e10f2ff41a98063d43a82faeeeef2ac72da3a3d0
     versions:
       - {version: 1, status: approved, effective_from: null, review_due: null, approver: null, safety_critical: true, sites: [], asset_classes: [], file: ../raw/hse/hsg85.pdf}
 
@@ -258,6 +261,7 @@ documents:
     doc_type: guidance
     owner: Health and Safety Executive
     source_url: https://www.hse.gov.uk/pubns/priced/hsr25.pdf
+    source_sha256: e9901ecb278b9489afc75213ba3739a0f742f5af412b57be232923d4737bf167
     versions:
       - {version: 1, status: approved, effective_from: null, review_due: null, approver: null, safety_critical: true, sites: [], asset_classes: [], file: ../raw/hse/hsr25.pdf}
 
@@ -267,6 +271,7 @@ documents:
     doc_type: guidance
     owner: Health and Safety Executive
     source_url: https://www.hse.gov.uk/pubns/priced/l80.pdf
+    source_sha256: 91e51df4d3e3c29d04999a982c9b1008cfe83000750a0b90de753ec1e11df240
     versions:
       - {version: 1, status: approved, effective_from: null, review_due: null, approver: null, safety_critical: true, sites: [], asset_classes: [], file: ../raw/hse/l80.pdf}
 
@@ -276,6 +281,7 @@ documents:
     doc_type: guidance
     owner: Health and Safety Executive
     source_url: https://www.hse.gov.uk/pubns/priced/l122.pdf
+    source_sha256: b3f0f7218b0c21e426059cf6103410733a96bc36154583dd84d08f4e7629ac83
     versions:
       - {version: 1, status: approved, effective_from: null, review_due: null, approver: null, safety_critical: true, sites: [], asset_classes: [], file: ../raw/hse/l122.pdf}
 
@@ -285,5 +291,6 @@ documents:
     doc_type: guidance
     owner: Health and Safety Executive
     source_url: https://www.hse.gov.uk/pubns/priced/l138.pdf
+    source_sha256: 2d8bbd03728b7d0ca2966322e319297d2288ff19034b3296cd3981fe86d4bfc9
     versions:
       - {version: 1, status: approved, effective_from: null, review_due: null, approver: null, safety_critical: true, sites: [], asset_classes: [], file: ../raw/hse/l138.pdf}

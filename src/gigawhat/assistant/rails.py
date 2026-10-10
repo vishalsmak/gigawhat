@@ -1,5 +1,6 @@
 """Input guardrails with NVIDIA NeMo Guardrails: jailbreaks, prompt injection and off-topic use."""
 
+import os
 from dataclasses import dataclass
 from typing import Any
 
@@ -11,6 +12,10 @@ from nemoguardrails import LLMRails, RailsConfig
 from nemoguardrails.rails.llm.options import RailStatus
 
 from gigawhat.assistant.prompts import rails_config_yaml
+
+# NeMo Guardrails reports anonymous usage statistics to NVIDIA unless told not to. It checks when
+# rails run, so setting it here is early enough.
+os.environ.setdefault("NEMO_GUARDRAILS_NO_USAGE_STATS", "1")
 
 
 @dataclass(frozen=True)

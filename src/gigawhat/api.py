@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from chainlit.utils import mount_chainlit
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, HTTPException, Request, Response
 
 from gigawhat.config import get_settings
 from gigawhat.ui.runtime import close_assistant, get_assistant
@@ -50,17 +50,21 @@ async def visitor_cookie(
 
 @app.get("/health")
 async def health() -> dict[str, str]:
-    return {"status": "ok", "profile": get_settings().profile.value}
+    settings = get_settings()
+    return {"status": "paused" if settings.paused else "ok", "profile": settings.profile.value}
 
 
 @app.get("/api/audit")
 async def audit(request: Request) -> list[dict[str, Any]]:
-    """This browser's audit events, newest first. Outside demo mode, everyone's."""
-    assistant = await get_assistant()
+    """This browser's audit events, newest first. Only in demo mode: the full trail needs an
+    auditor's sign-in, which this demo doesn't have."""
+    if not get_settings().demo_mode:
+        raise HTTPException(status_code=403, detail="The audit trail needs single sign-on.")
     visitor = visitor_from_cookie_header(request.headers.get("cookie"))
-    if get_settings().demo_mode and visitor is None:
+    if visitor is None:
         return []
-    return await assistant.oversight.events_for(visitor if get_settings().demo_mode else None)
+    assistant = await get_assistant()
+    return await assistant.oversight.events_for(visitor)
 
 
 mount_chainlit(app=app, target=str(CHAT_MODULE), path="/")

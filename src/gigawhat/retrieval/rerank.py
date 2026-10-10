@@ -1,5 +1,6 @@
 """Cross-encoder reranking: score each candidate passage against the question, 0 to 1."""
 
+import threading
 from collections.abc import Sequence
 from typing import Protocol
 
@@ -22,12 +23,17 @@ class LocalReranker:
         from sentence_transformers import CrossEncoder
 
         self._model = CrossEncoder(model_name)
+        # Searches call score() from worker threads. Two PyTorch predictions at once on the
+        # same model can crash the process, so they take turns.
+        self._lock = threading.Lock()
 
     def score(self, question: str, documents: Sequence[Document]) -> list[float]:
         if not documents:
             return []
         pairs = [(question, document.page_content) for document in documents]
-        return [float(score) for score in self._model.predict(pairs)]
+        with self._lock:
+            scores = self._model.predict(pairs)
+        return [float(score) for score in scores]
 
 
 class CohereReranker:

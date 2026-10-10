@@ -16,8 +16,8 @@ permissions:
 
 jobs:
   deploy:
+    # No GitHub environment: it would change the OIDC subject the deploy role trusts.
     runs-on: ubuntu-latest
-    environment: demo
     steps:
       - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
         with:

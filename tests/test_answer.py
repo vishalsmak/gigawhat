@@ -134,3 +134,26 @@ def test_quote_with_non_breaking_spaces_matches() -> None:
 
 def test_quote_with_minus_sign_matches_hyphen() -> None:
     assert quote_found("readings of minus\u22125 are rejected", "Readings of minus-5 are rejected.")
+
+
+LONG_SOURCE = (
+    "Regulation 14 says no person shall be engaged in any work activity on or so near any live "
+    "conductor that danger may arise unless it is unreasonable in all the circumstances for it "
+    "to be dead."
+)
+
+
+def test_long_quote_with_small_punctuation_drift_is_accepted() -> None:
+    quote = "no person shall be engaged in any work activity on or so near any live conductor"
+
+    assert quote_found(quote.replace("live conductor", "live-conductor"), LONG_SOURCE)
+
+
+def test_long_quote_with_a_changed_number_is_rejected() -> None:
+    quote = "Regulation 41 says no person shall be engaged in any work activity on or so near"
+
+    assert not quote_found(quote, LONG_SOURCE)
+
+
+def test_short_quote_must_match_exactly() -> None:
+    assert not quote_found("unless it is un-reasonable", "unless it is unreasonable")

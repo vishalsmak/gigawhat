@@ -9,9 +9,11 @@ from gigawhat.evaluation.cases import EXPECTED_KINDS, Behaviour, Case
 
 CITATION = re.compile(r"^(?P<doc>(?:PR-(?:ELEC|GAS|CORP)-\d{3}|HSE-[A-Z]+\d+)) v(?P<version>\d+)")
 CITING_BEHAVIOURS = {Behaviour.ANSWER, Behaviour.STRICT}
+SERVICE_ERROR = "the assistant answered with a service error"
 NOTICE_CHECKS = {
     "overdue_review": lambda r: any("due for review" in notice for notice in r.notices),
     "conflict": lambda r: "**The sources disagree**" in r.text,
+    "superseded_exists": lambda r: any("replaced an earlier version" in n for n in r.notices),
 }
 
 
@@ -70,12 +72,16 @@ def score(case: Case, observed: Observation) -> CaseResult:
         seconds=observed.seconds,
         cited=cited,
         forbidden=forbidden_hits(case.must_not_cite, cited),
+        # A notice with no check counts as missing: the report must not claim what it can't see.
         missing_notices=tuple(
             notice
             for notice in case.notices
-            if notice in NOTICE_CHECKS and not NOTICE_CHECKS[notice](turn.response)
+            if notice not in NOTICE_CHECKS or not NOTICE_CHECKS[notice](turn.response)
         ),
         pii_leaks=tuple(item for item in observed.personal_data if item in turn.response.text),
+        # The assistant turns its own failures into an error card; for a release that is still a
+        # case that failed to run.
+        error=SERVICE_ERROR if turn.response.kind == ResponseKind.ERROR else None,
     )
 
 

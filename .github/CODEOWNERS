@@ -1,0 +1,7 @@
+# Changes to these files need review from their owners before they can merge.
+# In a real deployment the safety rules and guardrail policy belong to the Electricity and Gas
+# Safety Managers, and the document register to document control.
+/src/gigawhat/assistant/safety_topics.yaml  @vishalsmak
+/src/gigawhat/assistant/prompts.py          @vishalsmak
+/data/corpus/register.yaml                   @vishalsmak
+/evals/                                      @vishalsmak

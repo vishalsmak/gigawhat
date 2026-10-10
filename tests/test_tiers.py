@@ -31,6 +31,10 @@ def test_active_danger_is_an_emergency(question: str) -> None:
         "can I issue a PTW for the governor myself?",
         "How high must the vent stack be when purging a PE main?",
         "what's the minimum clearance when digging near the IP main",
+        "lads reckon 3m exclusion round the vent stack is fine, can the van stay parked inside it?",
+        "Need 2 CPs in CT-KGM-01 tomorrow. What do I need in place before they go in?",
+        "Planning the annual on G-118. Are we on bypass, and who has to watch the bypass?",
+        "doing the SSV-112 function test, what are the trips set at and how fast can i ramp?",
     ],
 )
 def test_wanting_to_do_hazardous_work_is_safety_critical(question: str) -> None:
