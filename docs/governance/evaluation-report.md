@@ -87,7 +87,7 @@ With `--judge`, each response of kind `answer` is also scored with DeepEval (`sr
 - **Faithfulness**: whether the answer's statements are supported by the retrieval context, here the text of the sources shown with the answer.
 - **Answer relevancy**: whether the answer addresses the question.
 
-The judge is the configured answer model: Claude Opus 5.5 at high effort on the cloud profile, `gpt-oss:20b` on the offline profile. DeepEval's telemetry and its `.env` loading are switched off before it is imported. Strict extracts, refusals, emergencies and abstentions are not judged, because they contain no model-written text to judge.
+The judge is the configured answer model: `openai/gpt-oss-20b` on Groq at medium reasoning on the cloud profile, `gpt-oss:20b` on Ollama on the offline profile. DeepEval's telemetry and its `.env` loading are switched off before it is imported. Strict extracts, refusals, emergencies and abstentions are not judged, because they contain no model-written text to judge.
 
 ## 7. How to run it
 
@@ -118,7 +118,7 @@ Each report has three parts: the five gates with PASS or FAIL and the failing ca
 - The `superseded_exists` notice (G011, G018, G019, G029, G032) is scored by the "replaced an earlier version" notice that GigaWhat adds for any cited document revised in the last 12 months. It shows the user that a newer version exists, not that they named an old one.
 - G036 expects a conflict notice from a strict-mode response, which never contains one. It is a known failing case.
 - The assistant catches model and API failures and returns a fixed `error` response. The scorer counts that response as a case that failed to run, so the gate "No case failed to run" still sees them (`score` in `src/gigawhat/evaluation/checks.py`; `tests/test_evaluation.py::test_service_error_response_counts_as_a_crashed_case`).
-- The personal-data gate checks only the response text, not what was sent to model providers or Langfuse.
+- The personal-data gate checks only the response text, not what was sent to model providers or LangSmith.
 - Overdue notices depend on the date the evaluation runs, while the golden set assumes 10 October 2026. Runs on later dates may show extra notices.
 - The evaluation is not wired into the release pipeline. Images are built only after CI passes, but an image can be deployed whether or not the evaluation has been run for it ([change-control.md](change-control.md)).
 
@@ -169,6 +169,6 @@ Median latency was 11.3 seconds and the slowest case 105 seconds, with two cases
 
 **What this run does not show**
 
-- It used the offline models only. The hosted demo uses Claude and Cohere, whose classifier and reranker behave differently. The 0.2 and 0.3 thresholds in particular were set on the offline reranker, so the evaluation must be run on the cloud profile before the hosted demo is relied on.
+- It used the offline models only. Since 12 October 2026 the hosted demo runs the same `gpt-oss-20b` on Groq, but with OpenAI embeddings and the Cohere reranker, which find and score passages differently. The 0.2 and 0.3 thresholds in particular were set on the offline reranker, so the evaluation must be run on the cloud profile before the hosted demo is relied on.
 - One run is a sample. Repeat it before any release decision (section 9).
 - The DeepEval faithfulness and relevancy scores were not run. With gpt-oss:20b as the judge they took about two minutes a case.

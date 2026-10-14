@@ -6,7 +6,6 @@ Terraform for hosting GigaWhat on AWS. Everything is created in your project's s
 |---|---|---|
 | [`terraform/lean`](terraform/lean) | The hosted demo. One Graviton EC2 instance running the app, Postgres and Caddy in Docker, with a free `sslip.io` HTTPS hostname. | About $18 (see below) |
 | [`terraform/github-deploy`](terraform/github-deploy) | Optional. Lets GitHub Actions on `main` redeploy the lean instance, with no stored AWS keys. | Free |
-| [`terraform/production-reference`](terraform/production-reference) | Not deployed. What a regulated company would run instead: private VPC, Multi-AZ RDS, ECS Fargate behind a load balancer and WAF, Claude on Bedrock. It is only checked with `terraform validate`. | Indicative only: several hundred dollars, an order of magnitude more than lean, mostly the Multi-AZ database and NAT gateways |
 
 Lean, broken down (on-demand prices, check the [AWS Pricing Calculator](https://calculator.aws/) for today's figures):
 
@@ -18,7 +17,7 @@ Lean, broken down (on-demand prices, check the [AWS Pricing Calculator](https://
 | 7 daily snapshots (incremental) and the seed bucket | $1 or less |
 | **Total** | **$15 to $20** |
 
-Anthropic and Cohere bill their API usage separately; it is not part of the AWS bill. At about $18 a month, $100 of AWS credit lasts roughly five months.
+Groq, OpenAI and Cohere bill their API usage separately; it is not part of the AWS bill. At about $18 a month, $100 of AWS credit lasts roughly five months.
 
 ## Before you start
 
@@ -41,20 +40,22 @@ export AWS_REGION=eu-north-1
 The instance reads every parameter under `/gigawhat/` into `/opt/gigawhat/.env` when it starts. Terraform never creates or sees them, so they are not in Terraform state.
 
 ```sh
-read -rsp 'Anthropic API key: ' ANTHROPIC_API_KEY; echo
+read -rsp 'Groq API key: ' GROQ_API_KEY; echo
+read -rsp 'OpenAI API key: ' OPENAI_API_KEY; echo
 read -rsp 'Cohere API key: ' COHERE_API_KEY; echo
 
-aws ssm put-parameter --name /gigawhat/ANTHROPIC_API_KEY --type SecureString --value "$ANTHROPIC_API_KEY"
+aws ssm put-parameter --name /gigawhat/GROQ_API_KEY --type SecureString --value "$GROQ_API_KEY"
+aws ssm put-parameter --name /gigawhat/OPENAI_API_KEY --type SecureString --value "$OPENAI_API_KEY"
 aws ssm put-parameter --name /gigawhat/COHERE_API_KEY --type SecureString --value "$COHERE_API_KEY"
 aws ssm put-parameter --name /gigawhat/GIGAWHAT_DATABASE_PASSWORD --type SecureString --value "$(openssl rand -hex 24)"
 aws ssm put-parameter --name /gigawhat/GIGAWHAT_PROFILE --type String --value cloud
 
-# Optional: Langfuse tracing
-read -rsp 'Langfuse public key: ' LANGFUSE_PUBLIC_KEY; echo
-read -rsp 'Langfuse secret key: ' LANGFUSE_SECRET_KEY; echo
-aws ssm put-parameter --name /gigawhat/LANGFUSE_PUBLIC_KEY --type SecureString --value "$LANGFUSE_PUBLIC_KEY"
-aws ssm put-parameter --name /gigawhat/LANGFUSE_SECRET_KEY --type SecureString --value "$LANGFUSE_SECRET_KEY"
+# Optional: LangSmith tracing (EU region by default)
+read -rsp 'LangSmith API key: ' LANGSMITH_API_KEY; echo
+aws ssm put-parameter --name /gigawhat/LANGSMITH_API_KEY --type SecureString --value "$LANGSMITH_API_KEY"
 ```
+
+Use a Cohere production key here: Cohere's terms don't allow trial keys for production use. Groq's free plan allows 8,000 tokens a minute, less than one long answer prompt, so the Groq organisation needs its Developer plan.
 
 Reading the keys with `read -s` keeps them out of your shell history. Values must fit on one line; avoid `$` and quotes in them (the generated database password is hex, so it is safe). To change a value later, run the same command with `--overwrite`.
 
@@ -94,7 +95,7 @@ sudo tail -f /var/log/cloud-init-output.log    # finished when it prints "== Don
 
 ### 4. Seed the database
 
-The server never parses documents itself: it has no PyTorch or Docling. Build the cloud-profile database on a workstation (Cohere key in `.env`, Postgres running with `docker compose up -d db`) and upload a **data-only** dump:
+The server never parses documents itself: it has no PyTorch or Docling. Build the cloud-profile database on a workstation (OpenAI key in `.env`, Postgres running with `docker compose up -d db`) and upload a **data-only** dump:
 
 ```sh
 AWS_PROFILE=gigawhat deploy/seed.sh
@@ -178,7 +179,19 @@ It does not delete:
 - **Storage:** the root volume and its snapshots are encrypted; the seed bucket blocks all public access, requires TLS and encrypts objects.
 - **CPU credits** are set to `standard`, so the instance slows down under sustained load rather than running up surplus-credit charges.
 - **`sslip.io`** is a free third-party DNS service. It is fine for a demo; use your own domain for anything real.
-- There is no WAF in front of the lean instance; the app's own per-visitor question limit is the throttle. The production reference adds AWS WAF.
+- There is no WAF in front of the lean instance; the app's own per-visitor question limit is the throttle. The production design below adds AWS WAF.
+
+## Production design (not built)
+
+The lean instance is a demo. A regulated company would run GigaWhat differently, all in the project Region, at several hundred dollars a month, an order of magnitude more than lean, mostly for the Multi-AZ database and NAT gateways:
+
+- **Network:** a private VPC across two Availability Zones. Public subnets hold only the load balancer and one NAT gateway per zone; app tasks run in private subnets and the database in isolated subnets with no route to the internet. Interface endpoints for ECR, Secrets Manager, CloudWatch Logs and Bedrock would keep AWS API traffic inside the VPC.
+- **App:** two or more ECS Fargate tasks behind an Application Load Balancer that serves HTTPS only and keeps each browser on the same task, because Chainlit holds session state in the task.
+- **Database:** RDS for PostgreSQL 17 with pgvector, Multi-AZ, TLS only, a password RDS generates and rotates in Secrets Manager, and 14 days of point-in-time recovery.
+- **Encryption and secrets:** one customer-managed KMS key for the database, its snapshots, secrets and logs, so access to the data can be audited and revoked in one place. API keys in Secrets Manager, injected when a task starts, never in the task definition or Terraform state.
+- **Models:** called through Amazon Bedrock with the task's IAM role instead of third-party API keys, if the project Region offers gpt-oss and Cohere models there. This keeps model traffic inside AWS and the project Region.
+- **Edge:** a regional AWS WAF web ACL on the load balancer with the AWS managed common rules and a per-IP rate limit.
+- **Logs:** CloudWatch log groups with a set retention for the app and the database.
 
 ## Terraform state
 

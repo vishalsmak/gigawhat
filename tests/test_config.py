@@ -20,12 +20,12 @@ def test_explicit_database_name_wins_over_profile() -> None:
 
 
 def test_reads_standard_api_key_names(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant-test")
+    monkeypatch.setenv("GROQ_API_KEY", "gsk-test")
 
-    key = make_settings().anthropic_api_key
+    key = make_settings().groq_api_key
 
     assert key is not None
-    assert key.get_secret_value() == "sk-ant-test"
+    assert key.get_secret_value() == "gsk-test"
 
 
 def test_empty_key_counts_as_unset(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -35,19 +35,20 @@ def test_empty_key_counts_as_unset(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def test_secrets_are_hidden_in_repr(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant-test")
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
 
-    assert "sk-ant-test" not in repr(make_settings())
+    assert "sk-test" not in repr(make_settings())
 
 
-def test_tracing_needs_both_langfuse_keys(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("LANGFUSE_PUBLIC_KEY", "pk-lf-test")
-
+def test_tracing_off_without_a_langsmith_key() -> None:
     assert make_settings().tracing_enabled is False
 
 
-def test_tracing_enabled_with_both_langfuse_keys(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("LANGFUSE_PUBLIC_KEY", "pk-lf-test")
-    monkeypatch.setenv("LANGFUSE_SECRET_KEY", "sk-lf-test")
+def test_tracing_enabled_with_a_langsmith_key(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("LANGSMITH_API_KEY", "lsv2-test")
 
     assert make_settings().tracing_enabled is True
+
+
+def test_traces_go_to_the_eu_region_by_default() -> None:
+    assert make_settings().langsmith_endpoint == "https://eu.api.smith.langchain.com"

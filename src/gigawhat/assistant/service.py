@@ -6,7 +6,7 @@ from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, replace
 from typing import Any
 
-from langchain_core.callbacks import BaseCallbackHandler
+from langchain_core.tracers import LangChainTracer
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
 from langgraph.graph.state import CompiledStateGraph
@@ -39,7 +39,7 @@ from gigawhat.models import (
 )
 from gigawhat.personas import Persona
 from gigawhat.retrieval.service import build_retriever
-from gigawhat.tracing import create_tracer
+from gigawhat.tracing import create_tracer, flush
 
 CHECKPOINT_POOL_SIZE = 10
 STEP_LABELS = {
@@ -76,7 +76,7 @@ class Runtime:
 
     components: Components
     pool: AsyncConnectionPool
-    tracer: BaseCallbackHandler | None = None
+    tracer: LangChainTracer | None = None
     paused: bool = False
 
 
@@ -140,15 +140,16 @@ class Assistant:
     async def aclose(self) -> None:
         await self._components.retriever.aclose()
         await self._runtime.pool.close()
+        if self._runtime.tracer is not None:
+            flush(self._runtime.tracer)
 
     def _config(self, thread_id: str, persona: Persona | None = None) -> Any:
         config: dict[str, Any] = {"configurable": {"thread_id": thread_id}}
         if self._runtime.tracer is not None:
             config["callbacks"] = [self._runtime.tracer]
-            config["metadata"] = {
-                "langfuse_session_id": thread_id,
-                "langfuse_tags": [str(persona)] if persona else [],
-            }
+            # LangSmith groups runs that share a thread_id into one conversation.
+            config["metadata"] = {"thread_id": thread_id}
+            config["tags"] = [str(persona)] if persona else []
         return config
 
     async def _turn(self, thread_id: str) -> Turn:

@@ -2,6 +2,7 @@ name: Evaluation
 
 # The full golden and red-team evaluation on the cloud profile, with DeepEval judging answers.
 # Run by hand before a release; it spends API credit. Fails if any release gate fails.
+# Needs Groq's Developer plan and a Cohere production key: free-tier rate limits are too low.
 on:
   workflow_dispatch:
 
@@ -28,7 +29,8 @@ jobs:
           --health-retries 10
     env:
       GIGAWHAT_PROFILE: cloud
-      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       COHERE_API_KEY: ${{ secrets.COHERE_API_KEY }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

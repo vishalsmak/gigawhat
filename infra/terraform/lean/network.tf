@@ -70,7 +70,7 @@ resource "aws_vpc_security_group_ingress_rule" "web" {
 
 resource "aws_vpc_security_group_egress_rule" "all_ipv4" {
   security_group_id = aws_security_group.app.id
-  description       = "All outbound IPv4: package installs, GHCR, Anthropic, Cohere, AWS APIs"
+  description       = "All outbound IPv4: package installs, GHCR, model APIs, LangSmith, AWS APIs"
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
 }

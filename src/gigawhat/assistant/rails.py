@@ -28,8 +28,8 @@ class ConfiguredSettingsModel(BaseChatModel):
     """Passes NeMo's calls to our model with the settings we configured.
 
     NeMo binds temperature and max_tokens to every call. Ollama's client rejects them as
-    keyword arguments and Claude Opus 5.5 rejects temperature outright, so they are dropped
-    and the model keeps its own settings.
+    keyword arguments, and on Groq they would override the settings in models.py, so they are
+    dropped and the model keeps its own settings.
     """
 
     inner: BaseChatModel

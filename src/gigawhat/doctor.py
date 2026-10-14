@@ -59,13 +59,14 @@ def check_models(settings: Settings, http: httpx.Client) -> Check:
 
 def check_cloud_keys(settings: Settings) -> Check:
     keys = {
-        "ANTHROPIC_API_KEY": settings.anthropic_api_key,
+        "GROQ_API_KEY": settings.groq_api_key,
+        "OPENAI_API_KEY": settings.openai_api_key,
         "COHERE_API_KEY": settings.cohere_api_key,
     }
     missing = [name for name, value in keys.items() if value is None]
     if missing:
         return Check("models", Status.FAIL, f"Cloud profile needs {', '.join(missing)} in .env")
-    return Check("models", Status.OK, "Anthropic and Cohere keys set")
+    return Check("models", Status.OK, "Groq, OpenAI and Cohere keys set")
 
 
 def check_ollama(settings: Settings, http: httpx.Client) -> Check:
@@ -84,5 +85,5 @@ def check_ollama(settings: Settings, http: httpx.Client) -> Check:
 
 def check_tracing(settings: Settings) -> Check:
     if settings.tracing_enabled:
-        return Check("tracing", Status.OK, "Langfuse keys set")
-    return Check("tracing", Status.WARN, "Langfuse keys not set, so tracing is off")
+        return Check("tracing", Status.OK, "LangSmith key set")
+    return Check("tracing", Status.WARN, "LANGSMITH_API_KEY not set, so tracing is off")

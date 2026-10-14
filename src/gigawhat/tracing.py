@@ -1,22 +1,30 @@
-"""Optional Langfuse tracing of every model, tool and graph step. Off unless keys are set."""
+"""Optional LangSmith tracing of every model, tool and graph step. Off unless a key is set."""
 
-from langchain_core.callbacks import BaseCallbackHandler
-from langfuse import Langfuse
-from langfuse.langchain import CallbackHandler
+from langchain_core.tracers import LangChainTracer
+from langsmith import Client
 
 from gigawhat.config import Profile, Settings
 
+# Long enough for a final batch to reach LangSmith; short enough that an outage can't stall exit.
+FLUSH_TIMEOUT_SECONDS = 10
 
-def create_tracer(settings: Settings) -> BaseCallbackHandler | None:
-    """Never on the offline profile, whose promise is that nothing leaves the machine."""
-    if settings.profile is Profile.OFFLINE:
+
+def create_tracer(settings: Settings) -> LangChainTracer | None:
+    """Never on the offline profile, whose promise is that nothing leaves the machine.
+
+    The tracer is passed to each run rather than switched on with LANGSMITH_TRACING, which would
+    trace every LangChain call in the process, whatever the profile.
+    """
+    if settings.profile is Profile.OFFLINE or settings.langsmith_api_key is None:
         return None
-    if not settings.tracing_enabled or settings.langfuse_secret_key is None:
-        return None
-    # The client registers itself; the handler finds it by public key.
-    Langfuse(
-        public_key=settings.langfuse_public_key,
-        secret_key=settings.langfuse_secret_key.get_secret_value(),
-        host=settings.langfuse_host,
+    client = Client(
+        api_url=settings.langsmith_endpoint,
+        api_key=settings.langsmith_api_key.get_secret_value(),
     )
-    return CallbackHandler(public_key=settings.langfuse_public_key)
+    return LangChainTracer(project_name=settings.langsmith_project, client=client)
+
+
+def flush(tracer: LangChainTracer) -> None:
+    """Sends traces still queued in the background, so a short CLI run doesn't drop them."""
+    tracer.wait_for_futures()
+    tracer.client.flush(timeout=FLUSH_TIMEOUT_SECONDS)

@@ -19,11 +19,12 @@ def test_cloud_profile_fails_without_keys() -> None:
     check = check_models(make_settings(), httpx.Client())
 
     assert check.status is Status.FAIL
-    assert "ANTHROPIC_API_KEY, COHERE_API_KEY" in check.detail
+    assert "GROQ_API_KEY, OPENAI_API_KEY, COHERE_API_KEY" in check.detail
 
 
 def test_cloud_profile_passes_with_keys(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant-test")
+    monkeypatch.setenv("GROQ_API_KEY", "gsk-test")
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
     monkeypatch.setenv("COHERE_API_KEY", "co-test")
 
     assert check_models(make_settings(), httpx.Client()).status is Status.OK

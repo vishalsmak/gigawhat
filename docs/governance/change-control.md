@@ -24,7 +24,7 @@ This document says what is versioned, who should own each part, how a change rea
 | Evaluation sets | `evals/golden.yaml`, `evals/redteam.yaml` (in `.github/CODEOWNERS`) | Safety team and engineering | Reports in `evals/reports/` | `tests/test_evaluation.py::test_project_evaluation_sets_load` |
 | Dependencies | `pyproject.toml`, `uv.lock` (with hashes) | Engineering | Not recorded | CI installs with `--locked` |
 | Container image | `Dockerfile`; built by `.github/workflows/image.yml` | Engineering | Not recorded in the app | Image workflow |
-| Infrastructure | `infra/terraform/lean`, `github-deploy`, `production-reference` | Engineering | Terraform state (local, git-ignored) | `terraform validate` (stated in `infra/README.md`) |
+| Infrastructure | `infra/terraform/lean`, `github-deploy` | Engineering | Terraform state (local, git-ignored) | `terraform plan` reviewed before `apply` (`infra/README.md`) |
 
 ### The prompt fingerprint
 

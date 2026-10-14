@@ -15,7 +15,7 @@ See [`docs/architecture.html`](docs/architecture.html) for how it works: compone
 | 3 | Retrieval: hybrid search, row-level security, reranking | ✅ |
 | 4 | Workflow: guardrails, safety tiers, cited answers, approvals, audit | ✅ |
 | 5 | Chainlit UI with personas | ✅ |
-| 6 | Evaluation: golden and red-team sets, release gates, Langfuse tracing | ✅ |
+| 6 | Evaluation: golden and red-team sets, release gates, LangSmith tracing | ✅ |
 | 7 | Deployment: container, Terraform for AWS, GitHub Actions | ✅ code ready, not yet deployed |
 | 8 | Governance documents | ✅ |
 
@@ -48,7 +48,7 @@ uv run gigawhat search "vent stack height" --persona gas_field_engineer
 
 Pick a persona at the top of the chat. Safety-critical questions wait for an Authorised Person: switch to the Authorised Person persona for the same business unit to release or decline them, then switch back to see the outcome. The Auditor persona shows this browser's audit trail.
 
-On the offline profile, answers take about a minute on a laptop; Claude on the cloud profile is much faster.
+On the offline profile, answers take 20 seconds to a minute on a laptop; the same model on Groq is much faster.
 
 ## Container
 
@@ -66,7 +66,7 @@ Set `GIGAWHAT_PROFILE` in `.env`:
 
 | Profile | Models | Needs |
 |---|---|---|
-| `cloud` (default) | Claude for answers, Cohere for embeddings and reranking. The hosted demo uses this. | `ANTHROPIC_API_KEY`, `COHERE_API_KEY` |
+| `cloud` (default) | `gpt-oss-20b` on Groq for answers, OpenAI for embeddings, Cohere for reranking. The hosted demo uses this. | `GROQ_API_KEY`, `OPENAI_API_KEY`, `COHERE_API_KEY` |
 | `offline` | Open models on [Ollama](https://ollama.com). Nothing leaves your machine. | Ollama running locally |
 
 Each profile has its own database (`gigawhat_cloud`, `gigawhat_offline`) because the two embedding models produce different vectors.

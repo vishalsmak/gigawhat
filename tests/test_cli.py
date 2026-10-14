@@ -69,4 +69,4 @@ def test_doctor_fails_when_cloud_keys_are_missing() -> None:
 def test_doctor_names_the_missing_keys() -> None:
     result = runner.invoke(app, ["doctor"])
 
-    assert "ANTHROPIC_API_KEY, COHERE_API_KEY" in result.output
+    assert "GROQ_API_KEY, OPENAI_API_KEY, COHERE_API_KEY" in result.output

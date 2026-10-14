@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Run on a workstation: builds the cloud-profile database locally (Docling + Cohere embeddings),
+# Run on a workstation: builds the cloud-profile database locally (Docling + OpenAI embeddings),
 # then uploads a data-only dump that the server restores on its next deploy.
-# Needs: docker compose up -d db, COHERE_API_KEY in .env, and the AWS profile for the project.
+# Needs: docker compose up -d db, OPENAI_API_KEY in .env, and the AWS profile for the project.
 set -euo pipefail
 AWS_PROFILE="${AWS_PROFILE:-gigawhat}"
 export GIGAWHAT_PROFILE=cloud

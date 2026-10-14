@@ -50,14 +50,13 @@ GigaWhat must not be used for any of the following. The design keeps them out of
 
 ## 4. Profiles and models
 
-`GIGAWHAT_PROFILE` chooses where models run (`src/gigawhat/config.py`, `src/gigawhat/models.py`). Each profile has its own database because the two embedding models produce different vectors.
+`GIGAWHAT_PROFILE` chooses where models run (`src/gigawhat/config.py`, `src/gigawhat/models.py`). Each profile has its own database because the two embedding models produce different vectors. Both profiles run the same chat model: Groq hosts the open `gpt-oss-20b` weights that Ollama runs locally, so prompts tuned on one carry over to the other. Groq serves the model on its own hardware and software, so the cloud profile still needs its own evaluation run.
 
 | Job | `cloud` profile (default; the hosted demo) | `offline` profile |
 |---|---|---|
-| Safety-tier classifier and input guardrail ("fast model") | Claude Opus 5.5 (`claude-opus-5-5`), effort `low`, up to 2,048 output tokens | `gpt-oss:20b` on Ollama, reasoning `low`, temperature 0 |
-| Evidence gathering and cited answers ("answer model") | Claude Opus 5.5 (`claude-opus-5-5`), effort `high`, up to 16,000 output tokens | `gpt-oss:20b` on Ollama, reasoning `medium`, temperature 0 |
-| Refusal handling | Anthropic server-side fallback beta `server-side-fallback-2026-07-01` with `fallbacks: default`: a refused request is retried server-side on a model Anthropic chooses by refusal category | None |
-| Embeddings | Cohere `embed-v4.0`, 1,536 dimensions | `qwen3-embedding:0.6b` on Ollama, 1,024 dimensions, with a task instruction on queries only |
+| Safety-tier classifier and input guardrail ("fast model") | `openai/gpt-oss-20b` on Groq, reasoning `low`, temperature 0, up to 2,048 output tokens including reasoning | `gpt-oss:20b` on Ollama, reasoning `low`, temperature 0 |
+| Evidence gathering and cited answers ("answer model") | `openai/gpt-oss-20b` on Groq, reasoning `medium`, temperature 0, up to 16,000 output tokens including reasoning | `gpt-oss:20b` on Ollama, reasoning `medium`, temperature 0 |
+| Embeddings | OpenAI `text-embedding-3-small`, 1,536 dimensions | `qwen3-embedding:0.6b` on Ollama, 1,024 dimensions, with a task instruction on queries only |
 | Reranker | Cohere `rerank-v3.5` | `BAAI/bge-reranker-v2-m3`, run locally with sentence-transformers |
 | Personal-data detection | Presidio with spaCy `en_core_web_md` 3.8.0, run locally | Same |
 | Document parsing (ingestion only) | Docling, OCR switched off | Same |

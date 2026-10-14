@@ -15,10 +15,12 @@ os.environ["CHAINLIT_ENV_FILE"] = "no-such-file.env"
 
 TEST_DATABASE = "gigawhat_test"
 KEY_VARIABLES = (
-    "ANTHROPIC_API_KEY",
+    "GROQ_API_KEY",
+    "OPENAI_API_KEY",
     "COHERE_API_KEY",
-    "LANGFUSE_PUBLIC_KEY",
-    "LANGFUSE_SECRET_KEY",
+    "LANGSMITH_API_KEY",
+    "LANGSMITH_ENDPOINT",
+    "LANGSMITH_PROJECT",
 )
 
 

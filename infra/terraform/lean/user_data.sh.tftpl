@@ -43,7 +43,7 @@ install -d -m 0750 "$APP_DIR"
 cat > "$APP_DIR/fetch-env.sh" <<'SCRIPT'
 #!/bin/bash
 # Rewrites /opt/gigawhat/.env from every SSM parameter under /gigawhat/, decrypting SecureStrings.
-# NAME is the part after the last slash, upper-cased: /gigawhat/ANTHROPIC_API_KEY -> ANTHROPIC_API_KEY.
+# NAME is the part after the last slash, upper-cased: /gigawhat/GROQ_API_KEY -> GROQ_API_KEY.
 # If GIGAWHAT_DOMAIN isn't set in Parameter Store, the instance's sslip.io hostname is used.
 set -euo pipefail
 cd /opt/gigawhat

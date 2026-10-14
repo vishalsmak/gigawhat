@@ -101,7 +101,7 @@ Practices most relevant to GigaWhat:
 | Risk Practice 5: identify failure modes; consider engineering protection or human intervention; watch for loss of skills | Hazard log; strict mode; approvals. Skill fade is not addressed. |
 | Risk Practice 6: confidence in performance, with metrics | Release gates and quality targets ([evaluation-report.md](evaluation-report.md)) |
 | Risk Practice 8: human oversight from the earliest stage; consider overconfidence and lack of trust | Approval flow; automation-bias measures in [human-oversight.md](human-oversight.md), section 12 |
-| Risk Practice 9: monitor and review | Langfuse tracing (optional), feedback, audit; no regular review cadence yet |
+| Risk Practice 9: monitor and review | LangSmith tracing (optional), feedback, audit; no regular review cadence yet |
 | Competencies Practices 1 and 2: training plans; suitably qualified decision makers | Not covered by the system |
 | Appendix 3: AI supply chain management | Pinned actions and lockfile; HSE downloads checked against registered checksums; code owners for rules, prompts, register and evaluation sets; images built only after CI passes; gaps in [risk-register.md](risk-register.md) H17 |
 

@@ -35,15 +35,14 @@ class Settings(BaseSettings):
     ollama_url: str = "http://localhost:11434"
 
     # Standard names, so LangChain integrations can read the same variables.
-    anthropic_api_key: SecretStr | None = Field(default=None, validation_alias="ANTHROPIC_API_KEY")
+    groq_api_key: SecretStr | None = Field(default=None, validation_alias="GROQ_API_KEY")
+    openai_api_key: SecretStr | None = Field(default=None, validation_alias="OPENAI_API_KEY")
     cohere_api_key: SecretStr | None = Field(default=None, validation_alias="COHERE_API_KEY")
-    langfuse_public_key: str | None = Field(default=None, validation_alias="LANGFUSE_PUBLIC_KEY")
-    langfuse_secret_key: SecretStr | None = Field(
-        default=None, validation_alias="LANGFUSE_SECRET_KEY"
+    langsmith_api_key: SecretStr | None = Field(default=None, validation_alias="LANGSMITH_API_KEY")
+    langsmith_endpoint: str = Field(
+        default="https://eu.api.smith.langchain.com", validation_alias="LANGSMITH_ENDPOINT"
     )
-    langfuse_host: str = Field(
-        default="https://cloud.langfuse.com", validation_alias="LANGFUSE_HOST"
-    )
+    langsmith_project: str = Field(default="gigawhat", validation_alias="LANGSMITH_PROJECT")
 
     @property
     def database(self) -> str:
@@ -63,7 +62,7 @@ class Settings(BaseSettings):
 
     @property
     def tracing_enabled(self) -> bool:
-        return self.langfuse_public_key is not None and self.langfuse_secret_key is not None
+        return self.langsmith_api_key is not None
 
 
 @lru_cache
