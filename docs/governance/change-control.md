@@ -2,11 +2,11 @@
 
 | | |
 |---|---|
-| Status | Draft for the demo. Harrowmere Energy is fictional. |
+| Status | Draft for the demo. GigaWhat Energy is fictional. |
 | Written against | Commit `3e8cb02` plus the follow-up fixes made on 10 October 2026 |
 | Audience | Engineering, safety team, document controller, auditors |
 
-This document says what is versioned, who should own each part, how a change reaches the hosted demo, which checks must pass first, and how to roll back. Where the repository does not enforce a step, it says so.
+This document says what is versioned, who should own each part, how a change is released, which checks must pass first, and how to roll back. Where the repository does not enforce a step, it says so.
 
 ## 1. What is versioned
 

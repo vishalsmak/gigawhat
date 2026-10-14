@@ -47,7 +47,7 @@ UK_PHONE = r"(?<![\d-])(?:\+44\s?\(?0?\)?\s?|0)\d{2,4}[\s-]?\d{3,4}[\s-]?\d{3,4}
 # Company vocabulary that NER can mistake for names: sites, places and job titles. Only spans
 # without digits are excused, so an address with a house number is always masked.
 COMPANY_TERMS = (
-    "Harrowmere|Kingsmead|Ashford|Brookfield|Orchard Way|Riverside|Mill Lane|Station Road|"
+    "GigaWhat|Kingsmead|Ashford|Brookfield|Orchard Way|Riverside|Mill Lane|Station Road|"
     "Vale|Authorised Person|Competent Person|Control Engineer|Gas Network Controller|"
     "First Call Operative|Safety Manager|Document controller"
 )

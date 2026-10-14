@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| System | GigaWhat, an assistant for operational staff at Harrowmere Energy |
-| Status | Reference implementation run as a demo. Harrowmere Energy, its procedures and its records are fictional. |
+| System | GigaWhat, an assistant for operational staff at GigaWhat Energy |
+| Status | Reference implementation run as a demo. GigaWhat Energy, its procedures and its records are fictional. |
 | Written against | Commit `3e8cb02` plus the follow-up fixes made on 10 October 2026 |
 | Owner | Not yet named. A real deployment needs a named system owner (see [README](README.md)). |
 
@@ -71,7 +71,7 @@ The hosted image (`Dockerfile`) is cloud-only. It leaves out Docling and PyTorch
 
 | Source | What | Where |
 |---|---|---|
-| Document register | 33 documents: 26 fictional Harrowmere procedures (28 versions, including superseded, draft and withdrawn ones) and 7 public HSE publications (HSG250, HSG253, HSG85, HSR25, L80, L122, L138). The register, not the file, decides which version is current. | `data/corpus/register.yaml`, `data/corpus/procedures/` |
+| Document register | 33 documents: 26 fictional GigaWhat Energy procedures (28 versions, including superseded, draft and withdrawn ones) and 7 public HSE publications (HSG250, HSG253, HSG85, HSR25, L80, L122, L138). The register, not the file, decides which version is current. | `data/corpus/register.yaml`, `data/corpus/procedures/` |
 | HSE guidance | Downloaded from hse.gov.uk by `gigawhat data fetch-hse` and checked against the SHA-256 recorded for it in the register (`source_sha256`); a changed file is refused. Not committed or redistributed. | `data/raw/hse/` |
 | Operational records | Fictional sites, assets, work orders, inspections, incidents and alarms. People are identified by role only. | `data/records/` |
 | Questions | Typed by users. They may contain personal data, which is masked first (section 6, step 1). | Not stored unmasked |
@@ -126,15 +126,17 @@ These are honest limits of the current build. The [risk register](risk-register.
 - The summary sentence is checked only for numbers that do not appear in a kept claim. Its wording is not otherwise checked.
 - A claim's own wording is not compared with its quote. The check is that the quote appears, in order, in the first cited source. A claim can therefore overstate what its quote says.
 - Next steps are checked only for citing sources that exist. Their wording and the "needs an Authorised Person" flag are the model's judgement.
-- Conflicts between procedures are reported only if the model notices them. Strict mode never flags conflicts.
+- Conflicts between procedures are reported only if the model notices them. Strict mode never flags conflicts: asked how long to monitor a governor isolation, the Authorised Person was sent PR-GAS-010 §6.4.4 (5 minutes) without PR-GAS-021 §6.2.5 (10 minutes on MP plant).
+- Abstention gives the same message whether nothing relevant was found or relevant text was found but cannot be released (HSE guidance, or only Scope and Purpose sections, on a safety-critical question).
 
 **Documents and retrieval**
 
 - Tables are linearised into text by Docling when documents are loaded. Readings and limits held in tables can be harder to find and harder to read in an extract.
 - Keyword search uses one precise term per question (an asset ID, an expanded abbreviation or a rating). Everything else relies on vector search and the reranker.
+- When a question names an asset, the reranker can rank sections that mention the asset (often the Scope section) above the steps. Exploratory testing on 14 October 2026 found a strict extract of PR-ELEC-075 §6.2 "Test closing" offered for a question about isolating FDR-KGM-03, and a question about restoring supply on FDR-ASH-09 that abstained because only the Scope section cleared the 0.3 bar.
 - Strict mode quotes at most two sections. They may not be the right ones, and they are never the whole procedure. The preface tells the user to work to the full procedure and their permit.
 - The relevance thresholds (0.2 for an answer, 0.3 for a strict extract) were set on a small fictional corpus with the offline reranker (bge-reranker-v2-m3). Cohere's scores are distributed differently, so both must be checked with the evaluation on the cloud profile before they are relied on there. No single threshold separates every genuine question from every near miss: in the evaluation, a chatty but genuine safety-critical question scored its right section at 0.35 and a near miss scored 0.29.
-- Record tools have fixed windows: the latest 6 inspections, alarms in the 120 days before the newest alarm, open work orders plus the last 3 completed, and up to 5 incidents. Records are gathered only when the question names an asset or uses words such as "alarm", "history", "trend", "current", "superseded" or "overdue" (`RECORDS_INTENT` in `evidence.py`).
+- Record tools have fixed windows: the latest 6 inspections, alarms in the 120 days before the newest alarm, open work orders plus the last 3 completed, and up to 5 incidents. Records are gathered only when the question names an asset or uses words such as "alarm", "history", "trend", "current", "superseded", "overdue", "document" or "owner" (`RECORDS_INTENT` in `evidence.py`). The alarm count is given only for an asset the persona can see, so row-level security is never reported as "no alarms" (`tests/test_evidence.py::test_alarm_lookup_on_an_asset_the_persona_cannot_see_gives_no_count`).
 - Overdue notices use the server's date.
 
 **Safety routing and approvals**

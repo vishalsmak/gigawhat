@@ -8,7 +8,7 @@
 | Review due | 2028-02-03 |
 | Owner | Head of Electricity Network Operations |
 | Approved by | Senior Authorised Person (HV) |
-| Applies to | All Harrowmere Electricity sites: substation batteries |
+| Applies to | All GigaWhat Electricity sites: substation batteries |
 
 FICTIONAL DOCUMENT. Created for the GigaWhat demo. Not for real operational use.
 

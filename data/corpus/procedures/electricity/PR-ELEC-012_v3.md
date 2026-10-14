@@ -8,7 +8,7 @@
 | Review due | 2026-02-01 |
 | Owner | Head of Electricity Network Operations |
 | Approved by | Electricity Safety Manager |
-| Applies to | All Harrowmere Electricity sites: 11 kV switchgear, ring main units and feeders |
+| Applies to | All GigaWhat Electricity sites: 11 kV switchgear, ring main units and feeders |
 
 FICTIONAL DOCUMENT. Created for the GigaWhat demo. Not for real operational use.
 
@@ -18,7 +18,7 @@ This procedure sets out how 11 kV circuits are isolated, proved dead and earthed
 
 ## 2 Scope
 
-This procedure applies to 11 kV switchgear, ring main units and feeders at all Harrowmere Electricity sites, including SWG-ASH-11 (ESS-ASH), SWG-KGM-11 (ESS-KGM), RMU-BRK-01 (ESS-BRK), RMU-ORC-01 (ESS-ORC) and feeders FDR-ASH-07, FDR-ASH-09 and FDR-KGM-03. It does not cover 33 kV, 132 kV or low voltage equipment.
+This procedure applies to 11 kV switchgear, ring main units and feeders at all GigaWhat Electricity sites, including SWG-ASH-11 (ESS-ASH), SWG-KGM-11 (ESS-KGM), RMU-BRK-01 (ESS-BRK), RMU-ORC-01 (ESS-ORC) and feeders FDR-ASH-07, FDR-ASH-09 and FDR-KGM-03. It does not cover 33 kV, 132 kV or low voltage equipment.
 
 ## 3 References
 

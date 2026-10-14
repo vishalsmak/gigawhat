@@ -8,7 +8,7 @@
 | Review due | 2027-05-07 |
 | Owner | Head of Health, Safety and Environment |
 | Approved by | Chief Operating Officer |
-| Applies to | All Harrowmere Energy employees and contractors, both business units |
+| Applies to | All GigaWhat Energy employees and contractors, both business units |
 
 FICTIONAL DOCUMENT. Created for the GigaWhat demo. Not for real operational use.
 

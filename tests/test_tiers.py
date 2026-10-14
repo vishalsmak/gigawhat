@@ -30,7 +30,7 @@ def test_active_danger_is_an_emergency(question: str) -> None:
         "What's the procedure for entering the tunnel at Kingsmead?",
         "how do I go into the cable tunnel",
         "can I enter the cable tunnel on my own?",
-        "steps to do a stream changeover at Harrowmere PRS",
+        "steps to do a stream changeover at GigaWhat PRS",
         "how should we dig near the IP main on Vale Road",
         "can I issue a PTW for the governor myself?",
         "How high must the vent stack be when purging a PE main?",

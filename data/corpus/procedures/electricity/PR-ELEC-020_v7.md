@@ -8,17 +8,17 @@
 | Review due | 2027-09-02 |
 | Owner | Electricity Safety Manager |
 | Approved by | Head of Electricity Network Operations |
-| Applies to | All Harrowmere Electricity sites, plant and equipment |
+| Applies to | All GigaWhat Electricity sites, plant and equipment |
 
 FICTIONAL DOCUMENT. Created for the GigaWhat demo. Not for real operational use.
 
 ## 1 Purpose
 
-This procedure sets out how Permits-to-Work and Sanctions-for-Test are prepared, issued, used, transferred, cleared and cancelled on Harrowmere Electricity plant, so that everyone working on equipment knows exactly what has been made safe and where they may work.
+This procedure sets out how Permits-to-Work and Sanctions-for-Test are prepared, issued, used, transferred, cleared and cancelled on GigaWhat Electricity plant, so that everyone working on equipment knows exactly what has been made safe and where they may work.
 
 ## 2 Scope
 
-This procedure applies to all work and testing on HV equipment at all Harrowmere Electricity sites, and to LV and DC equipment where an Authorised Person (HV) decides a permit is needed to control the risk. Entry to the Kingsmead cable tunnel also needs a confined space entry permit under PR-ELEC-031.
+This procedure applies to all work and testing on HV equipment at all GigaWhat Electricity sites, and to LV and DC equipment where an Authorised Person (HV) decides a permit is needed to control the risk. Entry to the Kingsmead cable tunnel also needs a confined space entry permit under PR-ELEC-031.
 
 ## 3 References
 

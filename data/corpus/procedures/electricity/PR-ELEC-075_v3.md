@@ -8,7 +8,7 @@
 | Review due | 2028-09-01 |
 | Owner | Head of Electricity Network Operations |
 | Approved by | Electricity Safety Manager |
-| Applies to | All Harrowmere Electricity sites: 11 kV feeders, switchgear and ring main units |
+| Applies to | All GigaWhat Electricity sites: 11 kV feeders, switchgear and ring main units |
 
 FICTIONAL DOCUMENT. Created for the GigaWhat demo. Not for real operational use.
 
@@ -18,7 +18,7 @@ This procedure sets out how supplies are restored safely after a fault trip on a
 
 ## 2 Scope
 
-This procedure applies to 11 kV feeders, switchgear and ring main units at all Harrowmere Electricity sites, including FDR-ASH-07 and FDR-ASH-09 from SWG-ASH-11, FDR-KGM-03 from SWG-KGM-11, and RMU-BRK-01 and RMU-ORC-01. The Harrowmere 11 kV feeders are underground cable and have no auto-reclose.
+This procedure applies to 11 kV feeders, switchgear and ring main units at all GigaWhat Electricity sites, including FDR-ASH-07 and FDR-ASH-09 from SWG-ASH-11, FDR-KGM-03 from SWG-KGM-11, and RMU-BRK-01 and RMU-ORC-01. The GigaWhat Energy 11 kV feeders are underground cable and have no auto-reclose.
 
 ## 3 References
 

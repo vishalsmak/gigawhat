@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft for the demo. Harrowmere Energy is fictional. |
+| Status | Draft for the demo. GigaWhat Energy is fictional. |
 | Written against | Commit `3e8cb02` plus the follow-up fixes made on 10 October 2026 |
 | Audience | Safety team, Authorised Persons, auditors, engineering |
 

@@ -8,7 +8,7 @@
 | Review due | 2028-01-12 |
 | Owner | Head of Electricity Network Operations |
 | Approved by | Electricity Safety Manager |
-| Applies to | All Harrowmere Electricity sites: grid and primary transformers |
+| Applies to | All GigaWhat Electricity sites: grid and primary transformers |
 
 FICTIONAL DOCUMENT. Created for the GigaWhat demo. Not for real operational use.
 

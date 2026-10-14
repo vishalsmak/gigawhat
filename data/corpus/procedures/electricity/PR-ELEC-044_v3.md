@@ -8,7 +8,7 @@
 | Review due | 2028-04-01 |
 | Owner | Head of Electricity Network Operations |
 | Approved by | Senior Authorised Person (HV) |
-| Applies to | All Harrowmere Electricity sites: grid, primary and distribution transformers |
+| Applies to | All GigaWhat Electricity sites: grid, primary and distribution transformers |
 
 FICTIONAL DOCUMENT. Created for the GigaWhat demo. Not for real operational use.
 
@@ -18,7 +18,7 @@ This procedure sets out how insulating oil samples are taken from transformers, 
 
 ## 2 Scope
 
-This procedure applies to oil-filled transformers with a sampling valve at all Harrowmere Electricity sites: GT-1 and GT-2 (ESS-RVL), T-104 and T-105 (ESS-ASH), T-201 and T-202 (ESS-KGM), TX-BRK-01 (ESS-BRK) and TX-ORC-01 (ESS-ORC).
+This procedure applies to oil-filled transformers with a sampling valve at all GigaWhat Electricity sites: GT-1 and GT-2 (ESS-RVL), T-104 and T-105 (ESS-ASH), T-201 and T-202 (ESS-KGM), TX-BRK-01 (ESS-BRK) and TX-ORC-01 (ESS-ORC).
 
 ## 3 References
 

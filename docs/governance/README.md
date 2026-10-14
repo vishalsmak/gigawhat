@@ -2,7 +2,7 @@
 
 This folder holds the governance documents for GigaWhat, an AI assistant that helps operational staff at a gas and electricity utility find approved procedures, see the evidence behind them and get suggested next steps, with people making every decision.
 
-**It describes a demo.** GigaWhat is a reference implementation built to production standards and run with fictional data. Harrowmere Energy, its sites, staff, customers, procedures and records are invented. The public HSE guidance in the corpus is real and is downloaded, not redistributed. The pack is written as if the demo were heading for real use, so that it shows what such a pack contains and where the current build would fall short.
+**It describes a demo.** GigaWhat is a reference implementation built to production standards and run with fictional data. GigaWhat Energy, its sites, staff, customers, procedures and records are invented. The public HSE guidance in the corpus is real and is downloaded, not redistributed. The pack is written as if the demo were heading for real use, so that it shows what such a pack contains and where the current build would fall short.
 
 Every statement is meant to be checkable against the repository. Each document names the files, tests and evaluation gates it relies on, and says plainly where something is missing. All were written against commit `3e8cb02` and updated for the follow-up fixes made on 10 October 2026.
 

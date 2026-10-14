@@ -8,20 +8,20 @@
 | Review due | 2028-03-03 |
 | Owner | Gas Safety Manager |
 | Approved by | Head of Gas Network Operations |
-| Applies to | All Harrowmere Gas sites and all gas asset classes |
+| Applies to | All GigaWhat Gas sites and all gas asset classes |
 
 FICTIONAL DOCUMENT. Created for the GigaWhat demo. Not for real operational use.
 
 ## 1 Purpose
 
-This procedure sets out the Harrowmere Gas permit-to-work system. It makes sure that hazardous work on gas plant is planned, that isolations are made and proved before work starts, that everyone knows the limits of the work, and that plant is returned to service safely.
+This procedure sets out the GigaWhat Gas permit-to-work system. It makes sure that hazardous work on gas plant is planned, that isolations are made and proved before work starts, that everyone knows the limits of the work, and that plant is returned to service safely.
 
 ## 2 Scope
 
-A permit-to-work is required for the following work on any Harrowmere Gas site or asset:
+A permit-to-work is required for the following work on any GigaWhat Gas site or asset:
 
 - any work that breaks containment on gas plant, mains or services, whether live or isolated
-- maintenance or testing of the pressure reduction station PRS-HRW-01, district governors, slam-shut valves and filters
+- maintenance or testing of the pressure reduction station PRS-GWT-01, district governors, slam-shut valves and filters
 - purging and commissioning of mains under PR-GAS-031
 - hot work in a hazardous area under PR-GAS-040
 - entry into a confined space, including governor pits and valve chambers

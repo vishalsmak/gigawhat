@@ -8,13 +8,13 @@
 | Review due | 2025-07-01 |
 | Owner | Head of Gas Network Operations |
 | Approved by | Gas Safety Manager |
-| Applies to | All Harrowmere Gas sites: low pressure and medium pressure polyethylene mains |
+| Applies to | All GigaWhat Gas sites: low pressure and medium pressure polyethylene mains |
 
 FICTIONAL DOCUMENT. Created for the GigaWhat demo. Not for real operational use.
 
 ## 1 Purpose
 
-This procedure sets out how Harrowmere Gas purges new, replacement and re-laid polyethylene (PE) mains of air and commissions them with natural gas. It uses an indirect purge: air is displaced with nitrogen, then the nitrogen is displaced with natural gas, so that no flammable mixture forms inside the main.
+This procedure sets out how GigaWhat Gas purges new, replacement and re-laid polyethylene (PE) mains of air and commissions them with natural gas. It uses an indirect purge: air is displaced with nitrogen, then the nitrogen is displaced with natural gas, so that no flammable mixture forms inside the main.
 
 ## 2 Scope
 

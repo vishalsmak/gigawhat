@@ -1,4 +1,4 @@
-# Harrowmere Energy incident reports (fictional).
+# GigaWhat Energy incident reports (fictional).
 #
 # FICTIONAL DATA. Created for the GigaWhat demo. Not for real operational use.
 # Reported and categorised under PR-CORP-001. People are identified by role only.
@@ -14,7 +14,7 @@ incidents:
     riddor_reportable: false
     summary: Operational substation key lost from a split ring; lock cylinders changed at all substations
     description: >
-      At the end of the day shift, back at Ashford Road Electricity Depot, a Competent Person (HV) found that their operational key was missing from their key ring. The restricted-profile key opens the gates and buildings at all five Harrowmere Electricity substations. It had last been used at Kingsmead Primary Substation at about 11:30, and the split ring holding the keys had opened. The Competent Person and a colleague searched the van and retraced the route at Kingsmead without finding it. SCADA door alarms at ESS-RVL, ESS-ASH and ESS-KGM showed no openings other than recorded visits, and the key register entry for the key was correct. There was no evidence that anyone else had used the key.
+      At the end of the day shift, back at Ashford Road Electricity Depot, a Competent Person (HV) found that their operational key was missing from their key ring. The restricted-profile key opens the gates and buildings at all five GigaWhat Electricity substations. It had last been used at Kingsmead Primary Substation at about 11:30, and the split ring holding the keys had opened. The Competent Person and a colleague searched the van and retraced the route at Kingsmead without finding it. SCADA door alarms at ESS-RVL, ESS-ASH and ESS-KGM showed no openings other than recorded visits, and the key register entry for the key was correct. There was no evidence that anyone else had used the key.
     immediate_actions: >
       The loss was reported to the Control Engineer and the Electricity Safety Manager the same evening, in line with PR-ELEC-063. The Control Engineer flagged all five substations so that any unexpected door alarm would be attended as a possible intrusion. The Electricity Safety Manager decided to change the lock cylinders: ESS-RVL, ESS-ASH and ESS-KGM within 48 hours, and ESS-BRK and ESS-ORC within 7 days. New keys were issued to all holders against the key register.
     root_cause: >
@@ -61,18 +61,18 @@ incidents:
   - incident_id: INC-2025-003
     occurred_at: 2025-01-28T13:40:00+00:00
     business_unit: gas
-    site_id: GPR-HRW
-    asset_id: SSV-HRW-B
+    site_id: GPR-GWT
+    asset_id: SSV-GWT-B
     category: equipment_failure
     severity: medium
     riddor_reportable: false
-    summary: Slam-shut SSV-HRW-B did not close fully during its over-pressure function test at GPR-HRW
+    summary: Slam-shut SSV-GWT-B did not close fully during its over-pressure function test at GPR-GWT
     description: >
-      A Competent Person (Pressure Systems) was carrying out the 6-monthly function test of the stream B slam-shut valve SSV-HRW-B at Harrowmere Pressure Reduction Station, under a permit issued by the Authorised Person (Gas). Stream B was the standby stream and had been isolated for the test, with stream A supplying the MP network. When over-pressure was applied to the sensing line, the trip mechanism released at the correct setting, but the valve stopped short of its fully closed position. Pressure on the isolated test section rose by about 40 mbar in 10 minutes, well above the let-by limit of 10 mbar in 10 minutes in PR-GAS-014. A second trip gave the same result, so the valve failed the test. Supply to the network was maintained on stream A throughout. Nobody was hurt.
+      A Competent Person (Pressure Systems) was carrying out the 6-monthly function test of the stream B slam-shut valve SSV-GWT-B at GigaWhat Pressure Reduction Station, under a permit issued by the Authorised Person (Gas). Stream B was the standby stream and had been isolated for the test, with stream A supplying the MP network. When over-pressure was applied to the sensing line, the trip mechanism released at the correct setting, but the valve stopped short of its fully closed position. Pressure on the isolated test section rose by about 40 mbar in 10 minutes, well above the let-by limit of 10 mbar in 10 minutes in PR-GAS-014. A second trip gave the same result, so the valve failed the test. Supply to the network was maintained on stream A throughout. Nobody was hurt.
     immediate_actions: >
-      Stream B was left isolated, with its valves locked and tagged out of service. The Gas Network Controller was told that GPR-HRW was running on stream A with no standby, and the Gas Safety Manager was informed of the failed test. SSV-HRW-A, on the duty stream, was checked for correct latching and impulse line valve position. SSV-HRW-B was stripped and repaired within 5 days and passed a retest before stream B was returned to standby.
+      Stream B was left isolated, with its valves locked and tagged out of service. The Gas Network Controller was told that GPR-GWT was running on stream A with no standby, and the Gas Safety Manager was informed of the failed test. SSV-GWT-A, on the duty stream, was checked for correct latching and impulse line valve position. SSV-GWT-B was stripped and repaired within 5 days and passed a retest before stream B was returned to standby.
     root_cause: >
-      Strip-down found black powder, a fine iron oxide and sulphide dust, packed around the valve stem and guide bush. This increased friction so the closing spring could not drive the disc fully onto its seat. Stream B had been on standby for most of the previous year, so the valve had seldom moved. The dust came from the upstream IP steel main and had passed the FLT-HRW-01 filter element, which was near the end of its life. The stem, bush and seals were replaced and the filter element renewed, and the duty and standby streams are now changed over every quarter so that both slam-shuts are exercised.
+      Strip-down found black powder, a fine iron oxide and sulphide dust, packed around the valve stem and guide bush. This increased friction so the closing spring could not drive the disc fully onto its seat. Stream B had been on standby for most of the previous year, so the valve had seldom moved. The dust came from the upstream IP steel main and had passed the FLT-GWT-01 filter element, which was near the end of its life. The stem, bush and seals were replaced and the filter element renewed, and the duty and standby streams are now changed over every quarter so that both slam-shuts are exercised.
     status: closed
     linked_procedures: [PR-GAS-014, PR-GAS-036]
 
@@ -169,7 +169,7 @@ incidents:
   - incident_id: INC-2025-026
     occurred_at: 2025-08-12T14:35:00+01:00
     business_unit: gas
-    site_id: GNA-HRW
+    site_id: GNA-GWT
     asset_id: MAIN-LP-17
     category: near_miss
     severity: medium
@@ -205,7 +205,7 @@ incidents:
   - incident_id: INC-2025-031
     occurred_at: 2025-09-16T13:30:00+01:00
     business_unit: gas
-    site_id: GNA-HRW
+    site_id: GNA-GWT
     asset_id: MAIN-MP-03
     category: near_miss
     severity: medium
@@ -241,18 +241,18 @@ incidents:
   - incident_id: INC-2025-036
     occurred_at: 2025-11-04T14:20:00+00:00
     business_unit: gas
-    site_id: GNA-HRW
+    site_id: GNA-GWT
     asset_id: MAIN-MP-03
     category: gas_escape
     severity: high
     riddor_reportable: false
     summary: Third-party excavator damaged a PE service off MAIN-MP-03 near Vale Road; uncontrolled escape
     description: >
-      A third-party contractor laying telecoms ducting in the footway near Vale Road struck a 32 mm PE service pipe connected to the Vale Road MP main MAIN-MP-03 with an excavator bucket, about 2 m from the main and 0.5 m deep. The service was torn and gas escaped at MP pressure with a loud release. The contractor's supervisor moved the crew away and called the gas emergency number, 0800 111 999. A First Call Operative arrived 28 minutes after the call, set up a 25 m cordon, and asked for police support to close the road. Gas was found in the excavation and in a nearby telecoms chamber, but not inside any building. Occupants of the four nearest houses were asked to stay indoors with windows and doors closed. The contractor had Harrowmere plans showing the main and had scanned with a cable avoidance tool, but had not dug trial holes by hand. Nobody was hurt and there was no ignition.
+      A third-party contractor laying telecoms ducting in the footway near Vale Road struck a 32 mm PE service pipe connected to the Vale Road MP main MAIN-MP-03 with an excavator bucket, about 2 m from the main and 0.5 m deep. The service was torn and gas escaped at MP pressure with a loud release. The contractor's supervisor moved the crew away and called the gas emergency number, 0800 111 999. A First Call Operative arrived 28 minutes after the call, set up a 25 m cordon, and asked for police support to close the road. Gas was found in the excavation and in a nearby telecoms chamber, but not inside any building. Occupants of the four nearest houses were asked to stay indoors with windows and doors closed. The contractor had GigaWhat Energy plans showing the main and had scanned with a cable avoidance tool, but had not dug trial holes by hand. Nobody was hurt and there was no ignition.
     immediate_actions: >
       The First Call Operative removed ignition sources from the cordon, checked nearby properties and drains, and escalated the escape to the Gas Network Controller and the Authorised Person (Gas) under PR-GAS-003. A repair team hand-dug upstream of the damage and squeezed off the service, controlling the escape 1 hour 50 minutes after the first call. The damaged section was replaced and tested, and the one property supplied by the service was relit that evening. The cordon was lifted once readings were clear.
     root_cause: >
-      The contractor used an excavator close to a buried PE service without first locating it by hand-dug trial holes. Services are not always shown on plans, and a cable avoidance tool cannot detect PE pipe without a tracer wire, so the scan gave false reassurance. Harrowmere Gas wrote to the contractor and its client setting out the safe digging requirements in PR-GAS-052, recovered the repair costs, and held a briefing on excavating near gas plant for contractors working in the area.
+      The contractor used an excavator close to a buried PE service without first locating it by hand-dug trial holes. Services are not always shown on plans, and a cable avoidance tool cannot detect PE pipe without a tracer wire, so the scan gave false reassurance. GigaWhat Gas wrote to the contractor and its client setting out the safe digging requirements in PR-GAS-052, recovered the repair costs, and held a briefing on excavating near gas plant for contractors working in the area.
     status: closed
     linked_procedures: [PR-GAS-052, PR-GAS-003]
 
@@ -277,7 +277,7 @@ incidents:
   - incident_id: INC-2025-040
     occurred_at: 2025-12-08T06:55:00+00:00
     business_unit: gas
-    site_id: GNA-HRW
+    site_id: GNA-GWT
     asset_id: MAIN-LP-22
     category: gas_escape
     severity: high
@@ -313,18 +313,18 @@ incidents:
   - incident_id: INC-2026-007
     occurred_at: 2026-01-20T07:40:00+00:00
     business_unit: gas
-    site_id: GPR-HRW
+    site_id: GPR-GWT
     asset_id: null
     category: injury
     severity: high
     riddor_reportable: true
-    summary: Competent Person slipped on icy steps at GPR-HRW and fractured wrist; reported under RIDDOR
+    summary: Competent Person slipped on icy steps at GPR-GWT and fractured wrist; reported under RIDDOR
     description: >
-      A Competent Person (Pressure Systems), arriving with a colleague for a planned filter inspection at Harrowmere Pressure Reduction Station, slipped on the external steel steps leading down into the station compound. The overnight temperature had been minus 4 °C, the steps were iced over, and they had not been gritted. The Competent Person fell down 3 steps and landed on their outstretched left hand. The colleague gave first aid and drove them to hospital, where a fracture of the left wrist was confirmed. The Competent Person was off work for 6 weeks and then on light duties for 4 weeks. A fracture other than to fingers, thumbs or toes is a specified injury under the Reporting of Injuries, Diseases and Dangerous Occurrences Regulations 2013, so the Head of Health, Safety and Environment reported it to the HSE the same day. The steps had a chequer plate surface with no anti-slip nosings and a handrail on one side only.
+      A Competent Person (Pressure Systems), arriving with a colleague for a planned filter inspection at GigaWhat Pressure Reduction Station, slipped on the external steel steps leading down into the station compound. The overnight temperature had been minus 4 °C, the steps were iced over, and they had not been gritted. The Competent Person fell down 3 steps and landed on their outstretched left hand. The colleague gave first aid and drove them to hospital, where a fracture of the left wrist was confirmed. The Competent Person was off work for 6 weeks and then on light duties for 4 weeks. A fracture other than to fingers, thumbs or toes is a specified injury under the Reporting of Injuries, Diseases and Dangerous Occurrences Regulations 2013, so the Head of Health, Safety and Environment reported it to the HSE the same day. The steps had a chequer plate surface with no anti-slip nosings and a handrail on one side only.
     immediate_actions: >
       First aid was given at the scene and the casualty was taken to hospital. The steps were closed with a barrier and gritted, and the filter inspection was postponed. The Gas Safety Manager told the Head of Health, Safety and Environment within 1 hour. The HSE was notified the same day and the full report was submitted within 10 days.
     root_cause: >
-      Winter gritting at GPR-HRW was not part of the site's cold-weather checks, and the steel chequer plate steps became very slippery when iced. There were no anti-slip nosings and only one handrail. Anti-slip treads and a second handrail were fitted, grit bins were placed at the top of the steps, and all operational gas and electricity sites with external steps were added to the winter gritting rota.
+      Winter gritting at GPR-GWT was not part of the site's cold-weather checks, and the steel chequer plate steps became very slippery when iced. There were no anti-slip nosings and only one handrail. Anti-slip treads and a second handrail were fitted, grit bins were placed at the top of the steps, and all operational gas and electricity sites with external steps were added to the winter gritting rota.
     status: closed
     linked_procedures: [PR-CORP-001]
 
@@ -369,18 +369,18 @@ incidents:
   - incident_id: INC-2026-013
     occurred_at: 2026-04-08T09:10:00+01:00
     business_unit: gas
-    site_id: GPR-HRW
-    asset_id: FLT-HRW-01
+    site_id: GPR-GWT
+    asset_id: FLT-GWT-01
     category: near_miss
     severity: low
     riddor_reportable: false
-    summary: Contractor arrived at GPR-HRW to change a filter element without a permit; stopped at gate
+    summary: Contractor arrived at GPR-GWT to change a filter element without a permit; stopped at gate
     description: >
-      A contractor's technician arrived at Harrowmere Pressure Reduction Station to change the filter element in FLT-HRW-01. The job had been booked directly with the contractor by the planning team. The Authorised Person (Gas), who was on site for other work, checked the technician at the gate and found that no permit-to-work had been requested, there was no isolation plan, and the technician had not been given a hazardous area briefing for the station. The technician said they had expected to start straight away and to be given a permit on arrival. The technician was not allowed into the station compound. No work had started and nobody had entered the hazardous area.
+      A contractor's technician arrived at GigaWhat Pressure Reduction Station to change the filter element in FLT-GWT-01. The job had been booked directly with the contractor by the planning team. The Authorised Person (Gas), who was on site for other work, checked the technician at the gate and found that no permit-to-work had been requested, there was no isolation plan, and the technician had not been given a hazardous area briefing for the station. The technician said they had expected to start straight away and to be given a permit on arrival. The technician was not allowed into the station compound. No work had started and nobody had entered the hazardous area.
     immediate_actions: >
       The Authorised Person (Gas) turned the contractor away and told the planning team and the Gas Safety Manager. The filter change was rescheduled for 15 April 2026 and carried out under a permit issued in line with PR-GAS-021, with a hazardous area briefing given before work started.
     root_cause: >
-      The planning team raised a purchase order directly with the contractor, outside the work planning process that sends a permit request to the Authorised Person (Gas). The contractor's induction did not make clear that no work may start at a Harrowmere gas installation until a permit has been issued on site. Purchase orders for work at gas installations now need a permit request reference, and the contractor induction has been updated.
+      The planning team raised a purchase order directly with the contractor, outside the work planning process that sends a permit request to the Authorised Person (Gas). The contractor's induction did not make clear that no work may start at a GigaWhat Energy gas installation until a permit has been issued on site. Purchase orders for work at gas installations now need a permit request reference, and the contractor induction has been updated.
     status: closed
     linked_procedures: [PR-GAS-021, PR-GAS-040]
 
@@ -405,14 +405,14 @@ incidents:
   - incident_id: INC-2026-019
     occurred_at: 2026-06-23T10:30:00+01:00
     business_unit: gas
-    site_id: GPR-HRW
-    asset_id: PRS-HRW-01
+    site_id: GPR-GWT
+    asset_id: PRS-GWT-01
     category: equipment_failure
     severity: medium
     riddor_reportable: false
-    summary: Odorant level at GPR-HRW below the acceptable range; fault on the odorant injection pump
+    summary: Odorant level at GPR-GWT below the acceptable range; fault on the odorant injection pump
     description: >
-      During the monthly odorant check at Harrowmere Pressure Reduction Station, a Competent Person (Pressure Systems) measured an average odorant concentration of 4.2 mg/m3 at the outlet sampling point, below the acceptable range of 5.0 to 10.0 mg/m3 in PR-GAS-066, and the odour intensity check found only a faint odour at 1% gas-in-air. The Gas Network Controller was told and the injection rate was increased by 20%. The re-sample the next morning read 4.0 mg/m3. The Authorised Person (Gas) then had the injection unit checked: the duty pump was running and its stroke counter advancing, but it was delivering very little odorant. Air temperatures had been above 28 °C for 4 days, and part of the pump suction line ran above ground in full sun. The concentration never fell below the 3.5 mg/m3 critical level. Nobody was hurt.
+      During the monthly odorant check at GigaWhat Pressure Reduction Station, a Competent Person (Pressure Systems) measured an average odorant concentration of 4.2 mg/m3 at the outlet sampling point, below the acceptable range of 5.0 to 10.0 mg/m3 in PR-GAS-066, and the odour intensity check found only a faint odour at 1% gas-in-air. The Gas Network Controller was told and the injection rate was increased by 20%. The re-sample the next morning read 4.0 mg/m3. The Authorised Person (Gas) then had the injection unit checked: the duty pump was running and its stroke counter advancing, but it was delivering very little odorant. Air temperatures had been above 28 °C for 4 days, and part of the pump suction line ran above ground in full sun. The concentration never fell below the 3.5 mg/m3 critical level. Nobody was hurt.
     immediate_actions: >
       The standby injection pump was brought into service under a permit and the duty pump was isolated. Odorant concentration was sampled every 4 hours and was back within range by the evening of 24 June. Daily sampling continued for 2 weeks. The Gas Safety Manager was informed, and odour checks at three points on the downstream network found a distinct odour.
     root_cause: >
@@ -530,14 +530,14 @@ incidents:
   - incident_id: INC-2026-033
     occurred_at: 2026-10-02T11:25:00+01:00
     business_unit: gas
-    site_id: GNA-HRW
+    site_id: GNA-GWT
     asset_id: MAIN-IP-01
     category: gas_escape
     severity: medium
     riddor_reportable: false
-    summary: Leakage survey found a category 2 gas leak on MAIN-IP-01, the Harrowmere to Vale IP main
+    summary: Leakage survey found a category 2 gas leak on MAIN-IP-01, the GigaWhat to Vale IP main
     description: >
-      During the 12-monthly leakage survey of the Harrowmere to Vale IP steel main MAIN-IP-01 under PR-GAS-045, a First Call Operative found survey detector readings at the surface along the line of the main where it crosses farmland near the Vale. After scanning with a cable avoidance tool, bar holes found gas over about 4 m of the main, with a highest reading of 35% LEL. The nearest property is about 150 m away and no gas was found in nearby drains or chambers. As a confirmed leak on an IP main, it was classed as category 2 and reported to the Gas Network Controller the same day, for repair within 5 working days. MAIN-IP-01 is a 300 mm steel main laid in 1968 and operating at up to 7 bar. The source has not yet been exposed. Nobody was hurt and there was no loss of supply.
+      During the 12-monthly leakage survey of the GigaWhat to Vale IP steel main MAIN-IP-01 under PR-GAS-045, a First Call Operative found survey detector readings at the surface along the line of the main where it crosses farmland near the Vale. After scanning with a cable avoidance tool, bar holes found gas over about 4 m of the main, with a highest reading of 35% LEL. The nearest property is about 150 m away and no gas was found in nearby drains or chambers. As a confirmed leak on an IP main, it was classed as category 2 and reported to the Gas Network Controller the same day, for repair within 5 working days. MAIN-IP-01 is a 300 mm steel main laid in 1968 and operating at up to 7 bar. The source has not yet been exposed. Nobody was hurt and there was no loss of supply.
     immediate_actions: >
       The leak area was fenced off with barriers and warning signs, and bar hole readings are taken daily; they have not increased. The Authorised Person (Gas) is planning the repair under a permit issued under PR-GAS-021, with hand excavation within 1.5 m of the main and mechanical excavators kept at least 3 m away, as PR-GAS-052 requires. The repair is planned for 8 October 2026, within the 5 working day limit.
     root_cause: null

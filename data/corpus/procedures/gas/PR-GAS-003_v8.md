@@ -8,19 +8,19 @@
 | Review due | 2027-10-01 |
 | Owner | Head of Gas Network Operations |
 | Approved by | Gas Safety Manager |
-| Applies to | All Harrowmere Gas sites: low, medium and intermediate pressure mains and district governors |
+| Applies to | All GigaWhat Gas sites: low, medium and intermediate pressure mains and district governors |
 
 FICTIONAL DOCUMENT. Created for the GigaWhat demo. Not for real operational use.
 
 ## 1 Purpose
 
-This procedure sets out how Harrowmere Gas responds to reported gas escapes, from the first call to handover to a repair team. It covers attendance standards, making safe, evacuation, gas in buildings and escalation.
+This procedure sets out how GigaWhat Gas responds to reported gas escapes, from the first call to handover to a repair team. It covers attendance standards, making safe, evacuation, gas in buildings and escalation.
 
 ## 2 Scope
 
-This procedure applies to every report of a gas escape or smell of gas on or near the Harrowmere network: LP, MP and IP mains (including MAIN-IP-01, MAIN-MP-03, MAIN-LP-17 and MAIN-LP-22), services, meters up to the emergency control valve, and district governors G-112, G-118 and G-124.
+This procedure applies to every report of a gas escape or smell of gas on or near the GigaWhat Energy network: LP, MP and IP mains (including MAIN-IP-01, MAIN-MP-03, MAIN-LP-17 and MAIN-LP-22), services, meters up to the emergency control valve, and district governors G-112, G-118 and G-124.
 
-On a customer's installation beyond the emergency control valve, Harrowmere makes safe only. Repairs there are for a registered gas engineer engaged by the customer.
+On a customer's installation beyond the emergency control valve, GigaWhat Energy makes safe only. Repairs there are for a registered gas engineer engaged by the customer.
 
 ## 3 References
 
@@ -95,7 +95,7 @@ WARNING: A flammable atmosphere may already be present. An electric doorbell, li
 
 6.3.4 If the escape is downstream of the ECV and readings fall to zero with the ECV off, leave the ECV off, fit a warning label and advise the customer to contact a registered gas engineer.
 
-6.3.5 If the escape is upstream of the ECV, on Harrowmere's service or meter inlet, keep the area ventilated and ask the Gas Network Controller for a repair team.
+6.3.5 If the escape is upstream of the ECV, on GigaWhat Energy's service or meter inlet, keep the area ventilated and ask the Gas Network Controller for a repair team.
 
 6.3.6 If gas is still detected with the ECV off, or readings are rising, treat it as gas in buildings and follow 6.5 and 6.6.
 
@@ -175,7 +175,7 @@ WARNING: Escapes from MP and IP mains and governors release gas at high flow and
 
 6.9.3 Call 999 for fire, explosion or injury.
 
-6.9.4 If you cannot reach the Gas Network Controller by radio, call the National Gas Emergency Service on 0800 111 999 and ask for the Harrowmere Gas Network Controller.
+6.9.4 If you cannot reach the Gas Network Controller by radio, call the National Gas Emergency Service on 0800 111 999 and ask for the GigaWhat Gas Network Controller.
 
 6.9.5 Report every fire, explosion, injury, evacuation and missed attendance standard under PR-CORP-001.
 

@@ -8,17 +8,17 @@
 | Review due | 2027-08-05 |
 | Owner | Head of Gas Network Operations |
 | Approved by | Gas Safety Manager |
-| Applies to | Harrowmere Pressure Reduction Station (GPR-HRW): pressure reduction station PRS-HRW-01 |
+| Applies to | GigaWhat Pressure Reduction Station (GPR-GWT): pressure reduction station PRS-GWT-01 |
 
 FICTIONAL DOCUMENT. Created for the GigaWhat demo. Not for real operational use.
 
 ## 1 Purpose
 
-Natural gas has no smell of its own. Odorant is added so that people can smell a gas escape well before it becomes dangerous. This procedure sets out how odorant levels are checked at GPR-HRW, the acceptable ranges, and what to do when levels are low.
+Natural gas has no smell of its own. Odorant is added so that people can smell a gas escape well before it becomes dangerous. This procedure sets out how odorant levels are checked at GPR-GWT, the acceptable ranges, and what to do when levels are low.
 
 ## 2 Scope
 
-This procedure applies to the supplementary odorant injection unit that forms part of PRS-HRW-01, its odorant storage tank, and the odorant sampling point on the station outlet. Gas arrives at GPR-HRW already odorised upstream; the injection unit tops up the odorant when the incoming level is low.
+This procedure applies to the supplementary odorant injection unit that forms part of PRS-GWT-01, its odorant storage tank, and the odorant sampling point on the station outlet. Gas arrives at GPR-GWT already odorised upstream; the injection unit tops up the odorant when the incoming level is low.
 
 ## 3 References
 
@@ -31,7 +31,7 @@ This procedure applies to the supplementary odorant injection unit that forms pa
 
 ## 4 Definitions
 
-Odorant: The mercaptan-based liquid blend used by Harrowmere Gas to give natural gas its smell.
+Odorant: The mercaptan-based liquid blend used by GigaWhat Gas to give natural gas its smell.
 
 Odorant concentration: The amount of odorant in the gas, in milligrams per cubic metre (mg/m3), measured with a portable odorant analyser at the outlet sampling point.
 
@@ -119,7 +119,7 @@ WARNING: Odorant is highly flammable and has a very strong smell. A small spill 
 
 ## 7 Records
 
-The odorant record holds weekly tank levels and injection rates, monthly concentrations and odour intensity results, refill dates and volumes, and actions taken. It is kept in the GPR-HRW asset file for 6 years.
+The odorant record holds weekly tank levels and injection rates, monthly concentrations and odour intensity results, refill dates and volumes, and actions taken. It is kept in the GPR-GWT asset file for 6 years.
 
 ## 8 Revision history
 

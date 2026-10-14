@@ -8,13 +8,13 @@
 | Review due | 2026-06-30 |
 | Owner | Head of Electricity Network Operations |
 | Approved by | Senior Authorised Person (HV) |
-| Applies to | All Harrowmere Electricity sites, plant and equipment |
+| Applies to | All GigaWhat Electricity sites, plant and equipment |
 
 FICTIONAL DOCUMENT. Created for the GigaWhat demo. Not for real operational use.
 
 ## 1 Purpose
 
-This procedure sets how often Harrowmere Electricity substations are inspected and what is checked, so that defects are found and put right before they cause danger or loss of supply.
+This procedure sets how often GigaWhat Electricity substations are inspected and what is checked, so that defects are found and put right before they cause danger or loss of supply.
 
 ## 2 Scope
 

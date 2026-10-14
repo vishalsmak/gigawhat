@@ -8,24 +8,24 @@
 | Review due | 2027-11-04 |
 | Owner | Head of Gas Network Operations |
 | Approved by | Gas Safety Manager |
-| Applies to | All Harrowmere Gas sites: slam-shut valves |
+| Applies to | All GigaWhat Gas sites: slam-shut valves |
 
 FICTIONAL DOCUMENT. Created for the GigaWhat demo. Not for real operational use.
 
 ## 1 Purpose
 
-A slam-shut valve is the last line of protection against over-pressure downstream of a governor or pressure reduction stream. This procedure sets out how Harrowmere Gas function tests slam-shut valves, the trip settings and tolerances, and the criteria for passing or failing a valve.
+A slam-shut valve is the last line of protection against over-pressure downstream of a governor or pressure reduction stream. This procedure sets out how GigaWhat Gas function tests slam-shut valves, the trip settings and tolerances, and the criteria for passing or failing a valve.
 
 ## 2 Scope
 
-This procedure applies to all Harrowmere slam-shut valves:
+This procedure applies to all GigaWhat Energy slam-shut valves:
 
-- SSV-HRW-A and SSV-HRW-B on streams A and B of PRS-HRW-01 at the Harrowmere Pressure Reduction Station (GPR-HRW)
+- SSV-GWT-A and SSV-GWT-B on streams A and B of PRS-GWT-01 at the GigaWhat Pressure Reduction Station (GPR-GWT)
 - SSV-112 at Mill Lane District Governor (GPR-MLN)
 - SSV-118 at Station Road District Governor (GPR-STN)
 - SSV-124 at Kingsmead Avenue District Governor (GPR-KAV)
 
-District governor slam-shuts are tested every 12 months, normally during maintenance under PR-GAS-010. GPR-HRW slam-shuts are tested every 6 months, on the standby stream only. A slam-shut is also tested after any repair, adjustment or unplanned trip.
+District governor slam-shuts are tested every 12 months, normally during maintenance under PR-GAS-010. GPR-GWT slam-shuts are tested every 6 months, on the standby stream only. A slam-shut is also tested after any repair, adjustment or unplanned trip.
 
 ## 3 References
 
@@ -66,8 +66,8 @@ Gas Safety Manager: Is informed of every failed test and every unplanned trip.
 
 | Valve | Site | OPSO setting | OPSO tolerance | UPSO setting | UPSO tolerance |
 |---|---|---|---|---|---|
-| SSV-HRW-A | GPR-HRW stream A | 1.90 bar | plus or minus 0.04 bar | not fitted | not applicable |
-| SSV-HRW-B | GPR-HRW stream B | 1.90 bar | plus or minus 0.04 bar | not fitted | not applicable |
+| SSV-GWT-A | GPR-GWT stream A | 1.90 bar | plus or minus 0.04 bar | not fitted | not applicable |
+| SSV-GWT-B | GPR-GWT stream B | 1.90 bar | plus or minus 0.04 bar | not fitted | not applicable |
 | SSV-112 | GPR-MLN | 60 mbar | plus or minus 2.5 mbar | 12 mbar | plus or minus 2 mbar |
 | SSV-118 | GPR-STN | 55 mbar | plus or minus 2.5 mbar | 12 mbar | plus or minus 2 mbar |
 | SSV-124 | GPR-KAV | 63 mbar | plus or minus 2.5 mbar | 12 mbar | plus or minus 2 mbar |
@@ -80,9 +80,9 @@ NOTE: These settings match the governor settings in PR-GAS-010 and the station s
 
 6.2.2 At a district governor, put the LP network on bypass control or network support and isolate the governor stream under PR-GAS-010.
 
-6.2.3 At GPR-HRW, test only the standby stream. If the stream to be tested is on duty, change over first under PR-GAS-036.
+6.2.3 At GPR-GWT, test only the standby stream. If the stream to be tested is on duty, change over first under PR-GAS-036.
 
-6.2.4 Check that the test gauge has been calibrated within the last 12 months and has a suitable range: 0 to 100 mbar for district governors, 0 to 4 bar for GPR-HRW.
+6.2.4 Check that the test gauge has been calibrated within the last 12 months and has a suitable range: 0 to 100 mbar for district governors, 0 to 4 bar for GPR-GWT.
 
 6.2.5 Tell the Gas Network Controller the test is about to start.
 
@@ -96,7 +96,7 @@ WARNING: Closing the impulse line isolation valve disables the slam-shut's prote
 
 6.3.2 Raise the test rig to the normal outlet pressure and reset the slam-shut so that it is latched open.
 
-6.3.3 Raise the pressure slowly, no faster than 1 mbar per second for district governors or 0.01 bar per second for GPR-HRW.
+6.3.3 Raise the pressure slowly, no faster than 1 mbar per second for district governors or 0.01 bar per second for GPR-GWT.
 
 6.3.4 Record the pressure at which the valve trips and confirm the position indicator shows fully closed.
 
@@ -106,7 +106,7 @@ WARNING: Closing the impulse line isolation valve disables the slam-shut's prote
 
 ### 6.4 Under-pressure trip test
 
-NOTE: This subsection applies only to SSV-112, SSV-118 and SSV-124. The GPR-HRW slam-shuts have no under-pressure trip.
+NOTE: This subsection applies only to SSV-112, SSV-118 and SSV-124. The GPR-GWT slam-shuts have no under-pressure trip.
 
 6.4.1 With the valve latched open and the test rig at normal outlet pressure, lower the pressure slowly, no faster than 1 mbar per second.
 
@@ -120,7 +120,7 @@ NOTE: This subsection applies only to SSV-112, SSV-118 and SSV-124. The GPR-HRW 
 
 6.5.2 Close the vent valve and watch the gauge on the vented section.
 
-6.5.3 For district governors, record the pressure rise over 5 minutes. For GPR-HRW, record the pressure rise over 10 minutes.
+6.5.3 For district governors, record the pressure rise over 5 minutes. For GPR-GWT, record the pressure rise over 10 minutes.
 
 ### 6.6 Pass and fail criteria
 
@@ -132,7 +132,7 @@ NOTE: A slam-shut valve passes only if every check in 6.6.1 to 6.6.5 is met.
 
 6.6.3 Confirm that the valve did not relatch while the test pressure was above the OPSO setting.
 
-6.6.4 Confirm that let-by was no more than 1 mbar rise in 5 minutes for district governors, or no more than 10 mbar rise in 10 minutes for GPR-HRW.
+6.6.4 Confirm that let-by was no more than 1 mbar rise in 5 minutes for district governors, or no more than 10 mbar rise in 10 minutes for GPR-GWT.
 
 6.6.5 Confirm that the valve resets and latches open without force.
 
@@ -178,4 +178,4 @@ The slam-shut test record holds the valve ID, date, test gauge serial number and
 |---|---|---|
 | 1 | 2016-11-07 | First issue. |
 | 2 | 2020-11-02 | Added under-pressure trip testing for district governor slam-shuts and let-by test. |
-| 3 | 2024-11-04 | Added relatch check, two-trip pass criterion, hold point on impulse line valve before cancelling the permit, and unplanned trip section. GPR-HRW test interval reduced from 12 to 6 months. |
+| 3 | 2024-11-04 | Added relatch check, two-trip pass criterion, hold point on impulse line valve before cancelling the permit, and unplanned trip section. GPR-GWT test interval reduced from 12 to 6 months. |

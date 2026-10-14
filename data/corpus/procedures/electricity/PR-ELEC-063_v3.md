@@ -8,13 +8,13 @@
 | Review due | 2027-10-07 |
 | Owner | Electricity Safety Manager |
 | Approved by | Head of Electricity Network Operations |
-| Applies to | All Harrowmere Electricity sites, plant and equipment |
+| Applies to | All GigaWhat Electricity sites, plant and equipment |
 
 FICTIONAL DOCUMENT. Created for the GigaWhat demo. Not for real operational use.
 
 ## 1 Purpose
 
-This procedure controls access to Harrowmere Electricity substations, the issue of operational keys and the escorting of visitors, so that unauthorised people are kept away from danger and the Control Engineer always knows who is on site.
+This procedure controls access to GigaWhat Electricity substations, the issue of operational keys and the escorting of visitors, so that unauthorised people are kept away from danger and the Control Engineer always knows who is on site.
 
 ## 2 Scope
 
@@ -103,7 +103,7 @@ WARNING: Visitors have no training in HV hazards and may approach exposed conduc
 
 ### 6.4 Contractors
 
-6.4.1 Contractors with a Harrowmere authorisation follow 6.1 and 6.2.
+6.4.1 Contractors with a GigaWhat Energy authorisation follow 6.1 and 6.2.
 
 6.4.2 Treat contractors without an authorisation as visitors. They must be escorted or work in an area segregated from HV equipment, as agreed and recorded by an Authorised Person (HV).
 

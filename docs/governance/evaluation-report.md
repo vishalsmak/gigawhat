@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Method written for the demo. Harrowmere Energy is fictional. Results are added below by a separate process. |
+| Status | Method written for the demo. GigaWhat Energy is fictional. Results are added below by a separate process. |
 | Written against | Commit `3e8cb02` plus the follow-up fixes made on 10 October 2026; `PROMPT_VERSION` `01cc75222082` |
 | Audience | Safety team, engineering, auditors |
 
@@ -138,7 +138,9 @@ Each report has three parts: the five gates with PASS or FAIL and the failing ca
 
 ## Latest results
 
-Cloud profile after Phase 2a (`gemini-3.1-flash-lite` for the tier, rails and rewrites; `gemini-3.5-flash-lite` for records and answers; OpenAI `text-embedding-3-small`; the local `bge-reranker-v2-m3`), 60 golden and 25 red-team cases, run on 14 October 2026 on Gemini's free tier without the DeepEval judge. Full report: `evals/reports/2026-10-14-cloud-golden-redteam.md`; LangSmith experiment `golden+redteam-0e9721f3`.
+**Not yet rerun for the current build.** `PROMPT_VERSION` is now `9742a1f9df51`: on 14 October 2026 the emergency rules were widened and the fictional company in the prompts, procedures and records was renamed GigaWhat Energy. Change control requires a full run before the results below describe the current build.
+
+Cloud profile after Phase 2a (`gemini-3.1-flash-lite` for the tier, rails and rewrites; `gemini-3.5-flash-lite` for records and answers; OpenAI `text-embedding-3-small`; the local `bge-reranker-v2-m3`), 60 golden and 25 red-team cases, run on 14 October 2026 on Gemini's free tier without the DeepEval judge. Full report: `evals/reports/2026-10-14-cloud-golden-redteam.md`. The LangSmith experiment was deleted on 14 October 2026 when LangSmith was cleared; the report is the record.
 
 **Release gates: all five passed.**
 

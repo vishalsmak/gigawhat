@@ -11,7 +11,7 @@ questions about them have real evidence behind them:
 - G-112's logged maximum outlet pressure creeps past PR-GAS-058's flag (set point + 5 mbar)
   before the SSV-112 over-pressure trip at INC-2026-011, and again before INC-2026-027.
 - BAT-ASH has cells below PR-ELEC-058's 2.18 V limit at INC-2025-008.
-- GPR-HRW odorant falls below PR-GAS-066's 5.0 mg/m3 at INC-2026-019.
+- GPR-GWT odorant falls below PR-GAS-066's 5.0 mg/m3 at INC-2026-019.
 - SWG-KGM-11, 1974 oil switchgear, collects defects and fails to trip at INC-2024-007.
 
 Usage: uv run python scripts/generate_records.py
@@ -590,7 +590,7 @@ def network_alarms(rng: random.Random, incidents: dict[str, datetime]) -> Iterat
             )
     odorant = incidents["INC-2026-019"]
     yield Alarm(
-        "PRS-HRW-01",
+        "PRS-GWT-01",
         odorant,
         odorant + timedelta(hours=26),
         2,

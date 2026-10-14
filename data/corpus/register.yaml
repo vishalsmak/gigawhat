@@ -1,4 +1,4 @@
-# Harrowmere Energy document register (fictional).
+# GigaWhat Energy document register (fictional).
 #
 # The register is the source of truth for document control. Ingestion copies
 # these statuses into the database; a file's own contents never decide whether
@@ -156,7 +156,7 @@ documents:
     doc_type: procedure
     owner: Head of Gas Network Operations
     versions:
-      - {version: 2, status: approved, effective_from: 2025-08-04, review_due: 2028-08-04, approver: Gas Safety Manager, safety_critical: true, sites: [GPR-HRW], asset_classes: [pressure_reduction_station, slam_shut_valve, filter], file: procedures/gas/PR-GAS-036_v2.md}
+      - {version: 2, status: approved, effective_from: 2025-08-04, review_due: 2028-08-04, approver: Gas Safety Manager, safety_critical: true, sites: [GPR-GWT], asset_classes: [pressure_reduction_station, slam_shut_valve, filter], file: procedures/gas/PR-GAS-036_v2.md}
 
   - doc_id: PR-GAS-040
     title: Working in Hazardous Areas (DSEAR Zones)
@@ -196,7 +196,7 @@ documents:
     doc_type: procedure
     owner: Head of Gas Network Operations
     versions:
-      - {version: 2, status: approved, effective_from: 2024-08-05, review_due: 2027-08-05, approver: Gas Safety Manager, safety_critical: false, sites: [GPR-HRW], asset_classes: [pressure_reduction_station], file: procedures/gas/PR-GAS-066_v2.md}
+      - {version: 2, status: approved, effective_from: 2024-08-05, review_due: 2027-08-05, approver: Gas Safety Manager, safety_critical: false, sites: [GPR-GWT], asset_classes: [pressure_reduction_station], file: procedures/gas/PR-GAS-066_v2.md}
 
   - doc_id: PR-GAS-071
     title: Investigating Gas in Buildings

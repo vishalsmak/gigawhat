@@ -8,17 +8,17 @@
 | Review due | 2028-01-13 |
 | Owner | Head of Gas Network Operations |
 | Approved by | Gas Safety Manager |
-| Applies to | All Harrowmere Gas sites: low, medium and intermediate pressure mains |
+| Applies to | All GigaWhat Gas sites: low, medium and intermediate pressure mains |
 
 FICTIONAL DOCUMENT. Created for the GigaWhat demo. Not for real operational use.
 
 ## 1 Purpose
 
-This procedure sets out how Harrowmere Gas surveys its mains for leakage, how often each main is surveyed, and how leaks found are classified and acted on.
+This procedure sets out how GigaWhat Gas surveys its mains for leakage, how often each main is surveyed, and how leaks found are classified and acted on.
 
 ## 2 Scope
 
-This procedure applies to planned leakage surveys of the LP, MP and IP mains on the Harrowmere gas network. Reported escapes are dealt with under PR-GAS-003, not this procedure.
+This procedure applies to planned leakage surveys of the LP, MP and IP mains on the GigaWhat gas network. Reported escapes are dealt with under PR-GAS-003, not this procedure.
 
 ## 3 References
 
@@ -55,7 +55,7 @@ Authorised Person (Gas): Plans repairs of category 2 and 3 leaks and reviews mon
 
 | Main | Material and pressure | Survey frequency |
 |---|---|---|
-| MAIN-IP-01 Harrowmere to Vale | Steel, IP 7 bar, 300 mm, 1968 | Every 12 months |
+| MAIN-IP-01 GigaWhat to Vale | Steel, IP 7 bar, 300 mm, 1968 | Every 12 months |
 | MAIN-MP-03 Vale Road | PE, MP 2 bar, 180 mm, 2009 | Every 12 months |
 | MAIN-LP-17 Mill Lane | PE, LP 75 mbar, 125 mm, 2014 | Every 3 years |
 | MAIN-LP-22 Station Road | Cast iron, LP 75 mbar, 6 inch, 1932 | Every 6 months, plus a frost survey |

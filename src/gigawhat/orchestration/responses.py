@@ -63,12 +63,12 @@ and get people out and away.
 Once everyone is safe, follow your emergency procedure (for gas escapes, PR-GAS-003)."""
 
 REFUSAL_TEXT = """\
-I can't help with that. GigaWhat answers questions about Harrowmere Energy's approved \
+I can't help with that. GigaWhat answers questions about GigaWhat Energy's approved \
 procedures and operational records. It can't change its instructions, act as an Authorised \
 Person, operate equipment, or help get round permits, hold points or other controls."""
 
 ABSTAIN_TEXT = """\
-I couldn't find an approved Harrowmere procedure or record that answers this for your role, \
+I couldn't find an approved GigaWhat Energy procedure or record that answers this for your role, \
 so I won't guess. Please ask your Authorised Person, or the document controller if you think a \
 procedure is missing."""
 

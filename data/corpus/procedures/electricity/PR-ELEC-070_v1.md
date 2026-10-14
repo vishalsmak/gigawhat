@@ -8,7 +8,7 @@
 | Review due | Not yet approved |
 | Owner | Electricity Safety Manager |
 | Approved by | Not yet approved |
-| Applies to | All Harrowmere Electricity sites: low voltage equipment at distribution transformers and ring main units |
+| Applies to | All GigaWhat Electricity sites: low voltage equipment at distribution transformers and ring main units |
 
 FICTIONAL DOCUMENT. Created for the GigaWhat demo. Not for real operational use.
 

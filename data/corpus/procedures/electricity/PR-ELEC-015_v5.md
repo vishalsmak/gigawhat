@@ -8,7 +8,7 @@
 | Review due | 2028-06-02 |
 | Owner | Head of Electricity Network Operations |
 | Approved by | Electricity Safety Manager |
-| Applies to | All Harrowmere Electricity sites: 11 kV and 33 kV switchgear, feeders, primary transformers and grid transformers |
+| Applies to | All GigaWhat Electricity sites: 11 kV and 33 kV switchgear, feeders, primary transformers and grid transformers |
 
 FICTIONAL DOCUMENT. Created for the GigaWhat demo. Not for real operational use.
 
@@ -18,7 +18,7 @@ This procedure sets out how switching programmes for the 11 kV and 33 kV network
 
 ## 2 Scope
 
-This procedure applies to planned and fault switching on 11 kV and 33 kV switchgear, feeders, primary transformers and grid transformers at all Harrowmere Electricity sites. This includes SWG-RVL-33 and the 33 kV connections of GT-1 and GT-2 at ESS-RVL, SWG-ASH-11 at ESS-ASH and SWG-KGM-11 at ESS-KGM. Switching on the 132 kV side of GT-1 and GT-2 is outside this procedure.
+This procedure applies to planned and fault switching on 11 kV and 33 kV switchgear, feeders, primary transformers and grid transformers at all GigaWhat Electricity sites. This includes SWG-RVL-33 and the 33 kV connections of GT-1 and GT-2 at ESS-RVL, SWG-ASH-11 at ESS-ASH and SWG-KGM-11 at ESS-KGM. Switching on the 132 kV side of GT-1 and GT-2 is outside this procedure.
 
 ## 3 References
 
@@ -61,7 +61,7 @@ Competent Person (HV): may assist the operator but does not carry out HV switchi
 
 ### 6.1 Writing a switching programme
 
-6.1.1 Write planned switching programmes on the standard Harrowmere template at least five working days before the planned date.
+6.1.1 Write planned switching programmes on the standard GigaWhat Energy template at least five working days before the planned date.
 
 6.1.2 Give each step a sequence number, the site ID, the asset ID and switch label, the operation, the expected state afterwards and the person who carries it out.
 

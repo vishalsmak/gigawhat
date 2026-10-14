@@ -8,7 +8,7 @@
 | Review due | 2028-02-03 |
 | Owner | Head of Health, Safety and Environment |
 | Approved by | Chief Operating Officer |
-| Applies to | All Harrowmere Energy employees and contractors, both business units |
+| Applies to | All GigaWhat Energy employees and contractors, both business units |
 
 FICTIONAL DOCUMENT. Created for the GigaWhat demo. Not for real operational use.
 
@@ -86,7 +86,7 @@ NOTE: Report a near miss even if the timescale has passed. A late report is bett
 
 ### 6.3 RIDDOR reporting
 
-NOTE: Only the Head of Health, Safety and Environment, or a named deputy, makes RIDDOR reports for Harrowmere Energy.
+NOTE: Only the Head of Health, Safety and Environment, or a named deputy, makes RIDDOR reports for GigaWhat Energy.
 
 6.3.1 The Safety Manager tells the Head of Health, Safety and Environment within 1 hour of a death, specified injury, possible dangerous occurrence or member of the public taken to hospital, and the same day of any injury likely to cause over 7 days off work.
 

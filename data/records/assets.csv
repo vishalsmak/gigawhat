@@ -19,10 +19,10 @@ TX-BRK-01,ESS-BRK,distribution_transformer,11 kV/LV 1000 kVA distribution transf
 RMU-BRK-01,ESS-BRK,ring_main_unit,11 kV ring main unit,2003,medium
 TX-ORC-01,ESS-ORC,distribution_transformer,11 kV/LV 500 kVA distribution transformer,2010,low
 RMU-ORC-01,ESS-ORC,ring_main_unit,11 kV ring main unit,2010,medium
-PRS-HRW-01,GPR-HRW,pressure_reduction_station,IP to MP pressure reduction station with streams A and B,1999,high
-SSV-HRW-A,GPR-HRW,slam_shut_valve,Stream A slam-shut valve,1999,high
-SSV-HRW-B,GPR-HRW,slam_shut_valve,Stream B slam-shut valve,1999,high
-FLT-HRW-01,GPR-HRW,filter,Inlet filter,2011,medium
+PRS-GWT-01,GPR-GWT,pressure_reduction_station,IP to MP pressure reduction station with streams A and B,1999,high
+SSV-GWT-A,GPR-GWT,slam_shut_valve,Stream A slam-shut valve,1999,high
+SSV-GWT-B,GPR-GWT,slam_shut_valve,Stream B slam-shut valve,1999,high
+FLT-GWT-01,GPR-GWT,filter,Inlet filter,2011,medium
 G-112,GPR-MLN,district_governor,MP to LP district governor,2006,high
 SSV-112,GPR-MLN,slam_shut_valve,Governor slam-shut valve,2006,high
 FLT-112,GPR-MLN,filter,Governor inlet filter,2006,low
@@ -30,7 +30,7 @@ G-118,GPR-STN,district_governor,MP to LP district governor,1998,high
 SSV-118,GPR-STN,slam_shut_valve,Governor slam-shut valve,1998,high
 G-124,GPR-KAV,district_governor,MP to LP district governor,2015,high
 SSV-124,GPR-KAV,slam_shut_valve,Governor slam-shut valve,2015,high
-MAIN-IP-01,GNA-HRW,main_ip,Harrowmere to Vale IP steel main (7 bar 300 mm),1968,high
-MAIN-MP-03,GNA-HRW,main_mp,Vale Road MP PE main (2 bar 180 mm),2009,medium
-MAIN-LP-17,GNA-HRW,main_lp,Mill Lane LP PE main (75 mbar 125 mm),2014,low
-MAIN-LP-22,GNA-HRW,main_lp,Station Road LP cast iron main (75 mbar 6 inch) on replacement programme,1932,high
+MAIN-IP-01,GNA-GWT,main_ip,GigaWhat to Vale IP steel main (7 bar 300 mm),1968,high
+MAIN-MP-03,GNA-GWT,main_mp,Vale Road MP PE main (2 bar 180 mm),2009,medium
+MAIN-LP-17,GNA-GWT,main_lp,Mill Lane LP PE main (75 mbar 125 mm),2014,low
+MAIN-LP-22,GNA-GWT,main_lp,Station Road LP cast iron main (75 mbar 6 inch) on replacement programme,1932,high

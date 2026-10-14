@@ -58,7 +58,7 @@ The look lives outside the Python code: colours in [`public/theme.json`](public/
 
 ## Data
 
-[`data/README.md`](data/README.md) describes Harrowmere Energy, the fictional utility: its sites, assets, roles and document register, plus the deliberate test cases (superseded and draft procedures, an overdue review, two procedures that conflict) that the assistant must handle correctly.
+[`data/README.md`](data/README.md) describes GigaWhat Energy, the fictional utility: its sites, assets, roles and document register, plus the deliberate test cases (superseded and draft procedures, an overdue review, two procedures that conflict) that the assistant must handle correctly.
 
 ## Profiles
 

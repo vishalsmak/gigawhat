@@ -8,13 +8,13 @@
 | Review due | 2024-05-04 |
 | Owner | Head of Gas Network Operations |
 | Approved by | Gas Safety Manager |
-| Applies to | All Harrowmere Gas sites: low pressure mains |
+| Applies to | All GigaWhat Gas sites: low pressure mains |
 
 FICTIONAL DOCUMENT. Created for the GigaWhat demo. Not for real operational use.
 
 ## 1 Purpose
 
-This procedure sets out how Harrowmere Gas investigates gas found inside a building that is entering from an external source, such as a leaking low pressure main or service. It covers confirming that gas is entering from outside, evacuation, checking the building and its neighbours, tracing the source, and controlling the ingress until the repair is complete.
+This procedure sets out how GigaWhat Gas investigates gas found inside a building that is entering from an external source, such as a leaking low pressure main or service. It covers confirming that gas is entering from outside, evacuation, checking the building and its neighbours, tracing the source, and controlling the ingress until the repair is complete.
 
 ## 2 Scope
 
@@ -147,7 +147,7 @@ HOLD POINT: Do not allow anyone back into an evacuated building until the Author
 
 6.7.1 Call 999 for fire, explosion or injury.
 
-6.7.2 If you cannot contact the Gas Network Controller by radio, call the National Gas Emergency Service on 0800 111 999 and ask to be connected to the Harrowmere Gas Network Controller.
+6.7.2 If you cannot contact the Gas Network Controller by radio, call the National Gas Emergency Service on 0800 111 999 and ask to be connected to the GigaWhat Gas Network Controller.
 
 6.7.3 Keep lone working check-ins under PR-CORP-004 until another operative or the Authorised Person (Gas) arrives.
 

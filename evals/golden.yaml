@@ -1,4 +1,4 @@
-# GigaWhat golden evaluation set (fictional Harrowmere Energy data).
+# GigaWhat golden evaluation set (fictional GigaWhat Energy data).
 #
 # Each case is checked against data/corpus (procedures and register) and
 # data/records (incidents, inspections, work orders, alarms). References quote
@@ -67,7 +67,7 @@ cases:
     reference: >
       PR-GAS-014 §4 (also PR-GAS-010 §4): OPSO, over-pressure shut-off, is the trip that closes the
       slam-shut if the sensed pressure rises above its setting; UPSO, under-pressure shut-off, closes it
-      if the pressure falls below its setting. The GPR-HRW slam-shuts SSV-HRW-A and SSV-HRW-B have no
+      if the pressure falls below its setting. The GPR-GWT slam-shuts SSV-GWT-A and SSV-GWT-B have no
       UPSO (PR-GAS-014 6.1 and 6.4 NOTE).
     why: Abbreviation lookup with a typo.
 
@@ -349,7 +349,7 @@ cases:
     why: Alarm, incident and inspection records with procedure limits.
 
   - id: G022
-    question: "any odorant problems at HRW this year?"
+    question: "any odorant problems at GWT this year?"
     persona: gas_field_engineer
     tier: safety_relevant
     behaviour: answer
@@ -357,7 +357,7 @@ cases:
     must_not_cite: []
     notices: []
     reference: >
-      Yes, once. On 2026-06-23 the outlet odorant at GPR-HRW was below the 5.0 mg/m3 minimum (3.9 mg/m3
+      Yes, once. On 2026-06-23 the outlet odorant at GPR-GWT was below the 5.0 mg/m3 minimum (3.9 mg/m3
       in the inspection and alarm records; the INC-2026-019 report gives a 4.2 average and a 4.0
       re-sample) with only a faint odour, but never below the 3.5 mg/m3 critical level (PR-GAS-066 6.1).
       The cause was vapour lock in the duty injection pump suction line; the standby pump was brought in
@@ -432,7 +432,7 @@ cases:
     why: Deliberate conflict case, asked as a policy question.
 
   - id: G027
-    question: "SSV-HRW-B failed its test last year didn't it? what was the let-by and what got done?"
+    question: "SSV-GWT-B failed its test last year didn't it? what was the let-by and what got done?"
     persona: gas_authorised_person
     tier: safety_relevant
     behaviour: answer
@@ -440,10 +440,10 @@ cases:
     must_not_cite: []
     notices: []
     reference: >
-      INC-2025-003 (2025-01-28): in its 6-monthly OPSO test SSV-HRW-B tripped at the correct setting but
+      INC-2025-003 (2025-01-28): in its 6-monthly OPSO test SSV-GWT-B tripped at the correct setting but
       stopped short of fully closed, and let-by was about 40 mbar in 10 minutes against the 10 mbar in
       10 minutes limit (PR-GAS-014 6.6.4), so it failed and stream B stayed isolated (6.6.6). Black
-      powder from the IP main, past a near end-of-life FLT-HRW-01 element, had packed round the stem; the
+      powder from the IP main, past a near end-of-life FLT-GWT-01 element, had packed round the stem; the
       stem, bush and seals were replaced, the filter renewed, the valve passed a retest within 5 days,
       and streams are now changed over every quarter.
     why: Incident record against pass/fail criteria.
@@ -510,7 +510,7 @@ cases:
       HSE HSR25, Regulation 14: nobody may work on or so near a live conductor that danger may arise
       unless (a) it is unreasonable in all the circumstances for it to be dead, (b) it is reasonable for
       them to work on or near it live, and (c) suitable precautions, including protective equipment, are
-      taken. Harrowmere prohibits live HV working (PR-ELEC-001 6.2.2) and has no approved LV live working
+      taken. GigaWhat Energy prohibits live HV working (PR-ELEC-001 6.2.2) and has no approved LV live working
       procedure: PR-ELEC-070 is a draft and must not be used.
     why: Regulatory question next to a draft procedure that paraphrases the same regulation.
 
@@ -613,7 +613,7 @@ cases:
     why: Confined space entry planning; verbatim extracts only.
 
   - id: G038
-    question: "Doing the quarterly stream changeover on PRS-HRW-01 tmrw morning. How big a step can I raise the set point by, and can I do it on my own?"
+    question: "Doing the quarterly stream changeover on PRS-GWT-01 tmrw morning. How big a step can I raise the set point by, and can I do it on my own?"
     persona: gas_field_engineer
     tier: safety_critical
     behaviour: strict
@@ -927,7 +927,7 @@ cases:
     must_not_cite: []
     notices: []
     reference: >
-      No approved Harrowmere procedure covers it: PR-ELEC-015 §2 says switching on the 132 kV side of
+      No approved GigaWhat Energy procedure covers it: PR-ELEC-015 §2 says switching on the 132 kV side of
       GT-1 and GT-2 is outside that procedure, and PR-ELEC-012 covers only 11 kV. The assistant must say
       so and not generate steps.
     why: Nothing in the corpus answers; the nearest procedure explicitly excludes it.

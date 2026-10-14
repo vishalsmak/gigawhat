@@ -1,13 +1,13 @@
-# Harrowmere Energy: the fictional world behind the demo
+# GigaWhat Energy: the fictional world behind the demo
 
-**Everything in `data/` except the HSE guidance is fictional.** Harrowmere Energy, its sites, assets, people, procedures and records were invented for the GigaWhat demo. Do not use any of it for real operational work.
+**Everything in `data/` except the HSE guidance is fictional.** GigaWhat Energy, its sites, assets, people, procedures and records were invented for the GigaWhat demo. Do not use any of it for real operational work.
 
-Harrowmere Energy is a UK multi-utility with two operating business units and a small corporate function:
+GigaWhat Energy is a UK multi-utility with two operating business units and a small corporate function:
 
 | Business unit | Code | Runs |
 |---|---|---|
-| Harrowmere Electricity | `electricity` | A 132/33/11 kV distribution network around the town of Harrowmere and the Vale |
-| Harrowmere Gas | `gas` | A gas distribution network from intermediate pressure (7 bar) down to low pressure (75 mbar) |
+| GigaWhat Electricity | `electricity` | A 132/33/11 kV distribution network around the town of GigaWhat and the Vale |
+| GigaWhat Gas | `gas` | A gas distribution network from intermediate pressure (7 bar) down to low pressure (75 mbar) |
 | Corporate HSE | `shared` | Company-wide procedures that apply to both units |
 
 ## Roles
@@ -52,11 +52,11 @@ UK gas pressure tiers used throughout: low pressure (LP) up to 75 mbar, medium p
 
 | Site ID | Site | Pressure | Assets |
 |---|---|---|---|
-| `GPR-HRW` | Harrowmere Pressure Reduction Station | IP 7 bar to MP 2 bar | `PRS-HRW-01` station (two streams, A and B); `SSV-HRW-A`, `SSV-HRW-B` slam-shut valves; `FLT-HRW-01` filter |
+| `GPR-GWT` | GigaWhat Pressure Reduction Station | IP 7 bar to MP 2 bar | `PRS-GWT-01` station (two streams, A and B); `SSV-GWT-A`, `SSV-GWT-B` slam-shut valves; `FLT-GWT-01` filter |
 | `GPR-MLN` | Mill Lane District Governor | MP to LP 75 mbar | `G-112` district governor (2006); `SSV-112` slam-shut valve; `FLT-112` filter |
 | `GPR-STN` | Station Road District Governor | MP to LP 75 mbar | `G-118` district governor (1998); `SSV-118` slam-shut valve |
 | `GPR-KAV` | Kingsmead Avenue District Governor | MP to LP 75 mbar | `G-124` district governor (2015); `SSV-124` slam-shut valve |
-| `GNA-HRW` | Harrowmere gas network (mains) | | `MAIN-IP-01` Harrowmere to Vale IP steel main (7 bar, 300 mm, 1968); `MAIN-MP-03` Vale Road MP PE main (2 bar, 180 mm, 2009); `MAIN-LP-17` Mill Lane LP PE main (75 mbar, 125 mm, 2014); `MAIN-LP-22` Station Road LP cast iron main (75 mbar, 6 inch, 1932, on the replacement programme) |
+| `GNA-GWT` | GigaWhat gas network (mains) | | `MAIN-IP-01` GigaWhat to Vale IP steel main (7 bar, 300 mm, 1968); `MAIN-MP-03` Vale Road MP PE main (2 bar, 180 mm, 2009); `MAIN-LP-17` Mill Lane LP PE main (75 mbar, 125 mm, 2014); `MAIN-LP-22` Station Road LP cast iron main (75 mbar, 6 inch, 1932, on the replacement programme) |
 | `DEP-VAL` | Vale Gas Depot | | none |
 
 ## Asset classes
@@ -68,7 +68,7 @@ UK gas pressure tiers used throughout: low pressure (LP) up to 75 mbar, medium p
 | Path | What |
 |---|---|
 | `corpus/register.yaml` | The document register: every document, every version, its status and who it applies to. **The register, not the file, decides whether a version is current.** |
-| `corpus/procedures/` | Harrowmere procedures as Markdown, one file per version |
+| `corpus/procedures/` | GigaWhat Energy procedures as Markdown, one file per version |
 | `records/` | Sites, assets, work orders, inspections, incidents and alarms |
 | `raw/hse/` | HSE guidance PDFs, downloaded by `gigawhat data fetch-hse` and not committed |
 

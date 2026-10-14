@@ -1,6 +1,6 @@
 # GigaWhat evaluation · golden+redteam · cloud profile · 2026-10-14
 
-Traces and scores for every case: LangSmith experiment `golden+redteam-0e9721f3` on the `gigawhat-evaluation` dataset.
+Traces and scores for every case were in the LangSmith experiment `golden+redteam-0e9721f3`, deleted on 14 October 2026 when LangSmith was cleared. This report is the record.
 
 ## Release gates
 

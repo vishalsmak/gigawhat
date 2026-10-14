@@ -8,7 +8,7 @@
 | Review due | 2028-07-07 |
 | Owner | Head of Gas Network Operations |
 | Approved by | Gas Safety Manager |
-| Applies to | All Harrowmere Gas sites: district governors and slam-shut valves |
+| Applies to | All GigaWhat Gas sites: district governors and slam-shut valves |
 
 FICTIONAL DOCUMENT. Created for the GigaWhat demo. Not for real operational use.
 

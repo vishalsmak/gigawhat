@@ -8,13 +8,13 @@
 | Review due | 2028-05-06 |
 | Owner | Head of Gas Network Operations |
 | Approved by | Gas Safety Manager |
-| Applies to | All Harrowmere Gas sites: district governors and their slam-shut valves and filters |
+| Applies to | All GigaWhat Gas sites: district governors and their slam-shut valves and filters |
 
 FICTIONAL DOCUMENT. Created for the GigaWhat demo. Not for real operational use.
 
 ## 1 Purpose
 
-This procedure sets out how Harrowmere Gas carries out planned maintenance of district governors, including their slam-shut valves, creep relief valves and filters, while keeping customers in supply. It also sets the standard pressure settings for each district governor.
+This procedure sets out how GigaWhat Gas carries out planned maintenance of district governors, including their slam-shut valves, creep relief valves and filters, while keeping customers in supply. It also sets the standard pressure settings for each district governor.
 
 ## 2 Scope
 
@@ -24,7 +24,7 @@ This procedure applies to the three district governors that reduce medium pressu
 - G-118 at Station Road District Governor (GPR-STN), installed 1998, with slam-shut valve SSV-118
 - G-124 at Kingsmead Avenue District Governor (GPR-KAV), installed 2015, with slam-shut valve SSV-124
 
-Each installation has a single regulator stream with a manually operated bypass. Annual maintenance is carried out between 1 April and 30 September, when demand is low. The slam-shut valves and filter at the Harrowmere Pressure Reduction Station (GPR-HRW) are maintained under the station plan, with stream changeover under PR-GAS-036.
+Each installation has a single regulator stream with a manually operated bypass. Annual maintenance is carried out between 1 April and 30 September, when demand is low. The slam-shut valves and filter at the GigaWhat Pressure Reduction Station (GPR-GWT) are maintained under the station plan, with stream changeover under PR-GAS-036.
 
 ## 3 References
 

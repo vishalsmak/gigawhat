@@ -7,7 +7,7 @@
 | Controller | For the demo: whoever operates the hosted instance. For a real deployment: the utility. |
 | Audience | Data protection officer, security, engineering |
 
-This document follows the shape the ICO describes for a DPIA: the nature, scope, context and purposes of the processing; necessity and proportionality; risks to individuals; and measures to reduce them. It is not legal advice. Harrowmere Energy, its staff and its customers are fictional, and the demo is not meant to process real personal data. It still can, because anyone with the link can type anything into a question.
+This document follows the shape the ICO describes for a DPIA: the nature, scope, context and purposes of the processing; necessity and proportionality; risks to individuals; and measures to reduce them. It is not legal advice. GigaWhat Energy, its staff and its customers are fictional, and the demo is not meant to process real personal data. It still can, because anyone with the link can type anything into a question.
 
 ## 1. Why a DPIA
 
@@ -76,7 +76,7 @@ On the **offline** profile, steps 5, 6, 8 and 10 go to Ollama and a local rerank
 | UK postcodes | `[postcode]` |
 | NHS numbers, card numbers, IBANs, IP addresses (Presidio built-ins) | `[NHS number]`, `[card number]`, `[bank account]`, `[IP address]` |
 
-Settings that matter: a score threshold of 0.35 (Presidio scores UK phone numbers at 0.4); asset and document IDs such as `FDR-ASH-07` and `PR-GAS-031` are never treated as personal data; spans with no digits that contain a company term (Harrowmere, Kingsmead, Ashford, Vale, Mill Lane, job titles and so on) are allowed through; the gas emergency number 0800 111 999 is allowed through. Only the entity types found, not the values, go into the audit record.
+Settings that matter: a score threshold of 0.35 (Presidio scores UK phone numbers at 0.4); asset and document IDs such as `FDR-ASH-07` and `PR-GAS-031` are never treated as personal data; spans with no digits that contain a company term (GigaWhat, Kingsmead, Ashford, Vale, Mill Lane, job titles and so on) are allowed through; the gas emergency number 0800 111 999 is allowed through. Only the entity types found, not the values, go into the audit record.
 
 Tests: `tests/test_pii.py` (names, house number and street, "number 22 Vale Road", postcode, mobile, landline, email, entity types, and six company phrases left alone). The evaluation gate "No personal data repeated" checks that personal data in red-team questions does not appear in the response text.
 
@@ -118,7 +118,6 @@ The append-only design and the right to erasure pull in different directions. Ma
 | Cohere (Rerank API) | Processor on a production key; on a trial key Cohere acts as a controller under its privacy policy | cloud | Masked questions; candidate passages for reranking | Hosted on Google Cloud in the United States. For paying customers, logged prompts and generations are deleted after 30 days and training use can be switched off; zero data retention is for enterprise customers only. Trial keys may not be used for production or commercial purposes, and Cohere may use trial inputs and outputs to improve its products. |
 | LangSmith | Processor | cloud only, and only if a key is set | Traces of every step; evaluation datasets and experiments | The demo account is in the US region. The EU region is Google Cloud `europe-west4` (Netherlands), with sign-in on AWS `eu-central-1` (Germany); a key works only in the region it was created in, which `gigawhat doctor` checks. Base traces kept 14 days on the free plan. Not used to train models. LangChain has no EU legal entity; its data processing addendum is available from support. |
 | GitHub | Code, images, CI | build only | Source code, container images, evaluation reports with fictional data | Not used for production data |
-| Let's Encrypt, sslip.io | Certificate authority; DNS for the demo hostname | hosted demo | Hostname only | Not personal data |
 
 The **offline** profile sends no questions, answers or traces off the machine. It downloads models from Hugging Face on the first run.
 

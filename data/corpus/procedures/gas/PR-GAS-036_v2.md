@@ -8,19 +8,19 @@
 | Review due | 2028-08-04 |
 | Owner | Head of Gas Network Operations |
 | Approved by | Gas Safety Manager |
-| Applies to | Harrowmere Pressure Reduction Station (GPR-HRW): station PRS-HRW-01, slam-shut valves SSV-HRW-A and SSV-HRW-B, and filter FLT-HRW-01 |
+| Applies to | GigaWhat Pressure Reduction Station (GPR-GWT): station PRS-GWT-01, slam-shut valves SSV-GWT-A and SSV-GWT-B, and filter FLT-GWT-01 |
 
 FICTIONAL DOCUMENT. Created for the GigaWhat demo. Not for real operational use.
 
 ## 1 Purpose
 
-This procedure sets out how to change the duty stream at the Harrowmere Pressure Reduction Station without interrupting supply to the medium pressure network, and how to isolate a stream for maintenance and return it to standby.
+This procedure sets out how to change the duty stream at the GigaWhat Pressure Reduction Station without interrupting supply to the medium pressure network, and how to isolate a stream for maintenance and return it to standby.
 
 ## 2 Scope
 
-This procedure applies to PRS-HRW-01 at GPR-HRW, which reduces intermediate pressure (IP) gas at 4.5 to 7 bar to medium pressure (MP) at up to 2 bar. The MP network it supplies includes MAIN-MP-03 and the district governors G-112, G-118 and G-124.
+This procedure applies to PRS-GWT-01 at GPR-GWT, which reduces intermediate pressure (IP) gas at 4.5 to 7 bar to medium pressure (MP) at up to 2 bar. The MP network it supplies includes MAIN-MP-03 and the district governors G-112, G-118 and G-124.
 
-The station has a common inlet filter, FLT-HRW-01, feeding two identical streams, A and B. Each stream has an inlet valve (A1 or B1), a slam-shut valve (SSV-HRW-A or SSV-HRW-B), a regulator and an outlet valve (A2 or B2). A creep relief valve protects the common outlet header. One stream is on duty and the other is on live standby, set slightly lower so that it takes over automatically if the duty stream fails. The station has no manual bypass.
+The station has a common inlet filter, FLT-GWT-01, feeding two identical streams, A and B. Each stream has an inlet valve (A1 or B1), a slam-shut valve (SSV-GWT-A or SSV-GWT-B), a regulator and an outlet valve (A2 or B2). A creep relief valve protects the common outlet header. One stream is on duty and the other is on live standby, set slightly lower so that it takes over automatically if the duty stream fails. The station has no manual bypass.
 
 Changeover is carried out every 3 months to share wear between the streams, before maintenance of a stream, and after a duty stream failure.
 
@@ -61,8 +61,8 @@ Gas Safety Manager: Is informed of every unplanned changeover.
 | Duty stream outlet set point | 1.60 bar | plus or minus 0.03 bar |
 | Standby stream outlet set point | 1.50 bar | plus or minus 0.03 bar |
 | Outlet header creep relief (start to discharge) | 1.80 bar | plus or minus 0.03 bar |
-| SSV-HRW-A and SSV-HRW-B over-pressure trip | 1.90 bar | plus or minus 0.04 bar |
-| FLT-HRW-01 maximum differential pressure | 300 mbar | not applicable |
+| SSV-GWT-A and SSV-GWT-B over-pressure trip | 1.90 bar | plus or minus 0.04 bar |
+| FLT-GWT-01 maximum differential pressure | 300 mbar | not applicable |
 
 NOTE: Only the Gas Safety Manager may approve a change to these settings. The slam-shut settings are also in PR-GAS-014.
 
@@ -86,7 +86,7 @@ HOLD POINT: Do not start the changeover until the Authorised Person (Gas) is on 
 
 6.3.2 Confirm the incoming stream's inlet and outlet valves are fully open.
 
-6.3.3 Read the FLT-HRW-01 differential pressure gauge and confirm it is below 300 mbar.
+6.3.3 Read the FLT-GWT-01 differential pressure gauge and confirm it is below 300 mbar.
 
 6.3.4 Compare local outlet gauge readings with the telemetry readings and confirm they agree within 0.05 bar.
 
@@ -164,7 +164,7 @@ HOLD POINT: Do not leave site until the Authorised Person (Gas) has confirmed th
 
 ## 7 Records
 
-The changeover record holds the date, streams, set points before and after, filter differential pressure and the roles of those present. Isolation certificates and permits are kept with it in the GPR-HRW asset file for 6 years. The Gas Network Controller logs the time of each changeover and the current duty stream.
+The changeover record holds the date, streams, set points before and after, filter differential pressure and the roles of those present. Isolation certificates and permits are kept with it in the GPR-GWT asset file for 6 years. The Gas Network Controller logs the time of each changeover and the current duty stream.
 
 ## 8 Revision history
 

@@ -8,17 +8,17 @@
 | Review due | 2027-02-05 |
 | Owner | Head of Gas Network Operations |
 | Approved by | Gas Safety Manager |
-| Applies to | All Harrowmere Gas sites: low, medium and intermediate pressure mains |
+| Applies to | All GigaWhat Gas sites: low, medium and intermediate pressure mains |
 
 FICTIONAL DOCUMENT. Created for the GigaWhat demo. Not for real operational use.
 
 ## 1 Purpose
 
-This procedure sets out how to excavate safely near live Harrowmere gas mains, so that mains are found before they are struck and are protected while exposed.
+This procedure sets out how to excavate safely near live GigaWhat Energy gas mains, so that mains are found before they are struck and are protected while exposed.
 
 ## 2 Scope
 
-This procedure applies to all excavation within 5 m of a live LP, MP or IP main by Harrowmere staff and contractors, including bar holing and trial holes. It applies to excavations near MAIN-IP-01, MAIN-MP-03, MAIN-LP-17 and MAIN-LP-22, and to all other mains on the network.
+This procedure applies to all excavation within 5 m of a live LP, MP or IP main by GigaWhat Energy staff and contractors, including bar holing and trial holes. It applies to excavations near MAIN-IP-01, MAIN-MP-03, MAIN-LP-17 and MAIN-LP-22, and to all other mains on the network.
 
 ## 3 References
 
@@ -54,7 +54,7 @@ Gas Network Controller: Receives reports of any damage to a main.
 
 ### 6.1 Plans and planning
 
-6.1.1 Obtain Harrowmere gas mains plans, and plans from other utilities, dated no more than 30 days before the start of work.
+6.1.1 Obtain GigaWhat Energy gas mains plans, and plans from other utilities, dated no more than 30 days before the start of work.
 
 6.1.2 Treat plans as a guide only. Mains may not be where the plans show, and depths are not guaranteed.
 

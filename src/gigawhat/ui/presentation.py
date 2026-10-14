@@ -25,7 +25,7 @@ PENDING_HINT = (
     "In this demo, switch to the Authorised Person persona for that unit to release or decline "
     "it, then come back to see the outcome."
 )
-DEMO_NOTE = "_Fictional demo: Harrowmere Energy, its procedures and its records are invented._"
+DEMO_NOTE = "_Fictional demo: GigaWhat Energy, its procedures and its records are invented._"
 
 
 @dataclass(frozen=True)

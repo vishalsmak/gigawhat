@@ -137,7 +137,7 @@ default_theme = "dark"
 confirm_new_chat = true
 
 # Description of the assistant. This is used for HTML tags.
-description = "Trusted procedures, cited evidence and suggested next steps for Harrowmere Energy staff (fictional demo)."
+description = "Trusted procedures, cited evidence and suggested next steps for GigaWhat Energy staff (fictional demo)."
 
 # Chain of Thought (CoT) display mode. Can be "hidden", "tool_call" or "full".
 cot = "full"

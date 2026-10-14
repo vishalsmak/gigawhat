@@ -46,7 +46,7 @@ Staff at a regulated gas and electricity utility need to find the approved proce
 
 | ID | Assumption |
 |---|---|
-| A1 | The fictional Harrowmere Energy corpus and records stand in for a real document management system and asset systems, and stay labelled as fictional (brief §9 rule 9). |
+| A1 | The fictional GigaWhat Energy corpus and records stand in for a real document management system and asset systems, and stay labelled as fictional (brief §9 rule 9). |
 | A2 | UK context: HSE guidance, the Electricity at Work Regulations, gas safety regulations, UK GDPR. |
 | A3 | Users are the six existing personas. A pilot means at most 50 users, a few at once, and up to about 5,000 document versions. |
 | A4 | English text documents (Markdown and PDF). Drawings and schematics are out of scope. |

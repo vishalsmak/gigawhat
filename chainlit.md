@@ -1,6 +1,6 @@
 # How to use GigaWhat
 
-GigaWhat helps staff at **Harrowmere Energy**, a fictional UK gas and electricity network operator, find the approved procedure for a job, see the evidence behind it in operational records, and get suggested next steps. **People make the decisions.** GigaWhat never decides anything safety-critical and has no connection to plant or control systems.
+GigaWhat helps staff at **GigaWhat Energy**, a fictional UK gas and electricity network operator, find the approved procedure for a job, see the evidence behind it in operational records, and get suggested next steps. **People make the decisions.** GigaWhat never decides anything safety-critical and has no connection to plant or control systems.
 
 ## 1. Pick a persona
 

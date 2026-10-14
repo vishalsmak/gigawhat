@@ -8,17 +8,17 @@
 | Review due | 2028-01-06 |
 | Owner | Electricity Safety Manager |
 | Approved by | Head of Electricity Network Operations |
-| Applies to | All Harrowmere Electricity sites, plant and equipment |
+| Applies to | All GigaWhat Electricity sites, plant and equipment |
 
 FICTIONAL DOCUMENT. Created for the GigaWhat demo. Not for real operational use.
 
 ## 1 Purpose
 
-This document summarises the Harrowmere Electricity Distribution Safety Rules for staff who operate, inspect or work on the electricity network. It is a quick reference. The detailed requirements are in the procedures listed in section 3, and where this summary and a detailed procedure differ, the detailed procedure applies.
+This document summarises the GigaWhat Electricity Distribution Safety Rules for staff who operate, inspect or work on the electricity network. It is a quick reference. The detailed requirements are in the procedures listed in section 3, and where this summary and a detailed procedure differ, the detailed procedure applies.
 
 ## 2 Scope
 
-This summary applies to all employees and contractors who hold an authorisation under the Distribution Safety Rules, at every Harrowmere Electricity site: Riverside Lane Grid Substation (ESS-RVL), Ashford Road Primary Substation (ESS-ASH), Kingsmead Primary Substation (ESS-KGM) including the Kingsmead cable tunnel (CT-KGM-01), Brookfield Secondary Substation (ESS-BRK), Orchard Way Secondary Substation (ESS-ORC) and the Ashford Road depot (DEP-ASH). It covers high voltage (132 kV, 33 kV and 11 kV) and low voltage equipment.
+This summary applies to all employees and contractors who hold an authorisation under the Distribution Safety Rules, at every GigaWhat Electricity site: Riverside Lane Grid Substation (ESS-RVL), Ashford Road Primary Substation (ESS-ASH), Kingsmead Primary Substation (ESS-KGM) including the Kingsmead cable tunnel (CT-KGM-01), Brookfield Secondary Substation (ESS-BRK), Orchard Way Secondary Substation (ESS-ORC) and the Ashford Road depot (DEP-ASH). It covers high voltage (132 kV, 33 kV and 11 kV) and low voltage equipment.
 
 ## 3 References
 
@@ -37,7 +37,7 @@ This summary applies to all employees and contractors who hold an authorisation 
 
 ## 4 Definitions
 
-High voltage (HV): a voltage above 1000 V AC. On the Harrowmere network this means 132 kV, 33 kV and 11 kV.
+High voltage (HV): a voltage above 1000 V AC. On the GigaWhat Energy network this means 132 kV, 33 kV and 11 kV.
 
 Low voltage (LV): a voltage of 1000 V AC or below.
 
@@ -89,7 +89,7 @@ WARNING: Touching, or approaching too close to, a live HV conductor can cause a 
 
 6.2.1 Treat all HV equipment as live until it has been isolated, proved dead, earthed and a safety document issued for it.
 
-6.2.2 Do not work on or near live HV conductors. Live working on HV equipment is prohibited on the Harrowmere network.
+6.2.2 Do not work on or near live HV conductors. Live working on HV equipment is prohibited on the GigaWhat Energy network.
 
 6.2.3 Keep at least the safety distance from exposed live HV conductors: 0.8 m at 11 kV, 1.0 m at 33 kV and 1.4 m at 132 kV.
 

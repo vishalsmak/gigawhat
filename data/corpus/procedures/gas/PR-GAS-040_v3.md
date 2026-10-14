@@ -8,17 +8,17 @@
 | Review due | 2027-06-03 |
 | Owner | Gas Safety Manager |
 | Approved by | Head of Gas Network Operations |
-| Applies to | All Harrowmere Gas sites and all gas asset classes |
+| Applies to | All GigaWhat Gas sites and all gas asset classes |
 
 FICTIONAL DOCUMENT. Created for the GigaWhat demo. Not for real operational use.
 
 ## 1 Purpose
 
-This procedure sets out how Harrowmere Gas staff and contractors work safely in places where a flammable gas atmosphere may be present. It explains the hazardous area zones used at Harrowmere sites, the equipment allowed in each zone, and the controls for static, hot work and gas detector alarms.
+This procedure sets out how GigaWhat Gas staff and contractors work safely in places where a flammable gas atmosphere may be present. It explains the hazardous area zones used at GigaWhat Energy sites, the equipment allowed in each zone, and the controls for static, hot work and gas detector alarms.
 
 ## 2 Scope
 
-This procedure applies to all work in permanent hazardous areas at GPR-HRW, GPR-MLN, GPR-STN and GPR-KAV, and in temporary hazardous areas created by venting, purging, open pipework or gas escapes anywhere on the Harrowmere gas network.
+This procedure applies to all work in permanent hazardous areas at GPR-GWT, GPR-MLN, GPR-STN and GPR-KAV, and in temporary hazardous areas created by venting, purging, open pipework or gas escapes anywhere on the GigaWhat gas network.
 
 ## 3 References
 
@@ -35,7 +35,7 @@ This procedure applies to all work in permanent hazardous areas at GPR-HRW, GPR-
 
 Hazardous area: A place where a flammable gas atmosphere may be present in enough quantity to need special precautions.
 
-Zone 0: An area where a flammable atmosphere is present continuously or for long periods. At Harrowmere this is limited to the inside of pipework and vessels.
+Zone 0: An area where a flammable atmosphere is present continuously or for long periods. At GigaWhat Energy this is limited to the inside of pipework and vessels.
 
 Zone 1: An area where a flammable atmosphere is likely to occur occasionally in normal operation.
 
@@ -59,13 +59,13 @@ Gas Network Controller: Is told when anyone enters or leaves a permanent hazardo
 
 ## 6 Procedure
 
-### 6.1 Hazardous areas at Harrowmere sites
+### 6.1 Hazardous areas at GigaWhat Energy sites
 
 The hazardous area classification drawing for each site is kept in the site document box and in the asset file. The table summarises the zones.
 
 | Site | Zone 1 | Zone 2 |
 |---|---|---|
-| GPR-HRW | Within 1 m of the creep relief, slam-shut and odorant tank vent terminals | Within 3 m of any flange, valve or the filter FLT-HRW-01 inside the compound |
+| GPR-GWT | Within 1 m of the creep relief, slam-shut and odorant tank vent terminals | Within 3 m of any flange, valve or the filter FLT-GWT-01 inside the compound |
 | GPR-MLN, GPR-STN, GPR-KAV | Within 1 m of governor, creep relief and slam-shut vent terminals | The whole inside of the governor kiosk, and 1 m around open kiosk doors |
 
 NOTE: Use the site drawing, not this summary, when planning work. If the drawing and the plant do not match, stop and tell the Authorised Person (Gas).
@@ -166,4 +166,4 @@ Hazardous area classification drawings and DSEAR risk assessments are kept in th
 |---|---|---|
 | 1 | 2015-06-01 | First issue. |
 | 2 | 2020-06-01 | Added static and stray current controls and temporary hazardous areas. |
-| 3 | 2024-06-03 | Added zone summary table for each site, including the GPR-HRW odorant tank vent. Added gas detector alarm actions and hold point before non-Ex equipment enters a zone. |
+| 3 | 2024-06-03 | Added zone summary table for each site, including the GPR-GWT odorant tank vent. Added gas detector alarm actions and hold point before non-Ex equipment enters a zone. |
