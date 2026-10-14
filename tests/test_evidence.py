@@ -15,6 +15,7 @@ from sqlalchemy import Engine, delete, insert
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
 from gigawhat.config import Settings
+from gigawhat.identity.personas import Persona, profile_of
 from gigawhat.records.evidence import (
     FINISHED,
     REQUEST_TOKEN_BUDGET,
@@ -24,7 +25,7 @@ from gigawhat.records.evidence import (
 )
 from gigawhat.records.load import load_records
 from gigawhat.retrieval.query import analyse_query
-from gigawhat.storage.db import database_url
+from gigawhat.storage.db import create_reader_engine, database_url
 from gigawhat.storage.schema import document_versions, documents
 
 TEST_DOC = "PR-GAS-097"
@@ -37,6 +38,8 @@ TEST_DOC = "PR-GAS-097"
         "Is PR-GAS-010 still the current version?",
         "Which procedures are overdue for review?",
         "What happened at Mill Lane last month?",
+        "list of documents we have",
+        "Which of our procedures are owned by the Head of Health, Safety and Environment?",
     ],
 )
 def test_questions_about_assets_history_or_document_control_want_records(question: str) -> None:
@@ -52,6 +55,13 @@ def test_question_about_a_procedure_step_does_not_want_records() -> None:
 @pytest.fixture
 async def collector(test_settings: Settings) -> AsyncIterator[EvidenceCollector]:
     engine: AsyncEngine = create_async_engine(database_url(test_settings))
+    yield EvidenceCollector(engine)
+    await engine.dispose()
+
+
+@pytest.fixture
+async def electricity_collector(test_settings: Settings) -> AsyncIterator[EvidenceCollector]:
+    engine = create_reader_engine(test_settings, profile_of(Persona.ELECTRICITY_CONTROL_ROOM))
     yield EvidenceCollector(engine)
     await engine.dispose()
 
@@ -102,6 +112,33 @@ async def test_alarm_summary_counts_alarms_by_code(
 
     summary = next(item for item in collector.items if item.record_id == "ALM-SUMMARY-G-112")
     assert "1 in total (OUTLET_HIGH x1)" in summary.text
+
+
+@pytest.mark.integration
+async def test_alarm_lookup_on_an_asset_the_persona_cannot_see_gives_no_count(
+    electricity_collector: EvidenceCollector, loaded_records: None
+) -> None:
+    await electricity_collector.recent_alarms("G-112")
+
+    assert electricity_collector.items == []
+
+
+@pytest.mark.integration
+async def test_alarm_lookup_on_a_site_id_gives_no_count(
+    collector: EvidenceCollector, loaded_records: None
+) -> None:
+    await collector.recent_alarms("GPR-MLN")
+
+    assert collector.items == []
+
+
+@pytest.mark.integration
+async def test_register_entry_names_the_document_owner(
+    collector: EvidenceCollector, overdue_document: None
+) -> None:
+    text = await collector.document_register(TEST_DOC)
+
+    assert "owned by Head of Gas Network Operations" in text
 
 
 @pytest.mark.integration

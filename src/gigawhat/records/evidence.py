@@ -63,6 +63,10 @@ RECORDS_INTENT = (
     "current",
     "overdue",
     "register",
+    "document",
+    "owner",
+    "owned",
+    "who owns",
 )
 
 
@@ -89,8 +93,8 @@ class EvidenceCollector:
             _tool(self.search_incidents, "Search incident reports by words, optionally by asset."),
             _tool(
                 self.document_register,
-                "Every version of a document with its status, effective date and review date. "
-                "Leave doc_id empty to list all documents.",
+                "Every version of a document with its owner, status, effective date and review "
+                "date. Leave doc_id empty to list all documents.",
             ),
         ]
 
@@ -133,7 +137,15 @@ class EvidenceCollector:
         )
 
     async def recent_alarms(self, asset_id: str) -> str:
-        """Each alarm, plus a summary line with counts, so a count can be quoted and checked."""
+        """Each alarm, plus a summary line with counts, so a count can be quoted and checked.
+
+        An asset the persona can't see gets no summary: row-level security hides its alarms, and
+        a quotable "0 in total" would tell them it had none. So does an id that isn't an asset.
+        """
+        if not await self._query(
+            "SELECT 1 FROM assets WHERE asset_id = :asset_id", {"asset_id": asset_id.upper()}
+        ):
+            return self._keep("alarm", [])
         rows = await self._query(
             "SELECT alarm_id, raised_at, cleared_at, code, message, value, unit FROM alarms"
             " WHERE asset_id = :asset_id"
@@ -203,10 +215,11 @@ class EvidenceCollector:
         )
 
     async def document_register(self, doc_id: str = "") -> str:
-        """Document control: what is current, superseded, withdrawn or overdue for review."""
+        """Document control: who owns what, and what is current, superseded, withdrawn or overdue
+        for review."""
         rows = await self._query(
-            "SELECT d.doc_id, d.title, v.version, v.status, v.effective_from, v.review_due"
-            " FROM documents d JOIN document_versions v USING (doc_id)"
+            "SELECT d.doc_id, d.title, d.owner, v.version, v.status, v.effective_from,"
+            " v.review_due FROM documents d JOIN document_versions v USING (doc_id)"
             " WHERE (:doc_id = '' OR d.doc_id = :doc_id) ORDER BY d.doc_id, v.version",
             {"doc_id": doc_id.upper()},
         )
@@ -216,8 +229,9 @@ class EvidenceCollector:
             [
                 (
                     f"REG-{row.doc_id}-v{row.version}",
-                    f"{row.doc_id} v{row.version} {row.title}: {row.status}, effective "
-                    f"{row.effective_from or 'n/a'}, review due {row.review_due or 'n/a'}"
+                    f"{row.doc_id} v{row.version} {row.title}, owned by {row.owner}: "
+                    f"{row.status}, effective {row.effective_from or 'n/a'}, "
+                    f"review due {row.review_due or 'n/a'}"
                     + (
                         " (review overdue)"
                         if row.status == "approved" and row.review_due and row.review_due < today
