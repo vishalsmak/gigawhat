@@ -9,7 +9,8 @@
 .pytest_cache
 .coverage
 .files
-.chainlit/translations
+.chainlit/translations/*
+!.chainlit/translations/en-US.json
 data
 evals
 docs
