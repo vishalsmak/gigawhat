@@ -1,0 +1,466 @@
+<title>AI Engineering Landscape</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one reading column (68ch) inside a 1100px frame; figures use the full frame and scroll sideways on phones */
+:root {
+  --bg: #f2f5f4;
+  --surface: #ffffff;
+  --box: #f6f8f7;
+  --ink: #142120;
+  --ink-2: #3a4846;
+  --muted: #5a6866;
+  --line: #c7d0cd;
+  --accent: #0d6870;
+  --accent-soft: #e0efef;
+  --routine: #2b744a;
+  --relevant: #8f5d00;
+  --critical: #b83d0d;
+  --emergency: #ad241c;
+  --blocked: #5d666b;
+  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1312; --surface: #151e1d; --box: #1b2625; --ink: #e2e9e7; --ink-2: #c0ccc9;
+    --muted: #91a09d; --line: #2c3a38; --accent: #56b8bf; --accent-soft: #15302f;
+    --routine: #5fc48b; --relevant: #e0a43e; --critical: #f07d49; --emergency: #ef6a5f; --blocked: #9aa4a9;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1312; --surface: #151e1d; --box: #1b2625; --ink: #e2e9e7; --ink-2: #c0ccc9;
+  --muted: #91a09d; --line: #2c3a38; --accent: #56b8bf; --accent-soft: #15302f;
+  --routine: #5fc48b; --relevant: #e0a43e; --critical: #f07d49; --emergency: #ef6a5f; --blocked: #9aa4a9;
+  color-scheme: dark;
+}
+
+body { background: var(--bg); color: var(--ink); font: 400 16px/1.6 var(--sans); }
+.wrap { max-width: 1100px; margin: 0 auto; padding-inline: 20px; padding-block: 44px 88px; }
+.prose { max-width: 68ch; }
+p { margin: 0; }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+
+header { display: grid; gap: 18px; padding-bottom: 36px; }
+.eyebrow { font: 500 .74rem/1.2 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+h1 { font-family: var(--display); font-weight: 700; font-size: clamp(2rem, 4.4vw, 2.9rem); line-height: 1.08; letter-spacing: -.01em; margin: 0; text-wrap: balance; }
+.lede { font-size: 1.12rem; color: var(--ink-2); }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin: 6px 0 0; }
+.facts div { border-left: 2px solid var(--line); padding-left: 12px; min-width: 0; }
+.facts dt { font: 500 .7rem/1.4 var(--mono); letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+.facts dd { margin: 2px 0 0; font-size: .95rem; }
+
+section { display: grid; gap: 18px; padding-block: 40px; border-top: 1px solid var(--line); }
+h2 { font-family: var(--display); font-weight: 700; font-size: 1.55rem; line-height: 1.2; margin: 0; text-wrap: balance; }
+h3 { font: 600 1rem/1.3 var(--sans); margin: 0 0 6px; }
+
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 16px; }
+.two > div { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; min-width: 0; }
+.two ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: .95rem; }
+.wont h3 { color: var(--emergency); }
+.will h3 { color: var(--routine); }
+.two > .here { border-color: var(--accent); }
+.here h3 { color: var(--accent); }
+
+figure { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; min-width: 0; }
+.scroll { overflow-x: auto; }
+figure svg { display: block; width: 100%; height: auto; min-width: 780px; color: var(--ink); }
+figcaption { font-size: .9rem; color: var(--muted); margin-top: 14px; max-width: 82ch; }
+figcaption b { color: var(--ink); font-weight: 600; }
+
+/* SVG vocabulary */
+.box { fill: var(--box); stroke: var(--line); stroke-width: 1.3; }
+.core { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2; }
+.zone { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 6 5; }
+.panel { fill: none; stroke: var(--line); stroke-width: 1.2; }
+.zl { fill: var(--muted); font: 600 10.5px var(--mono); letter-spacing: .05em; }
+.t { fill: var(--ink); font: 600 12.5px var(--sans); }
+.ts { fill: var(--ink); font: 600 11.5px var(--sans); }
+.s { fill: var(--muted); font: 400 11px var(--sans); }
+.lbl { fill: var(--muted); font: 500 10.5px var(--mono); }
+.lbl-acc { fill: var(--accent); font: 600 11px var(--sans); }
+.edge { fill: none; stroke: var(--ink-2); stroke-width: 1.4; }
+.edge-acc { fill: none; stroke: var(--accent); stroke-width: 2; }
+.ah { fill: var(--ink-2); }
+.ah-acc { fill: var(--accent); }
+.ot { fill: none; stroke: var(--emergency); stroke-width: 1.4; stroke-dasharray: 5 4; }
+.none { fill: none; stroke: var(--emergency); stroke-width: 1.4; stroke-dasharray: 4 4; }
+.x { stroke: var(--emergency); stroke-width: 2.4; stroke-linecap: round; }
+.lbl-danger { fill: var(--emergency); font: 600 10.5px var(--mono); }
+.band { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1; }
+.lbl-band { fill: var(--accent); font: 500 10.5px var(--mono); }
+.abstain { fill: color-mix(in srgb, var(--critical) 12%, var(--surface)); stroke: var(--critical); stroke-width: 1.3; }
+.p-blocked { fill: color-mix(in srgb, var(--blocked) 16%, var(--surface)); stroke: var(--blocked); }
+.p-emergency { fill: color-mix(in srgb, var(--emergency) 16%, var(--surface)); stroke: var(--emergency); }
+.p-routine { fill: color-mix(in srgb, var(--routine) 16%, var(--surface)); stroke: var(--routine); }
+.p-critical { fill: color-mix(in srgb, var(--critical) 16%, var(--surface)); stroke: var(--critical); }
+.pt { font: 600 11.5px var(--sans); }
+.pt-blocked { fill: var(--blocked); } .pt-emergency { fill: var(--emergency); }
+.pt-routine { fill: var(--routine); } .pt-critical { fill: var(--critical); }
+
+/* Tables */
+.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; font-size: .92rem; min-width: 640px; }
+th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+th { font: 600 .7rem/1.3 var(--mono); letter-spacing: .07em; text-transform: uppercase; color: var(--muted); background: var(--box); }
+td.q { font-style: italic; color: var(--ink-2); }
+td.grp { font: 600 .7rem/1.3 var(--mono); letter-spacing: .07em; text-transform: uppercase; color: var(--accent); background: var(--accent-soft); padding-block: 7px; }
+.chip { display: inline-block; white-space: nowrap; padding: 1px 10px; border-radius: 999px; font: 600 .78rem/1.6 var(--sans); border: 1px solid currentColor; }
+.c-routine { color: var(--routine); background: color-mix(in srgb, var(--routine) 12%, var(--surface)); }
+.c-relevant { color: var(--relevant); background: color-mix(in srgb, var(--relevant) 12%, var(--surface)); }
+.c-critical { color: var(--critical); background: color-mix(in srgb, var(--critical) 12%, var(--surface)); }
+.c-emergency { color: var(--emergency); background: color-mix(in srgb, var(--emergency) 12%, var(--surface)); }
+.st-dec { color: var(--accent); background: var(--accent-soft); }
+.st-prop { color: var(--relevant); background: color-mix(in srgb, var(--relevant) 12%, var(--surface)); }
+.st-open { color: var(--critical); background: color-mix(in srgb, var(--critical) 12%, var(--surface)); }
+
+ol.steps { margin: 0; padding-left: 22px; display: grid; gap: 10px; max-width: 74ch; }
+ol.steps li::marker { font: 600 .9rem var(--mono); color: var(--accent); }
+pre { margin: 0; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; overflow-x: auto; font: 400 .82rem/1.6 var(--mono); color: var(--ink-2); }
+pre .hl { color: var(--accent); font-weight: 600; }
+pre .warn { color: var(--critical); font-weight: 600; }
+code { font-family: var(--mono); font-size: .88em; }
+.note { font-size: .9rem; color: var(--muted); }
+.open-list { margin: 0; padding-left: 20px; display: grid; gap: 8px; max-width: 76ch; }
+.refs { margin: 0; padding-left: 20px; display: grid; gap: 4px; font-size: .9rem; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Reference notes · mid-2026</div>
+  <h1>The AI engineering landscape</h1>
+  <p class="lede prose">General notes on the field and its common design patterns, kept beside GigaWhat but not about it. For how GigaWhat itself works, see <a href="architecture.html">architecture.html</a>.</p>
+</header>
+
+<section>
+  <h2>The AI engineering landscape</h2>
+  <p class="prose">General reference, not specific to GigaWhat, written as of mid-2026. An AI engineer builds applications on top of existing models; an ML engineer trains them. Most of the work is ordinary software engineering with a thin model layer on top. The fastest-moving parts (agent frameworks, coding tools) change month to month, so treat the names below as a snapshot.</p>
+
+  <h3>What has changed</h3>
+  <ol class="steps">
+    <li><b>From chatbots to agents.</b> The typical project used to be a chatbot over documents. Now it is models that call tools, take many steps and work for minutes or hours. Coding agents are the breakout use case.</li>
+    <li><b>Context engineering has replaced prompt engineering.</b> The hard part is deciding what goes into the context: retrieved documents, memory, tool results, and how to trim long sessions.</li>
+    <li><b>MCP became the standard plug.</b> The Model Context Protocol is now the usual way to connect models to tools and data, supported by all major providers. Agent-to-agent protocols exist but have not caught on to the same degree.</li>
+    <li><b>Frameworks are getting thinner.</b> Every provider ships its own agent SDK. LangGraph is the most-used independent orchestrator, and many experienced teams write plain code against the provider SDK.</li>
+    <li><b>Evals and tracing are mandatory.</b> "Evals are the new unit tests" is a common line, and production teams trace every model call.</li>
+    <li><b>Clouds sell managed agent runtimes.</b> AWS Bedrock AgentCore, Azure AI Foundry Agent Service, Google Vertex AI Agent Engine, Databricks Agent Bricks, Snowflake Cortex Agents.</li>
+    <li><b>Open-weight models are a real option.</b> Llama, Qwen, DeepSeek, Mistral, Gemma and OpenAI's gpt-oss are good enough for many tasks, especially cheap high-volume steps or data that can't leave the building.</li>
+    <li><b>Cost engineering matters.</b> Route each task to the cheapest model that can handle it, cache prompts, and put a gateway in front of the providers.</li>
+    <li><b>RAG matured rather than died.</b> Long context windows didn't replace retrieval. Hybrid search with reranking is the baseline, and agentic retrieval, where the agent decides when and what to search, is growing. Graph RAG stays niche.</li>
+    <li><b>Security is the unsolved problem.</b> Prompt injection has no complete fix, so the field relies on limiting what tools can do, sandboxing, and human approval for risky actions. Regulation such as the EU AI Act is phasing in.</li>
+  </ol>
+
+  <h3>The tool map</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Layer</th><th>Ubiquitous</th><th>Also common</th></tr></thead>
+      <tbody>
+        <tr><td>Closed models</td><td>OpenAI GPT, Anthropic Claude, Google Gemini</td><td>xAI Grok</td></tr>
+        <tr><td>Open models</td><td>Llama, Qwen, DeepSeek, Mistral</td><td>Gemma, gpt-oss, Kimi</td></tr>
+        <tr><td>Access</td><td>Provider APIs; cloud AI platforms (Bedrock, Azure AI Foundry, Vertex AI)</td><td>Gateways (LiteLLM, OpenRouter); fast inference hosts (Together, Fireworks, Groq)</td></tr>
+        <tr><td>Running open models</td><td>Ollama on a laptop, vLLM on servers</td><td>SGLang, llama.cpp</td></tr>
+        <tr><td>Building apps and agents</td><td>LangChain/LangGraph; provider SDKs (OpenAI Agents SDK, Claude Agent SDK, Google ADK)</td><td>LlamaIndex, Pydantic AI, CrewAI, Microsoft Agent Framework, AWS Strands, DSPy; in TypeScript, Vercel AI SDK and Mastra</td></tr>
+        <tr><td>Tools and integration</td><td>MCP, function calling</td><td>Code sandboxes (E2B, Modal, Daytona); browser automation (Playwright, Browserbase)</td></tr>
+        <tr><td>Retrieval and data</td><td>Postgres + pgvector, Pinecone, Elasticsearch/OpenSearch</td><td>Qdrant, Weaviate, Milvus, Chroma, MongoDB Atlas, Redis</td></tr>
+        <tr><td>Embeddings and reranking</td><td>OpenAI, Cohere, Voyage</td><td>Open models (BGE, Qwen, Jina, Nomic)</td></tr>
+        <tr><td>Parsing documents</td><td>Unstructured, Docling</td><td>LlamaParse, Reducto, cloud OCR (Textract, Azure Document Intelligence)</td></tr>
+        <tr><td>Tracing</td><td>LangSmith, Langfuse</td><td>Braintrust, Arize Phoenix, W&amp;B Weave, Datadog</td></tr>
+        <tr><td>Evals</td><td>promptfoo, Ragas, LLM-as-judge</td><td>DeepEval, Inspect (UK AI Security Institute), Braintrust</td></tr>
+        <tr><td>Guardrails</td><td>Provider guardrails (Bedrock, Azure)</td><td>Llama Guard, NeMo Guardrails, Guardrails AI, Presidio</td></tr>
+        <tr><td>Demo UIs</td><td>Streamlit, Gradio</td><td>Chainlit, Open WebUI; production apps on Next.js</td></tr>
+        <tr><td>Data platforms</td><td>Databricks, Snowflake</td><td>BigQuery</td></tr>
+        <tr><td>Coding assistants</td><td>Claude Code, Cursor, GitHub Copilot</td><td>OpenAI Codex, Gemini CLI, Windsurf</td></tr>
+        <tr><td>Low-code automation</td><td>n8n</td><td>Zapier, Make</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note prose">Underneath all of it is ordinary software engineering, which is the truly universal part: Python first and TypeScript second, Pydantic, FastAPI, Git, Docker and cloud basics.</p>
+
+  <div class="two">
+    <div>
+      <h3>Where LangChain sits</h3>
+      <ul>
+        <li>The best-known framework and the one job ads mention most</li>
+        <li>Also the most criticised, mainly for its layers of abstraction</li>
+        <li>Common senior view: LangGraph is respected for production agents, LangChain is handy for its connectors, and you should understand the raw API underneath either way</li>
+        <li>LangSmith, its tracing product, is used even by teams that don't use LangChain</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Where Databricks sits</h3>
+      <ul>
+        <li>Everywhere in large companies, but as a data platform</li>
+        <li>AI engineers meet it when the company's data already lives there: typical in enterprise, finance, energy and retail</li>
+        <li>Startups rarely use it; Snowflake plays the same role elsewhere</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="two">
+    <div class="will">
+      <h3>Safe to invest in</h3>
+      <ul>
+        <li>Python and the providers' own APIs</li>
+        <li>Pydantic and structured output</li>
+        <li>Postgres/pgvector and hybrid retrieval</li>
+        <li>MCP</li>
+        <li>Writing evals and reading traces</li>
+        <li>Prompt-injection awareness; cost and latency trade-offs</li>
+      </ul>
+    </div>
+    <div class="wont">
+      <h3>Expect churn</h3>
+      <ul>
+        <li>Which agent framework is in fashion</li>
+        <li>Coding-tool rankings</li>
+        <li>Vector database startups</li>
+        <li>Eval and observability vendors</li>
+        <li>New agent protocols</li>
+      </ul>
+    </div>
+  </div>
+  <p class="note prose"><b>What employers tend to test:</b> whether you can design what goes into context, build a reliable tool-using agent, prove quality with evals, debug from traces, keep cost under control, and defend against prompt injection. The tool names matter much less than those skills.</p>
+</section>
+
+<section>
+  <h2>Design patterns for AI engineering</h2>
+  <p class="prose">General reference, not specific to GigaWhat. Language models have a few awkward properties: they are sometimes wrong, slow, expensive, easily misled by instructions hidden in text, hard to inspect, limited by their context window, and always changing. Each pattern below exists to handle one of these, and most have a direct ancestor in ordinary software engineering.</p>
+  <figure>
+    <div class="scroll">
+    <svg viewBox="0 0 1080 470" role="img" aria-label="Where the patterns sit along a request's path. A user reaches the app, passes through input and output guardrails, and reaches a workflow or agent. The workflow can pause for human approval, draws on context and tools, and calls models through a gateway that checks a response cache first. Evaluations gate what ships. Every hop emits a trace, and failures found in traces become new test cases.">
+      <defs>
+        <marker id="f9-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+        <marker id="f9-b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah-acc" d="M0,0 L10,5 L0,10 z"/></marker>
+      </defs>
+
+      <!-- Top row -->
+      <rect class="box" x="422" y="40" width="190" height="62" rx="6"/>
+      <text class="ts" x="517" y="64" text-anchor="middle">Human approval</text>
+      <text class="s" x="517" y="82" text-anchor="middle">pause · approve · resume</text>
+      <path class="edge" d="M517 104 V148" marker-start="url(#f9-a)" marker-end="url(#f9-a)"/>
+      <rect class="box" x="640" y="40" width="150" height="62" rx="6"/>
+      <text class="ts" x="715" y="64" text-anchor="middle">Response cache</text>
+      <text class="s" x="715" y="82" text-anchor="middle">exact · semantic</text>
+      <path class="edge" d="M715 166 V104" marker-end="url(#f9-a)"/>
+      <text class="lbl" x="722" y="140">check first</text>
+
+      <!-- Main request path -->
+      <rect class="box" x="20" y="168" width="90" height="84" rx="6"/>
+      <text class="ts" x="65" y="214" text-anchor="middle">User</text>
+      <path class="edge" d="M110 210 H132" marker-end="url(#f9-a)"/>
+      <rect class="box" x="134" y="168" width="130" height="84" rx="6"/>
+      <text class="ts" x="199" y="192" text-anchor="middle">App + UI</text>
+      <text class="s" x="199" y="210" text-anchor="middle">streaming</text>
+      <text class="s" x="199" y="225" text-anchor="middle">sources, undo,</text>
+      <text class="s" x="199" y="240" text-anchor="middle">feedback</text>
+      <path class="edge" d="M266 210 H286" marker-start="url(#f9-a)" marker-end="url(#f9-a)"/>
+      <rect class="box" x="288" y="168" width="110" height="84" rx="6"/>
+      <text class="ts" x="343" y="192" text-anchor="middle">Guardrails</text>
+      <text class="s" x="343" y="210" text-anchor="middle">input checks</text>
+      <text class="s" x="343" y="225" text-anchor="middle">output checks</text>
+      <text class="s" x="343" y="240" text-anchor="middle">PII redaction</text>
+      <path class="edge" d="M400 210 H420" marker-start="url(#f9-a)" marker-end="url(#f9-a)"/>
+      <rect class="core" x="422" y="150" width="190" height="120" rx="6"/>
+      <text class="t" x="517" y="176" text-anchor="middle">Workflow or agent</text>
+      <text class="s" x="517" y="198" text-anchor="middle">routing · chaining</text>
+      <text class="s" x="517" y="215" text-anchor="middle">parallel · evaluator loop</text>
+      <text class="s" x="517" y="232" text-anchor="middle">agent loop + budgets</text>
+      <text class="s" x="517" y="249" text-anchor="middle">durable checkpoints</text>
+      <path class="edge-acc" d="M612 210 H638" marker-end="url(#f9-b)"/>
+      <rect class="box" x="640" y="168" width="150" height="84" rx="6"/>
+      <text class="ts" x="715" y="192" text-anchor="middle">Gateway</text>
+      <text class="s" x="715" y="210" text-anchor="middle">retries · fallbacks</text>
+      <text class="s" x="715" y="225" text-anchor="middle">model cascade</text>
+      <text class="s" x="715" y="240" text-anchor="middle">pinned versions</text>
+      <path class="edge-acc" d="M790 210 H816" marker-end="url(#f9-b)"/>
+      <rect class="box" x="818" y="168" width="222" height="84" rx="6"/>
+      <text class="ts" x="929" y="192" text-anchor="middle">Models</text>
+      <text class="s" x="929" y="210" text-anchor="middle">closed APIs or open weights</text>
+      <text class="s" x="929" y="225" text-anchor="middle">structured output</text>
+      <text class="s" x="929" y="240" text-anchor="middle">prompt caching · batch API</text>
+
+      <!-- Below the workflow -->
+      <path class="edge" d="M460 272 V298" marker-start="url(#f9-a)" marker-end="url(#f9-a)"/>
+      <rect class="box" x="330" y="300" width="180" height="84" rx="6"/>
+      <text class="ts" x="420" y="324" text-anchor="middle">Context</text>
+      <text class="s" x="420" y="342" text-anchor="middle">RAG: hybrid + rerank</text>
+      <text class="s" x="420" y="357" text-anchor="middle">memory · compaction</text>
+      <text class="s" x="420" y="372" text-anchor="middle">embedding cache</text>
+      <path class="edge" d="M570 272 V298" marker-start="url(#f9-a)" marker-end="url(#f9-a)"/>
+      <rect class="box" x="530" y="300" width="180" height="84" rx="6"/>
+      <text class="ts" x="620" y="324" text-anchor="middle">Tools</text>
+      <text class="s" x="620" y="342" text-anchor="middle">least privilege</text>
+      <text class="s" x="620" y="357" text-anchor="middle">sandboxed code</text>
+      <text class="s" x="620" y="372" text-anchor="middle">output treated as data</text>
+
+      <!-- Evals and release -->
+      <rect class="box" x="818" y="300" width="222" height="84" rx="6"/>
+      <text class="ts" x="929" y="324" text-anchor="middle">Evals + release</text>
+      <text class="s" x="929" y="342" text-anchor="middle">golden set · LLM judge</text>
+      <text class="s" x="929" y="357" text-anchor="middle">CI gate · shadow · canary</text>
+      <text class="s" x="929" y="372" text-anchor="middle">prompts versioned as code</text>
+      <path class="edge" d="M818 330 H760 V254" stroke-dasharray="5 4" marker-end="url(#f9-a)"/>
+      <text class="lbl" x="766" y="294">gates releases</text>
+
+      <!-- Observability -->
+      <rect class="band" x="20" y="420" width="1020" height="30" rx="4"/>
+      <text class="lbl-band" x="36" y="439">OBSERVABILITY · every hop emits a span: inputs, outputs, tokens, latency, cost, versions · feedback attached</text>
+      <path class="edge-acc" d="M929 418 V386" marker-end="url(#f9-b)"/>
+      <text class="lbl-acc" x="938" y="406">failures become tests</text>
+    </svg>
+    </div>
+    <figcaption><b>Most patterns attach to one point on the request path; observability attaches to all of them.</b> The teal arrows are model calls. The gateway checks the response cache before it spends money, and the workflow can stop and wait for a person. Traces from every hop feed the evaluation set, and evaluations decide which prompt and model versions ship.</figcaption>
+  </figure>
+
+  <h3>Calling the model reliably</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Pattern</th><th>What it is</th><th>Watch out for</th></tr></thead>
+      <tbody>
+        <tr><td>Gateway</td><td>One service for every model call: keys, quotas, logging, fallbacks, switching providers (LiteLLM, cloud AI gateways)</td><td>Without one, every team scatters keys and retry code</td></tr>
+        <tr><td>Retries + fallbacks</td><td>Back off on rate limits and errors; fall back to another model or provider</td><td>Retrying a tool call that changes something can do it twice</td></tr>
+        <tr><td>Structured output</td><td>Ask for JSON matching a schema (usually Pydantic), validate it, retry on failure</td><td>Parsing free text breaks quietly</td></tr>
+        <tr><td>Pin model versions</td><td>Use exact model IDs, never "latest"</td><td>A silent upgrade changes behaviour; re-run evals before upgrading</td></tr>
+        <tr><td>Streaming</td><td>Show tokens as they arrive</td><td>Feels faster, but structured output can only be validated once complete</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Context engineering: what the model sees</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Pattern</th><th>What it is</th></tr></thead>
+      <tbody>
+        <tr><td>RAG</td><td>Retrieve relevant text, then generate from it; refined with hybrid search, reranking and query rewriting</td></tr>
+        <tr><td>Just-in-time retrieval</td><td>Give the agent search tools and let it fetch what it needs, rather than loading everything up front</td></tr>
+        <tr><td>Compaction</td><td>Summarise a long session as it nears the context limit and continue from the summary</td></tr>
+        <tr><td>External memory and notes</td><td>The agent writes progress to a file or store and reads it back, instead of holding everything in context</td></tr>
+        <tr><td>Sub-agents</td><td>A focused task runs in a clean context and returns only a summary</td></tr>
+        <tr><td>Cache-friendly prompt layout</td><td>Stable content (instructions, tools, documents) first, changing content last, so the provider's prompt cache can reuse it</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Workflows and agents</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Pattern</th><th>What it is</th><th>Use when</th></tr></thead>
+      <tbody>
+        <tr><td>Prompt chaining</td><td>A fixed sequence of calls, each feeding the next</td><td>The task splits cleanly into steps</td></tr>
+        <tr><td>Routing</td><td>Classify the input, then send it down a specialised path</td><td>Different inputs need different handling or models</td></tr>
+        <tr><td>Parallelisation</td><td>Run sub-tasks at once, or ask several times and vote</td><td>You want speed or more confidence</td></tr>
+        <tr><td>Orchestrator–workers</td><td>One model plans and hands sub-tasks to workers</td><td>The sub-tasks can't be known in advance</td></tr>
+        <tr><td>Evaluator–optimiser</td><td>Generate, critique, revise</td><td>There are clear quality criteria</td></tr>
+        <tr><td>Agent loop</td><td>The model calls tools in a loop until done</td><td>The task is open-ended; always cap steps, tokens and cost</td></tr>
+        <tr><td>Human-in-the-loop</td><td>Pause for approval before consequential actions</td><td>Money, safety or anything irreversible is involved</td></tr>
+        <tr><td>Durable execution</td><td>Save state after each step so a run can resume after a crash or a pause (LangGraph checkpoints, Temporal)</td><td>Runs are long or wait on people</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note prose">The first six come from Anthropic's "Building effective agents". The usual advice is to use the simplest pattern that works: a fixed workflow when the steps are known, an autonomous agent only when they are not.</p>
+
+  <h3>Caching</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Layer</th><th>What gets cached</th><th>Watch out for</th></tr></thead>
+      <tbody>
+        <tr><td>Provider prompt caching</td><td>The repeated start of a prompt (Anthropic, OpenAI, Gemini; vLLM for open models)</td><td>Large, easy savings, but only if the start of the prompt is identical byte for byte</td></tr>
+        <tr><td>Exact response cache</td><td>Same model, prompt and settings → the stored answer</td><td>Invalidate it when the prompt, model or source documents change</td></tr>
+        <tr><td>Semantic cache</td><td>Questions similar to earlier ones, matched by embedding similarity</td><td>Similar questions can need different answers; keep it to FAQ-style content, never personalised or permission-restricted answers</td></tr>
+        <tr><td>Embedding cache</td><td>Vectors keyed by a hash of the content</td><td>Saves re-embedding text that hasn't changed</td></tr>
+        <tr><td>Tool and retrieval cache</td><td>Results of expensive lookups</td><td>Stale data, and results leaking between users</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Observability</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Pattern</th><th>What it is</th></tr></thead>
+      <tbody>
+        <tr><td>Trace everything as spans</td><td>Every model call, retrieval and tool call records inputs, outputs, tokens, latency, cost, model version and prompt version; OpenTelemetry has emerging GenAI conventions</td></tr>
+        <tr><td>One trace ID per request</td><td>Follow user → agent steps → tool calls end to end</td></tr>
+        <tr><td>Cost attribution</td><td>Tokens and spend per user, feature and prompt version</td></tr>
+        <tr><td>Capture feedback</td><td>Ratings, edits and accept/reject signals attached to the trace</td></tr>
+        <tr><td>Redact before logging</td><td>Strip personal data before traces leave the app</td></tr>
+        <tr><td>Watch quality online</td><td>Dashboards and alerts on error, refusal and abstention rates and latency, not only uptime</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Quality and evals</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Pattern</th><th>What it is</th></tr></thead>
+      <tbody>
+        <tr><td>Golden test set</td><td>Real questions with expected answers or sources; the base for everything else</td></tr>
+        <tr><td>Error analysis first</td><td>Read 50–100 real traces and group the failures before choosing what to measure</td></tr>
+        <tr><td>LLM-as-judge</td><td>A model scores answers; check its scores against human judgement before trusting it</td></tr>
+        <tr><td>Regression evals in CI</td><td>Prompt and model changes must pass the test set before they ship</td></tr>
+        <tr><td>Online evals</td><td>Score a sample of live traffic continuously</td></tr>
+        <tr><td>Self-verification</td><td>Check grounding and that citations match their sources, in code where possible</td></tr>
+        <tr><td>Abstain</td><td>Say "I don't know" when the evidence is below a threshold</td></tr>
+        <tr><td>Data flywheel</td><td>Failures found in production become new test cases</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Cost and latency</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Pattern</th><th>What it is</th></tr></thead>
+      <tbody>
+        <tr><td>Model cascade</td><td>Try a small, cheap model first; escalate to a larger one only when needed</td></tr>
+        <tr><td>Batch APIs</td><td>Send offline jobs in bulk, typically at about half price</td></tr>
+        <tr><td>Cap output tokens</td><td>Output costs more and takes longer than input</td></tr>
+        <tr><td>Parallel tool calls</td><td>Run independent calls at the same time</td></tr>
+        <tr><td>Distil or fine-tune</td><td>Move a stable, high-volume task to a smaller model</td></tr>
+        <tr><td>Budgets per run</td><td>Limits on steps, tokens and money, with circuit breakers to stop runaway agents</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Security</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Pattern</th><th>What it is</th></tr></thead>
+      <tbody>
+        <tr><td>Guardrail sandwich</td><td>Check the input, call the model, check the output</td></tr>
+        <tr><td>Least-privilege tools</td><td>Read-only by default, allow-lists, narrowly scoped credentials</td></tr>
+        <tr><td>Avoid the lethal trifecta</td><td>Never give one agent private data, untrusted content and a way to send data out all at once; together they let prompt injection steal data (Simon Willison)</td></tr>
+        <tr><td>Quarantine untrusted content</td><td>Text from documents, web pages and tool results is data, never instructions; in the dual-LLM pattern the model that can act never reads untrusted text directly</td></tr>
+        <tr><td>Sandbox code execution</td><td>Run model-written code in an isolated environment</td></tr>
+        <tr><td>Permission-aware retrieval</td><td>Filter what the user may see at the data layer, before the model sees anything</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Shipping and change</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Pattern</th><th>What it is</th></tr></thead>
+      <tbody>
+        <tr><td>Prompts as code</td><td>Versioned, reviewed and tested with evals like any other change</td></tr>
+        <tr><td>Shadow and canary releases</td><td>Run a new prompt or model in shadow mode first, then release it to a small share of traffic, behind feature flags</td></tr>
+        <tr><td>Defensive UX</td><td>Show sources, allow edit and undo, set expectations, make feedback easy</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="note prose"><b>Ten to learn first:</b> structured output; a gateway with retries and fallbacks; RAG with hybrid search and reranking; routing; human-in-the-loop; prompt caching; tracing; a golden test set with CI evals; least-privilege tools; the lethal trifecta.</p>
+  <p class="note prose">Further reading:
+    <a href="https://martinfowler.com/articles/gen-ai-patterns/">Fowler &amp; Subramaniam, Emerging Patterns in Building GenAI Products</a> ·
+    <a href="https://eugeneyan.com/writing/llm-patterns/">Eugene Yan, Patterns for Building LLM-based Systems &amp; Products</a> ·
+    <a href="https://www.anthropic.com/engineering/building-effective-agents">Anthropic, Building effective agents</a> ·
+    <a href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents">Anthropic, Effective context engineering for AI agents</a> ·
+    <a href="https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/">Simon Willison, The lethal trifecta</a> ·
+    <a href="https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/generative-ai-lens.html">AWS Well-Architected Generative AI Lens</a> ·
+    <a href="https://huyenchip.com/2024/07/25/genai-platform.html">Chip Huyen, Building A Generative AI Platform</a></p>
+</section>
+</div>

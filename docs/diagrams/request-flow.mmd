@@ -1,0 +1,40 @@
+flowchart TD
+    receive["Receive question and authenticated context"] --> mask["Mask personal data<br/>before anything is stored or sent"]
+    mask --> emergency{"Emergency?"}
+    emergency -- Yes --> card["Show emergency card<br/>(rules only, no model)"]
+    emergency -- No --> screen["Check input and permitted scope<br/>(injection, role claims, off-topic)"]
+    screen --> inscope{"In scope and safe?"}
+    inscope -- No --> decline["Decline or redirect safely"]
+    inscope -- Yes --> tier["Classify risk tier<br/>(rules + model, stricter wins)"]
+    tier --> retrieve["Retrieve approved, accessible evidence<br/>(procedures + read-only records)"]
+    retrieve --> assess["Check authority, versions and conflicts"]
+    assess --> conflict{"Unresolved conflict<br/>between sources?"}
+    conflict -- Yes --> disclose["Show both sources side by side<br/>and escalate to document owners"]
+    conflict -- No --> sufficient{"Evidence sufficient?"}
+    sufficient -- No --> clarifiable{"Can clarification resolve it?"}
+    clarifiable -- Yes --> clarify["Ask one targeted clarification"]
+    clarify -. colleague replies .-> receive
+    clarifiable -- No --> abstain["Say what is missing<br/>and escalate to operational expert"]
+    sufficient -- Yes --> critical{"Safety-critical?"}
+    critical -- Yes --> extracts["Prepare verbatim extracts<br/>(no generated text)"]
+    extracts --> ap{"Authorised Person<br/>releases?"}
+    ap -- Released --> present
+    ap -- Declined --> declined["Tell the colleague it was declined,<br/>with the reason"]
+    critical -- No --> generate["Generate structured grounded response"]
+    generate --> validate["Validate claims, citations and policy"]
+    validate --> checks{"All checks pass?"}
+    checks -- "No: repairable" --> repair["Drop unsupported claims,<br/>add missing notices (once)"]
+    repair --> validate
+    checks -- "No: critical" --> abstain
+    checks -- Yes --> present["Present evidence, sources, limitations<br/>and suggested next step"]
+    present --> human["Colleague reviews and decides<br/>(not an authorisation)"]
+    failure["Model or service failure<br/>at any step"] --> errorMsg["Fixed message: nothing decided,<br/>use procedures as normal"]
+    card --> audit
+    decline --> audit
+    disclose --> audit
+    clarify --> audit
+    abstain --> audit
+    declined --> audit
+    human --> audit
+    errorMsg --> audit
+    audit["Audit outcome<br/>(append-only, masked)"]
