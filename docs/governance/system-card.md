@@ -139,7 +139,7 @@ These are honest limits of the current build. The [risk register](risk-register.
 
 **Safety routing and approvals**
 
-- Emergency rules are English regular expressions. Other phrasings depend on the model. If the model is unavailable and the rules do not match, the user sees the service-error message, not the emergency card.
+- Emergency rules are English regular expressions. Every emergency evaluation case is caught by them without any model (`tests/test_tiers.py::test_every_emergency_case_is_caught_without_any_model`), but other phrasings depend on the model. If the model is unavailable and the rules do not match, the user sees the service-error message, which also gives the emergency numbers.
 - Separation of duties compares personas, not people. A request made by an Authorised Person persona can only be released by a different persona of the same unit, so in the demo it cannot be released and expires after 24 hours.
 - Nothing checks that an Authorised Person opened the full extract before releasing it.
 

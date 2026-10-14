@@ -83,9 +83,15 @@ PAUSED_TEXT = """\
 GigaWhat is paused by the operations team and is not answering questions at the moment. \
 Use your procedures and your Authorised Person as normal."""
 
+# An emergency phrasing no rule catches reaches the models; if they fail, this still gives the
+# numbers.
 SERVICE_ERROR_TEXT = """\
 GigaWhat couldn't finish this answer because a service it depends on failed. Nothing was \
-decided. Please try again, or use your procedures and your Authorised Person as normal."""
+decided. Please try again, or use your procedures and your Authorised Person as normal.
+
+**If this is an emergency:** call **999** if anyone is hurt or at risk; the National Gas \
+Emergency Service on **0800 111 999** for a smell of gas or a gas escape; **105** for damaged \
+power lines or substation equipment."""
 
 AI_NOTE = "Written by AI from approved documents; check the cited sources."
 

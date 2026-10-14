@@ -11,11 +11,23 @@ emergency:
   - id: gas-escaping-now
     pattern: '\bgas\b[^.?!]{0,20}\b(is\s+)?(escaping|leaking|hissing)\b[^.?!]{0,20}\b(now|right now|at the moment|everywhere)\b'
   - id: electric-shock
-    pattern: '\b(electrocuted|electric shock|been shocked|got a shock|has had a shock|taken a shock)\b'
+    pattern: '\b(electrocuted|electric shock|been shocked|got a shock|has had a shock|just had a shock|taken a shock)\b'
   - id: casualty
     pattern: '\b(collapsed|unconscious|not breathing|is injured|badly hurt|bleeding)\b'
   - id: fire-or-explosion
-    pattern: '\b(on fire|fire in|smoke coming|explosion|exploded)\b'
+    pattern: '\b(on fire|fire in|smoke coming|explosion|exploded|caught fire|gas has lit|is alight|are alight|ablaze)\b'
+  # Ways people report an emergency that once reached the card only through the model. Each
+  # needs a sign of danger now, so questions about procedures don't match.
+  - id: gas-smell-reported-now
+    pattern: '\b(strong\s+(smell\s+of\s+gas|gas\s+smell)|(smell\s+of\s+gas|gas\s+smell)\b[^.?!]{0,80}\b(right\s+now|at\s+the\s+moment))\b'
+  - id: gas-pouring-out
+    pattern: '\bgas\b[^.?!]{0,20}\b(roaring|gushing|pouring)\b'
+  - id: main-or-service-just-damaged
+    pattern: '\b(just|has|have)\s+(ripped|hit|struck|fractured|broken|damaged)\b[^.?!]{0,30}\b(service|main|gas\s+pipe)\b'
+  - id: casualty-not-responding
+    pattern: '\band\s+(isn''t|is\s+not)\s+(moving|breathing|responding)\b'
+  - id: live-cable-down
+    pattern: '\b(power\s+cable|overhead\s+line|cable|wire)(s\s+are|\s+is|''s)?\s+down\b'
 
 safety_critical:
   # Hazardous work together with an intention to do it.

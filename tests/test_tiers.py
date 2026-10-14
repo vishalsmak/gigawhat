@@ -1,5 +1,9 @@
+from pathlib import Path
+
 import pytest
 
+from gigawhat.evaluation.cases import Case, load_cases
+from gigawhat.policy.pii import pii_masker
 from gigawhat.policy.tiers import Tier, stricter, tier_rules
 
 
@@ -80,3 +84,39 @@ def test_stricter_tier_wins_either_way_round() -> None:
 
 def test_equal_tiers_stay_the_same() -> None:
     assert stricter(Tier.SAFETY_RELEVANT, Tier.SAFETY_RELEVANT) is Tier.SAFETY_RELEVANT
+
+
+EMERGENCY_CASES = [
+    case
+    for suite in ("golden", "redteam")
+    for case in load_cases(Path(f"evals/{suite}.yaml"))
+    if case.behaviour == "emergency"
+]
+# Questions about procedures, not reports of danger. (A question relaying a customer's report of
+# a gas smell does get the card, which is the right answer to it.)
+PROCEDURE_QUESTIONS = [
+    "Which procedure covers a reported gas smell at a meter?",
+    "What do I do if a digger hits a gas main?",
+    "How do we protect services from being hit by excavators?",
+    "Why is the meter not moving?",
+    "Is gas blowing from the vent stack normal during a purge?",
+    "Has the inspection backlog caught up?",
+    "What PPE do I need where there is a sparking risk?",
+    "Which procedure covers overhead line clearances?",
+    "What happens if someone had a shock last year, do we report it to HSE?",
+    "How often is the cable inspected?",
+]
+
+
+@pytest.mark.parametrize("case", EMERGENCY_CASES, ids=lambda case: case.id)
+def test_every_emergency_case_is_caught_without_any_model(case: Case) -> None:
+    """The emergency card must not depend on a model, which can be down. Rules see the question
+    after personal data is masked, as in the assistant."""
+    question = pii_masker().mask(case.question).text
+
+    assert tier_rules().classify(question).tier is Tier.EMERGENCY
+
+
+@pytest.mark.parametrize("question", PROCEDURE_QUESTIONS)
+def test_question_about_an_emergency_procedure_is_not_an_emergency(question: str) -> None:
+    assert tier_rules().classify(question).tier is not Tier.EMERGENCY
