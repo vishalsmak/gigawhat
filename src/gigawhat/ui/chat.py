@@ -1,46 +1,66 @@
-"""The Chainlit chat interface. Visitors pick a persona; there is no sign-up."""
+"""The Chainlit chat interface. Visitors pick a persona; there is no sign-up.
+
+The Markdown for every message comes from `presentation.py`; this module wires Chainlit's
+events to the assistant. Icons, the logo, the theme and the stylesheet live in `public/`.
+"""
 
 import asyncio
+from dataclasses import dataclass
 from datetime import date
-from typing import Any
 
 import chainlit as cl
 
-from gigawhat.assistant.oversight import (
-    Approval,
-    ApprovalError,
-    Decision,
-    DecisionRequest,
-    Feedback,
-)
-from gigawhat.assistant.responses import Response, ResponseKind
+from gigawhat.assistant.oversight import ApprovalError, Decision, DecisionRequest, Feedback
+from gigawhat.assistant.responses import ResponseKind
 from gigawhat.assistant.service import Question, Turn
 from gigawhat.config import get_settings
 from gigawhat.corpus.catalogue import StoredVersion, stored_versions
 from gigawhat.db import create_db_engine
 from gigawhat.personas import PROFILES, Persona, PersonaProfile, profile_of
+from gigawhat.ui import presentation
 from gigawhat.ui.runtime import get_assistant, limiter
 from gigawhat.ui.starters import STARTERS
 from gigawhat.ui.visitor import visitor_from_cookie_header
 
-DEMO_BANNER = (
-    "_Demo with fictional data. Harrowmere Energy and its records are invented. "
-    "Answers are written by AI from approved documents._"
-)
 NOTE_TIMEOUT_SECONDS = 600
-EXTRACT_PREVIEW = 600
+NO_REQUESTS = (
+    "No requests are waiting for you. Ask a safety-critical question as a field engineer or "
+    "control room persona, then come back here to release or decline it."
+)
+NO_EVENTS = "No audit events yet for this browser. Ask something first."
 AUDIT_ROWS = 15
+
+
+@dataclass(frozen=True)
+class Button:
+    """An action under a message: the callback it triggers and its Lucide icon."""
+
+    callback: str
+    icon: str
+
+
+RELEASE = Button("release", "shield-check")
+DECLINE = Button("decline", "shield-x")
+SHOW_OUTCOME = Button("show_outcome", "refresh-cw")
+FEEDBACK_UP = Button("feedback", "thumbs-up")
+FEEDBACK_DOWN = Button("feedback", "thumbs-down")
 
 
 @cl.set_chat_profiles
 async def chat_profiles(user: cl.User | None) -> list[cl.ChatProfile]:
+    """With an icon, Chainlit shows it and the description on the empty chat, above the
+    example questions: the persona's welcome."""
     return [
         cl.ChatProfile(
             name=profile.persona.value,
             display_name=profile.title,
-            markdown_description=f"{profile.description}\n\n{DEMO_BANNER}",
+            icon=f"/public/personas/{profile.persona.value}.svg",
+            markdown_description=presentation.persona_welcome(profile),
             default=profile.persona is Persona.GAS_FIELD_ENGINEER,
-            starters=[cl.Starter(label=label, message=text) for label, text in STARTERS[persona]],
+            starters=[
+                cl.Starter(label=example.label, message=example.question, icon=example.icon_url)
+                for example in STARTERS[persona]
+            ],
         )
         for persona, profile in PROFILES.items()
     ]
@@ -48,8 +68,8 @@ async def chat_profiles(user: cl.User | None) -> list[cl.ChatProfile]:
 
 @cl.on_chat_start
 async def start() -> None:
-    """Askers start on an empty chat so Chainlit shows their example questions; reviewer
-    personas open on their queue, the audit trail or the register."""
+    """Askers start on an empty chat so Chainlit shows their welcome and example questions;
+    reviewer personas open on their queue, the audit trail or the register."""
     profile = profile_of(_persona())
     if profile.can_release:
         await _welcome(profile)
@@ -65,12 +85,7 @@ async def start() -> None:
 
 
 async def _welcome(profile: PersonaProfile) -> None:
-    units = ", ".join(unit.value for unit in profile.business_units)
-    role = f" ({profile.role})" if profile.role != profile.title else ""
-    await cl.Message(
-        f"**{profile.title}**{role} · sees {units} documents and records\n\n"
-        f"{profile.description}\n\n{DEMO_BANNER}"
-    ).send()
+    await cl.Message(presentation.persona_welcome(profile)).send()
 
 
 @cl.on_message
@@ -89,7 +104,7 @@ async def on_message(message: cl.Message) -> None:
     await _send_turn(turn)
 
 
-@cl.action_callback("release")
+@cl.action_callback(RELEASE.callback)
 async def on_release(action: cl.Action) -> None:
     note = await _ask_for_note(
         "What did you check before releasing? For example the permit number and site conditions. "
@@ -99,7 +114,7 @@ async def on_release(action: cl.Action) -> None:
         await _decide(action, Decision.RELEASED, note)
 
 
-@cl.action_callback("decline")
+@cl.action_callback(DECLINE.callback)
 async def on_decline(action: cl.Action) -> None:
     note = await _ask_for_note("Why are you declining? This goes to the requester.")
     if note:
@@ -116,13 +131,13 @@ async def _ask_for_note(prompt: str) -> str | None:
     return note
 
 
-@cl.action_callback("show_outcome")
+@cl.action_callback(SHOW_OUTCOME.callback)
 async def on_show_outcome(action: cl.Action) -> None:
     assistant = await get_assistant()
     await _send_turn(await assistant.outcome(action.payload["thread_id"]))
 
 
-@cl.action_callback("feedback")
+@cl.action_callback(FEEDBACK_UP.callback)
 async def on_feedback(action: cl.Action) -> None:
     assistant = await get_assistant()
     await assistant.oversight.record_feedback(
@@ -143,41 +158,30 @@ async def _decide(action: cl.Action, decision: Decision, note: str) -> None:
         await cl.Message(f"Not done: {error}.").send()
         return
     await action.remove()
-    outcome = "released" if decision is Decision.RELEASED else "declined"
     await cl.Message(
-        f"{request.approval_id} {outcome}. The requester sees it under **Your requests** "
-        "when they switch back to their persona."
+        f"{presentation.approval_badge(decision.value)} · `{request.approval_id}`\n\n"
+        "The requester sees it under **Your requests** when they switch back to their persona."
     ).send()
 
 
 async def _send_turn(turn: Turn) -> None:
-    response = turn.response
-    notices = "".join(f"\n\n> **Notice:** {notice}" for notice in response.notices)
     elements = [
         cl.Text(name=source.label, content=source.text, display="side")
-        for source in response.sources
+        for source in turn.response.sources
         if source.text
     ]
     await cl.Message(
-        content=f"{response.text}{notices}{_pending_hint(response)}",
-        elements=elements,
-        actions=_actions_for(turn),
+        content=presentation.turn_markdown(turn), elements=elements, actions=_actions_for(turn)
     ).send()
-
-
-def _pending_hint(response: Response) -> str:
-    if response.kind != ResponseKind.PENDING:
-        return ""
-    return "\n\n_In this demo, switch to the Authorised Person persona for that unit to decide._"
 
 
 def _actions_for(turn: Turn) -> list[cl.Action]:
     if turn.response.kind == ResponseKind.PENDING:
-        return [_action("show_outcome", "Check status", thread_id=turn.thread_id)]
+        return [_action(SHOW_OUTCOME, "Check status", thread_id=turn.thread_id)]
     if turn.response.kind == ResponseKind.ANSWER:
         return [
-            _action("feedback", "Helpful", thread_id=turn.thread_id, helpful=True),
-            _action("feedback", "Not helpful", thread_id=turn.thread_id, helpful=False),
+            _action(FEEDBACK_UP, "Helpful", thread_id=turn.thread_id, helpful=True),
+            _action(FEEDBACK_DOWN, "Not helpful", thread_id=turn.thread_id, helpful=False),
         ]
     return []
 
@@ -187,31 +191,17 @@ async def _show_queue(profile: PersonaProfile) -> None:
     visitor = _visitor() if get_settings().demo_mode else None
     queue = await assistant.pending_approvals(profile.persona, visitor)
     if not queue:
-        await cl.Message(
-            "No requests are waiting for you. Ask a safety-critical question as a field "
-            "engineer or control room persona, then come back here to release or decline it."
-        ).send()
+        await cl.Message(presentation.callout("note", NO_REQUESTS)).send()
         return
     for approval in queue:
         await cl.Message(
-            content=_approval_card(approval),
+            content=presentation.approval_card(approval),
             elements=[cl.Text(name=approval.approval_id, content=approval.extract, display="side")],
             actions=[
-                _action("release", "Release", approval_id=approval.approval_id),
-                _action("decline", "Decline", approval_id=approval.approval_id),
+                _action(RELEASE, "Release", approval_id=approval.approval_id),
+                _action(DECLINE, "Decline", approval_id=approval.approval_id),
             ],
         ).send()
-
-
-def _approval_card(approval: Approval) -> str:
-    requester = profile_of(Persona(approval.requester_persona)).title
-    extract = approval.extract[:EXTRACT_PREVIEW]
-    more = "…" if len(approval.extract) > EXTRACT_PREVIEW else ""
-    return (
-        f"**{approval.approval_id}** from {requester} at {approval.created_at:%H:%M}\n\n"
-        f"> {approval.question}\n\nCites {', '.join(approval.citations)}. "
-        f"Read the full extract in {approval.approval_id} before deciding.\n\n{extract}{more}"
-    )
 
 
 async def _show_my_requests() -> None:
@@ -219,57 +209,26 @@ async def _show_my_requests() -> None:
     requests = await assistant.oversight.requests_of(_visitor())
     if not requests:
         return
-    lines = ["**Your requests**"]
-    actions = []
-    for approval in requests:
-        lines.append(f"- {approval.approval_id}: {approval.status} · _{approval.question}_")
-        if approval.status != "pending":
-            label = f"Show {approval.approval_id}"
-            actions.append(_action("show_outcome", label, thread_id=approval.thread_id))
-    await cl.Message(content="\n".join(lines), actions=actions).send()
+    actions = [
+        _action(SHOW_OUTCOME, f"Show {approval.approval_id}", thread_id=approval.thread_id)
+        for approval in requests
+        if approval.status != "pending"
+    ]
+    await cl.Message(content=presentation.requests_table(requests), actions=actions).send()
 
 
 async def _show_audit() -> None:
     assistant = await get_assistant()
     events = await assistant.oversight.events_for(_visitor())
     if not events:
-        await cl.Message("No audit events yet for this browser. Ask something first.").send()
+        await cl.Message(presentation.callout("note", NO_EVENTS)).send()
         return
-    rows = [
-        "| Time | Persona | Event | Tier | Top source | Prompt | Seconds |",
-        "|---|---|---|---|---|---|---|",
-    ]
-    for event in events[:AUDIT_ROWS]:
-        rows.append(
-            f"| {event['occurred_at'][11:19]} | {event['persona']} | {event['event_type']} "
-            f"| {event['tier']} | {_top_source(event['sources'])} | {event['prompt_version']} "
-            f"| {(event['latency_ms'] or 0) / 1000:.1f} |"
-        )
-    await cl.Message(
-        "**Audit trail for this browser** (append-only; the full record, including every "
-        "answer, is at `/api/audit`)\n\n" + "\n".join(rows)
-    ).send()
-
-
-def _top_source(sources: list[dict[str, Any]]) -> str:
-    if not sources:
-        return "none"
-    first = sources[0].get("citation") or sources[0].get("record", "")
-    more = f" +{len(sources) - 1}" if len(sources) > 1 else ""
-    return f"{first}{more}"
+    await cl.Message(presentation.audit_table(events[:AUDIT_ROWS])).send()
 
 
 async def _show_register() -> None:
     versions = await asyncio.to_thread(_stored_versions)
-    rows = ["| Document | Ver | Status | Review due | Title |", "|---|---|---|---|---|"]
-    today = date.today()
-    for stored in versions:
-        overdue = " **overdue**" if stored.review_overdue(today) else ""
-        rows.append(
-            f"| {stored.doc_id} | {stored.version} | {stored.status} "
-            f"| {stored.review_due or ''}{overdue} | {stored.title} |"
-        )
-    await cl.Message("**Document register**\n\n" + "\n".join(rows)).send()
+    await cl.Message(presentation.register_table(versions, date.today())).send()
 
 
 def _stored_versions() -> list[StoredVersion]:
@@ -281,8 +240,8 @@ def _stored_versions() -> list[StoredVersion]:
         engine.dispose()
 
 
-def _action(name: str, label: str, **payload: object) -> cl.Action:
-    return cl.Action(name=name, label=label, payload=payload)
+def _action(button: Button, label: str, **payload: object) -> cl.Action:
+    return cl.Action(name=button.callback, label=label, icon=button.icon, payload=payload)
 
 
 def _persona() -> Persona:

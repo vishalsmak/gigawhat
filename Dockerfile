@@ -18,7 +18,9 @@ WORKDIR /app
 RUN chown gigawhat:gigawhat /app
 COPY --from=build --chown=gigawhat:gigawhat /app /app
 COPY --chown=gigawhat:gigawhat .chainlit/config.toml ./.chainlit/config.toml
+COPY --chown=gigawhat:gigawhat .chainlit/translations/en-US.json ./.chainlit/translations/
 COPY --chown=gigawhat:gigawhat chainlit.md ./
+COPY --chown=gigawhat:gigawhat public ./public
 ENV PATH="/app/.venv/bin:$PATH" PYTHONUNBUFFERED=1 GIGAWHAT_PROFILE=cloud \
     NEMO_GUARDRAILS_NO_USAGE_STATS=1 HF_HUB_DISABLE_TELEMETRY=1
 USER gigawhat

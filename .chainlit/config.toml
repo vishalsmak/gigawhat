@@ -117,7 +117,7 @@ reaction_on_message_received = false
 # Name of the assistant.
 name = "GigaWhat"
 
-# default_theme = "dark"
+default_theme = "dark"
 
 # Force a specific language for all users (e.g., "en-US", "he-IL", "fr-FR")
 # If not set, the browser's language will be used
@@ -137,14 +137,15 @@ name = "GigaWhat"
 confirm_new_chat = true
 
 # Description of the assistant. This is used for HTML tags.
-# description = ""
+description = "Trusted procedures, cited evidence and suggested next steps for Harrowmere Energy staff (fictional demo)."
 
 # Chain of Thought (CoT) display mode. Can be "hidden", "tool_call" or "full".
 cot = "full"
 
 # Specify a CSS file that can be used to customize the user interface.
 # The CSS file can be served from the public directory or via an external link.
-# custom_css = "/public/test.css"
+# GigaWhat's brand on the welcome screen and small layout touches; colours are in public/theme.json.
+custom_css = "/public/style.css"
 
 # Specify additional attributes for a custom CSS file
 # custom_css_attributes = "media=\"print\""
@@ -154,7 +155,8 @@ cot = "full"
 # custom_js = "/public/test.js"
 
 # The style of alert boxes. Can be "classic" or "modern".
-alert_style = "classic"
+# Rounded, softly tinted callouts for the :::variant boxes in src/gigawhat/ui/presentation.py.
+alert_style = "modern"
 
 # Specify additional attributes for custom JS file
 # custom_js_attributes = "async type = \"module\""
@@ -176,7 +178,8 @@ alert_style = "classic"
 logo_file_url = ""
 
 # Load assistant avatar image directly from URL.
-default_avatar_file_url = ""
+# Without this, replies would show the persona's icon, which belongs to the user, not GigaWhat.
+default_avatar_file_url = "/public/avatars/gigawhat.svg"
 
 # Avatar size in pixels (default: 20).
 # avatar_size = 20

@@ -23,6 +23,7 @@ data/raw/
 # Coverage data
 .coverage
 
-# Chainlit regenerates these on start
-.chainlit/translations/
+# Chainlit creates any translation that is missing. English is kept: it carries GigaWhat's own wording.
+.chainlit/translations/*
+!.chainlit/translations/en-US.json
 .files/

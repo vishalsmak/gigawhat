@@ -46,9 +46,11 @@ uv run gigawhat ask "How do I purge the 75 mbar main on Mill Lane?" --persona ga
 uv run gigawhat search "vent stack height" --persona gas_field_engineer
 ```
 
-Pick a persona at the top of the chat. Safety-critical questions wait for an Authorised Person: switch to the Authorised Person persona for the same business unit to release or decline them, then switch back to see the outcome. The Auditor persona shows this browser's audit trail.
+Pick a persona at the top of the chat; each opens on its own welcome and example questions, and the **Readme** button explains every status a reply can have. Safety-critical questions wait for an Authorised Person: switch to the Authorised Person persona for the same business unit to release or decline them, then switch back to see the outcome. The Auditor persona shows this browser's audit trail.
 
 On the offline profile, answers take 20 seconds to a minute on a laptop; on the cloud profile, about 10 seconds.
+
+The look lives outside the Python code: colours in [`public/theme.json`](public/theme.json), the logo, persona and question icons in [`public/`](public), a few touches in [`public/style.css`](public/style.css), and GigaWhat's own wording for Chainlit's labels in `.chainlit/translations/en-US.json`. How replies are framed (status lines, notice boxes, approval cards) is in [`src/gigawhat/ui/presentation.py`](src/gigawhat/ui/presentation.py). Icons are from [Lucide](https://lucide.dev) (ISC licence, [`public/icons/LICENSE-lucide.txt`](public/icons/LICENSE-lucide.txt)).
 
 ## Container
 
