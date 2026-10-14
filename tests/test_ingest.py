@@ -19,7 +19,7 @@ from gigawhat.corpus.ingest import (
     contextual_content,
 )
 from gigawhat.corpus.register import DocumentEntry
-from gigawhat.models import embedding_model
+from gigawhat.providers.registry import ModelRegistry
 from gigawhat.schema import chunks, document_versions
 
 pytestmark = pytest.mark.integration
@@ -68,7 +68,7 @@ def make_document(*versions: dict[str, Any]) -> DocumentEntry:
 def ingestor(database: Engine, test_settings: Settings, tmp_path: Path) -> Iterator[Ingestor]:
     with database.begin() as connection:
         connection.execute(text("TRUNCATE documents CASCADE"))
-    model = embedding_model(test_settings)
+    model = ModelRegistry(test_settings).embedding_model()
     yield Ingestor(
         engine=database,
         chunker=ParagraphChunker(),

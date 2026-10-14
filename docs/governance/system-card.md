@@ -50,12 +50,12 @@ GigaWhat must not be used for any of the following. The design keeps them out of
 
 ## 4. Profiles and models
 
-`GIGAWHAT_PROFILE` chooses where models run (`src/gigawhat/config.py`, `src/gigawhat/models.py`). Each profile has its own database because the two embedding models produce different vectors. Both profiles run the same chat model: Groq hosts the open `gpt-oss-20b` weights that Ollama runs locally, so prompts tuned on one carry over to the other. Groq serves the model on its own hardware and software, so the cloud profile still needs its own evaluation run.
+`GIGAWHAT_PROFILE` chooses each role's default model (`src/gigawhat/providers/registry.py`), and a chat role can be switched in `.env` (`GIGAWHAT_FAST_MODEL`, `GIGAWHAT_ANSWER_MODEL`). Each profile has its own database because the two embedding models produce different vectors. Since 14 October 2026 the cloud profile runs Gemini rather than the offline profile's `gpt-oss-20b`, so prompts tuned on one need evaluating on the other. Cloud models have a per-request timeout (30 seconds for the fast role, 90 for the answer role) and are paced to their declared rate limits (`src/gigawhat/providers/limits.py`).
 
-| Job | `cloud` profile (default; the hosted demo) | `offline` profile |
+| Job | `cloud` profile (default) | `offline` profile |
 |---|---|---|
-| Safety-tier classifier and input guardrail ("fast model") | `openai/gpt-oss-20b` on Groq, reasoning `low`, temperature 0, up to 2,048 output tokens including reasoning | `gpt-oss:20b` on Ollama, reasoning `low`, temperature 0 |
-| Evidence gathering and cited answers ("answer model") | `openai/gpt-oss-20b` on Groq, reasoning `medium`, temperature 0, up to 16,000 output tokens including reasoning | `gpt-oss:20b` on Ollama, reasoning `medium`, temperature 0 |
+| Safety-tier classifier, input guardrail and search rewrites (fast role) | `gemini-3.1-flash-lite` on Gemini's free tier, thinking `low`, Gemini's default temperature, up to 2,048 output tokens including thinking | `gpt-oss:20b` on Ollama, reasoning `low`, temperature 0 |
+| Evidence gathering and cited answers (answer role) | `gemini-3.5-flash-lite` on Gemini's free tier, thinking `medium`, Gemini's default temperature, up to 16,000 output tokens including thinking. Each evidence-agent request is held under 6,000 input tokens (`REQUEST_TOKEN_BUDGET` in `evidence.py`). | `gpt-oss:20b` on Ollama, reasoning `medium`, temperature 0 |
 | Embeddings | OpenAI `text-embedding-3-small`, 1,536 dimensions | `qwen3-embedding:0.6b` on Ollama, 1,024 dimensions, with a task instruction on queries only |
 | Reranker | Cohere `rerank-v3.5`, or `BAAI/bge-reranker-v2-m3` locally with `GIGAWHAT_RERANKER=local` | `BAAI/bge-reranker-v2-m3`, run locally with sentence-transformers |
 | Personal-data detection | Presidio with spaCy `en_core_web_md` 3.8.0, run locally | Same |

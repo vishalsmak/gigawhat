@@ -15,6 +15,10 @@ from docling_core.types.doc.document import DoclingDocument
 from langchain_docling import DoclingLoader
 from langchain_docling.loader import BaseMetaExtractor
 
+# Chunk boundaries come from one tokenizer so both profiles split documents identically.
+CHUNK_TOKENIZER = "Qwen/Qwen3-Embedding-0.6B"
+CHUNK_MAX_TOKENS = 512
+
 
 @dataclass(frozen=True)
 class SectionChunk:

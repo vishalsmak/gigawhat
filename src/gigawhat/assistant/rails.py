@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from langchain_core.callbacks import AsyncCallbackManagerForLLMRun, CallbackManagerForLLMRun
-from langchain_core.language_models import BaseChatModel
+from langchain_core.language_models import BaseChatModel, LangSmithParams
 from langchain_core.messages import BaseMessage
 from langchain_core.outputs import ChatResult
 from nemoguardrails import LLMRails, RailsConfig
@@ -28,8 +28,9 @@ class ConfiguredSettingsModel(BaseChatModel):
     """Passes NeMo's calls to our model with the settings we configured.
 
     NeMo binds temperature and max_tokens to every call. Ollama's client rejects them as
-    keyword arguments, and on Groq they would override the settings in models.py, so they are
-    dropped and the model keeps its own settings.
+    keyword arguments, and elsewhere they would override the role's settings in the model
+    registry, so they are dropped and the model keeps its own settings. Calling the inner model's
+    _agenerate skips its rate limiter, so the wrapper takes the same one.
     """
 
     inner: BaseChatModel
@@ -37,6 +38,10 @@ class ConfiguredSettingsModel(BaseChatModel):
     @property
     def _llm_type(self) -> str:
         return f"configured-{self.inner._llm_type}"
+
+    def _get_ls_params(self, stop: list[str] | None = None, **kwargs: Any) -> LangSmithParams:
+        """Traces name the model that answers, not this wrapper."""
+        return self.inner._get_ls_params(stop=stop, **kwargs)
 
     def _generate(
         self,
@@ -60,7 +65,8 @@ class ConfiguredSettingsModel(BaseChatModel):
 class InputRails:
     def __init__(self, model: BaseChatModel) -> None:
         config = RailsConfig.from_content(yaml_content=rails_config_yaml())
-        self._rails = LLMRails(config, llm=ConfiguredSettingsModel(inner=model))
+        configured = ConfiguredSettingsModel(inner=model, rate_limiter=model.rate_limiter)
+        self._rails = LLMRails(config, llm=configured)
 
     async def check(self, question: str) -> RailsVerdict:
         result = await self._rails.check_async([{"role": "user", "content": question}])

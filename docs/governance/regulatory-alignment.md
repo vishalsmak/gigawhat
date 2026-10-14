@@ -65,7 +65,7 @@ Regulation (EU) 2026/1744 (the Digital Omnibus on AI) was published in the Offic
 |---|---|---|
 | 9 | Risk management system | [risk-register.md](risk-register.md) |
 | 10 | Data and data governance | Document register with validation and immutable versions; fictional, documented dataset (`data/README.md`) |
-| 11 | Technical documentation | `docs/architecture.html` and this pack |
+| 11 | Technical documentation | `docs/phase-1-architecture.md` and this pack |
 | 12 | Record-keeping: automatic logging of events over the system's lifetime | `audit_events`, append-only (migration `0005_oversight.py`) |
 | 13 | Transparency and information for deployers | [system-card.md](system-card.md) |
 | 14 | Human oversight, including awareness of automation bias (14(4)(b)) and the ability to interrupt the system with a "stop" button or similar (14(4)(e)) | Approval flow; pause switch (`GIGAWHAT_PAUSED`) |
@@ -143,7 +143,7 @@ Practices most relevant to GigaWhat:
 | EU AI Act Art. 13 and 50(1), transparency | System card; citations; banner and closing note saying answers are written by AI | [system-card.md](system-card.md); `src/gigawhat/ui/chat.py`; `responses.py` (`AI_NOTE`) | No automated test of the AI note |
 | EU AI Act Art. 14, human oversight | Approval through `interrupt()`, with the extract withheld until release; separation of duties in code and database; expiry; full extract and a required note for the decider; pause switch that also blocks decisions | `oversight.py`; migration `0005_oversight.py`; `tests/test_graph.py::test_requester_does_not_see_the_extract_before_release`, `::test_requester_cannot_release_their_own_request`, `::test_expired_request_cannot_be_released`, `::test_paused_assistant_refuses_decisions` | Identity-based separation of duties; evidence that the extract was read; pause without restart |
 | EU AI Act Art. 15, accuracy and robustness | Release gates; quote checks; abstention | `src/gigawhat/evaluation/report.py`; `answer.py`; `tests/test_answer.py` | Evaluation in the release pipeline; larger, realistic test sets |
-| EU AI Act Art. 15, cybersecurity | Input guardrail; row-level security; no SSH; IMDSv2; secrets in Parameter Store | `rails.py`; migration `0004_access_control.py`; `infra/terraform/lean` | Least-privilege database logins; WAF; image digests; penetration test |
+| EU AI Act Art. 15, cybersecurity | Input guardrail; row-level security; a restricted reader role; a non-root container | `rails.py`; migration `0004_access_control.py`; `Dockerfile` | Least-privilege database logins; WAF; image digests; penetration test |
 | EU AI Act Art. 26(2), competent overseers | Authorised Person persona | `src/gigawhat/personas.py` | Sign-on with group membership tied to real appointments |
 | UK principle: safety, security, robustness | Tiers, strict mode, gates, red-team | `safety_topics.yaml`; `evals/redteam.yaml` | As above |
 | UK principle: transparency and explainability | Citations, gaps, AI note, step list, system card | `responses.py`; `service.py` (`STEP_LABELS`) | Verify claim wording against quotes |

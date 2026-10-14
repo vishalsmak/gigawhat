@@ -13,7 +13,7 @@ from pgvector.sqlalchemy import Vector
 from sqlalchemy.dialects import postgresql
 
 from gigawhat.config import get_settings
-from gigawhat.models import embedding_model
+from gigawhat.providers.registry import ModelRegistry
 
 revision: str = "0002"
 down_revision: str | None = "0001"
@@ -24,7 +24,7 @@ depends_on: str | Sequence[str] | None = None
 def upgrade() -> None:
     # Each profile has its own database, so the vector size follows the profile's embedding model.
     settings = context.config.attributes.get("settings") or get_settings()
-    dimensions = embedding_model(settings).dimensions
+    dimensions = ModelRegistry(settings).embedding_model().dimensions
 
     status = postgresql.ENUM("draft", "approved", "superseded", "withdrawn", name="document_status")
     status.create(op.get_bind())

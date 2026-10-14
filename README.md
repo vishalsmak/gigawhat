@@ -4,7 +4,7 @@ An AI assistant that helps operational staff at a gas and electricity utility fi
 
 This is a reference implementation built to production standards and run as a demo. The utility, its procedures and its records are fictional. Public HSE guidance is downloaded by a script, not redistributed.
 
-See [`docs/architecture.html`](docs/architecture.html) for how it works: components, safety tiers, retrieval, guardrails and hosting.
+It is being restructured to the plan in [`docs/phase-1-architecture.md`](docs/phase-1-architecture.md): components, request flow ([`docs/diagrams/request-flow.png`](docs/diagrams/request-flow.png)), threat model, evaluation plan and roadmap.
 
 ## Status
 
@@ -16,7 +16,7 @@ See [`docs/architecture.html`](docs/architecture.html) for how it works: compone
 | 4 | Workflow: guardrails, safety tiers, cited answers, approvals, audit | ✅ |
 | 5 | Chainlit UI with personas | ✅ |
 | 6 | Evaluation: golden and red-team sets, release gates, LangSmith tracing | ✅ |
-| 7 | Deployment: container, Terraform for AWS, GitHub Actions | ✅ code ready, not yet deployed |
+| 7 | Deployment: container image and GitHub Actions | ✅ image builds; hosting not yet chosen |
 | 8 | Governance documents | ✅ |
 
 ## Quickstart
@@ -48,13 +48,11 @@ uv run gigawhat search "vent stack height" --persona gas_field_engineer
 
 Pick a persona at the top of the chat. Safety-critical questions wait for an Authorised Person: switch to the Authorised Person persona for the same business unit to release or decline them, then switch back to see the outcome. The Auditor persona shows this browser's audit trail.
 
-On the offline profile, answers take 20 seconds to a minute on a laptop; the same model on Groq is much faster.
+On the offline profile, answers take 20 seconds to a minute on a laptop; on the cloud profile, about 10 seconds.
 
 ## Container
 
-`docker build -t gigawhat .` builds the hosted image: cloud profile only, no PyTorch or Docling. On an Apple M4 Mac, run it with `-e OPENSSL_armcap=0`: Linux VMs on M4 advertise CPU features that crash OpenSSL's start-up probe. Graviton and x86 servers don't need it.
-
-Deployment to AWS is described in [`infra/README.md`](infra/README.md).
+`docker build -t gigawhat .` builds the image: cloud profile only, no PyTorch or Docling. On an Apple M4 Mac, run it with `-e OPENSSL_armcap=0`: Linux VMs on M4 advertise CPU features that crash OpenSSL's start-up probe. Graviton and x86 servers don't need it.
 
 ## Data
 
@@ -66,17 +64,28 @@ Set `GIGAWHAT_PROFILE` in `.env`:
 
 | Profile | Models | Needs |
 |---|---|---|
-| `cloud` (default) | `gpt-oss-20b` on Groq for answers, OpenAI for embeddings, Cohere for reranking (or the local reranker with `GIGAWHAT_RERANKER=local`). The hosted demo uses this. | `GROQ_API_KEY`, `OPENAI_API_KEY`, and `COHERE_API_KEY` unless reranking locally |
-| `offline` | Open models on [Ollama](https://ollama.com). Nothing leaves your machine. | Ollama running locally |
+| `cloud` (default) | Gemini's free tier for both chat roles, OpenAI for embeddings, Cohere for reranking (or the local reranker with `GIGAWHAT_RERANKER=local`) | `GOOGLE_API_KEY`, `OPENAI_API_KEY`, and `COHERE_API_KEY` unless reranking locally |
+| `offline` | `gpt-oss:20b` and Qwen3 embeddings on [Ollama](https://ollama.com), and the local reranker. Nothing leaves your machine. | Ollama running locally |
 
 Each profile has its own database (`gigawhat_cloud`, `gigawhat_offline`) because the two embedding models produce different vectors.
+
+Models are chosen by role in [`src/gigawhat/providers/registry.py`](src/gigawhat/providers/registry.py):
+
+| Role | Does | Cloud default |
+|---|---|---|
+| fast | Input check, safety tier, search rewrites | `gemini:gemini-3.1-flash-lite` |
+| answer | Gathering records and writing cited answers | `gemini:gemini-3.5-flash-lite` |
+| embeddings | Search vectors | `openai:text-embedding-3-small` |
+| reranker | Scoring passages against the question | `cohere:rerank-v3.5`, or local `BAAI/bge-reranker-v2-m3` |
+
+The two chat roles use different Gemini models because free-tier quotas are per model: each gets its own 15 requests a minute and 500 a day. Switch a chat role in `.env` with `GIGAWHAT_FAST_MODEL` or `GIGAWHAT_ANSWER_MODEL`, written `provider:model` (`gemini`, `groq` or `ollama`), for example when a model's daily quota is used up. `gigawhat doctor` checks each role's key and model, shows its rate limits, and checks that the answer model's tokens-a-minute limit fits an evidence request.
 
 ## Development
 
 ```sh
 uv run pytest                 # unit + integration tests (integration needs the db container)
 uv run ruff check . && uv run ruff format --check .
-uv run mypy src tests
+uv run mypy
 ```
 
 ## Evaluation
@@ -85,6 +94,8 @@ uv run mypy src tests
 uv run gigawhat eval run --suite golden --suite redteam          # writes evals/reports/<date>-<profile>-....md
 uv run gigawhat eval run --suite golden --limit 10 --judge        # also scores answers with DeepEval
 ```
+
+With a LangSmith key on the cloud profile, each run is also a LangSmith experiment: the cases are synced to the `gigawhat-evaluation` dataset, every case's trace is kept with its scores, and the release gates are summary scores, so runs can be compared side by side. On the offline profile, or without a key, it runs on this machine only. A full run uses about half of each Gemini model's daily free quota; `--judge` adds DeepEval calls to the answer model's.
 
 60 golden questions and 25 red-team attacks, scored in code against five release gates (never cite a forbidden version, every emergency gets the emergency card, no generated answer to a safety-critical question, no personal data repeated, no case failed to run) and five quality targets. The command exits non-zero if a gate fails. The method and the latest results are in [`docs/governance/evaluation-report.md`](docs/governance/evaluation-report.md).
 

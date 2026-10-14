@@ -12,8 +12,8 @@ from gigawhat.config import Settings
 from gigawhat.corpus.chunking import SectionChunk
 from gigawhat.corpus.ingest import Ingestor
 from gigawhat.corpus.register import DocumentEntry
-from gigawhat.models import embedding_model
 from gigawhat.personas import Persona
+from gigawhat.providers.registry import ModelRegistry
 from gigawhat.retrieval.search import MIN_RELEVANCE, Retriever
 
 pytestmark = pytest.mark.integration
@@ -123,10 +123,11 @@ def corpus(
     corpus_dir = tmp_path_factory.mktemp("corpus")
     with database.begin() as connection:
         connection.execute(text("TRUNCATE documents CASCADE"))
+    size = ModelRegistry(test_settings).embedding_model().dimensions
     ingestor = Ingestor(
         engine=database,
         chunker=HeadingChunker(),
-        embeddings=DeterministicFakeEmbedding(size=embedding_model(test_settings).dimensions),
+        embeddings=DeterministicFakeEmbedding(size=size),
         embedding_model="fake",
         corpus_dir=corpus_dir,
     )
@@ -138,7 +139,7 @@ def corpus(
 
 @pytest.fixture
 async def retriever(corpus: None, test_settings: Settings) -> AsyncIterator[Retriever]:
-    size = embedding_model(test_settings).dimensions
+    size = ModelRegistry(test_settings).embedding_model().dimensions
     retriever = Retriever(
         test_settings, DeterministicFakeEmbedding(size=size), WordOverlapReranker()
     )

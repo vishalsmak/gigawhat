@@ -5,10 +5,11 @@ from typing import Any
 
 from langchain_core.language_models import BaseChatModel
 
-from gigawhat.assistant.service import Turn
 from gigawhat.evaluation.cases import Case
+from gigawhat.evaluation.checks import Outcome
 
 THRESHOLD = 0.7
+SCORE_NAMES = ("faithfulness", "relevancy")
 
 
 def build_judge(model: BaseChatModel, name: str) -> Any:
@@ -45,17 +46,18 @@ def build_judge(model: BaseChatModel, name: str) -> Any:
     return LangChainJudge()
 
 
-async def judge_answer(judge: Any, case: Case, turn: Turn) -> dict[str, float]:
+async def judge_answer(judge: Any, case: Case, outcome: Outcome) -> dict[str, float]:
     from deepeval.metrics import AnswerRelevancyMetric, FaithfulnessMetric
     from deepeval.test_case import LLMTestCase
 
     test_case = LLMTestCase(
         input=case.question,
-        actual_output=turn.response.text,
-        retrieval_context=[source.text for source in turn.response.sources],
+        actual_output=outcome.response.text,
+        retrieval_context=[source.text for source in outcome.response.sources],
     )
     faithfulness = FaithfulnessMetric(threshold=THRESHOLD, model=judge, include_reason=False)
     relevancy = AnswerRelevancyMetric(threshold=THRESHOLD, model=judge, include_reason=False)
     await faithfulness.a_measure(test_case, _show_indicator=False)
     await relevancy.a_measure(test_case, _show_indicator=False)
-    return {"faithfulness": faithfulness.score or 0.0, "relevancy": relevancy.score or 0.0}
+    measured = (faithfulness.score, relevancy.score)
+    return {name: value or 0.0 for name, value in zip(SCORE_NAMES, measured, strict=True)}

@@ -4,6 +4,7 @@ import asyncio
 
 from gigawhat.assistant.service import Assistant, create_assistant
 from gigawhat.config import get_settings
+from gigawhat.tracing import create_tracer
 from gigawhat.ui.limits import RateLimiter
 
 _assistant: Assistant | None = None
@@ -15,7 +16,8 @@ async def get_assistant() -> Assistant:
     global _assistant
     async with _lock:
         if _assistant is None:
-            _assistant = await create_assistant(get_settings())
+            settings = get_settings()
+            _assistant = await create_assistant(settings, create_tracer(settings))
     return _assistant
 
 

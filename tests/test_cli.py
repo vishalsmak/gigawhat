@@ -5,7 +5,7 @@ import pytest
 from rich.console import Console
 from typer.testing import CliRunner
 
-from gigawhat.cli import app, versions_table
+from gigawhat.cli import app, report_name, versions_table
 from gigawhat.config import get_settings
 from gigawhat.corpus.catalogue import StoredVersion
 
@@ -69,4 +69,16 @@ def test_doctor_fails_when_cloud_keys_are_missing() -> None:
 def test_doctor_names_the_missing_keys() -> None:
     result = runner.invoke(app, ["doctor"])
 
-    assert "GROQ_API_KEY, OPENAI_API_KEY, COHERE_API_KEY" in result.output
+    assert all(
+        f"{variable} isn't set" in result.output
+        for variable in ("GOOGLE_API_KEY", "OPENAI_API_KEY", "COHERE_API_KEY")
+    )
+
+
+def test_limited_evaluation_report_never_overwrites_a_full_run() -> None:
+    from gigawhat.evaluation.runner import EvaluationPlan
+
+    full = report_name("2026-10-14", "cloud", EvaluationPlan({"golden": []}))
+    limited = report_name("2026-10-14", "cloud", EvaluationPlan({"golden": []}, limit=1))
+
+    assert (full, limited) == ("2026-10-14-cloud-golden.md", "2026-10-14-cloud-golden-limit1.md")

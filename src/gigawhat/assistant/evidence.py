@@ -5,14 +5,21 @@ in the persona's business units. None of them can change anything.
 """
 
 from collections import Counter
-from collections.abc import Sequence
+from collections.abc import Awaitable, Callable, Sequence
 from dataclasses import dataclass, field
 from datetime import date
+from typing import Any
 
 from langchain.agents import create_agent
-from langchain.agents.middleware import ToolCallLimitMiddleware
+from langchain.agents.middleware import (
+    AgentMiddleware,
+    ModelRequest,
+    ModelResponse,
+    ToolCallLimitMiddleware,
+)
 from langchain_core.language_models import BaseChatModel
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.messages.utils import count_tokens_approximately
 from langchain_core.tools import BaseTool, StructuredTool
 from sqlalchemy import Row, text
 from sqlalchemy.ext.asyncio import AsyncEngine
@@ -21,6 +28,11 @@ from gigawhat.assistant.prompts import EVIDENCE_PROMPT
 from gigawhat.retrieval.query import QueryAnalysis
 
 MAX_TOOL_CALLS = 5
+# Input tokens per evidence request: room for five tool results of up to about 600 tokens each.
+# `gigawhat doctor` checks that the answer model's tokens-a-minute limit allows it.
+REQUEST_TOKEN_BUDGET = 6_000
+# What the prompt tells the agent to reply when it has finished.
+FINISHED = "DONE"
 INSPECTIONS_SHOWN = 6
 ALARM_DAYS = 120
 INCIDENTS_SHOWN = 5
@@ -235,14 +247,46 @@ def wants_records(question: str, analysis: QueryAnalysis) -> bool:
     return bool(analysis.asset_ids) or any(word in lowered for word in RECORDS_INTENT)
 
 
+class RequestBudget(AgentMiddleware):
+    """Ends the agent before any request larger than the budget, keeping the records found so far.
+
+    Every call resends the whole conversation, so requests grow with each tool result; one grew
+    past a provider's tokens-a-minute limit and failed the question. The size is estimated from
+    characters, which is close enough for a budget set well inside the providers' limits.
+    """
+
+    def __init__(self, max_tokens: int) -> None:
+        super().__init__()
+        self.max_tokens = max_tokens
+
+    async def awrap_model_call(
+        self,
+        request: ModelRequest[Any],
+        handler: Callable[[ModelRequest[Any]], Awaitable[ModelResponse[Any]]],
+    ) -> ModelResponse[Any] | AIMessage:
+        if request_tokens(request) > self.max_tokens:
+            return AIMessage(FINISHED)
+        return await handler(request)
+
+
+def request_tokens(request: ModelRequest[Any]) -> int:
+    system = [request.system_message] if request.system_message else []
+    return count_tokens_approximately([*system, *request.messages], tools=request.tools)
+
+
 async def gather_evidence(
     model: BaseChatModel, collector: EvidenceCollector, question: str
 ) -> list[EvidenceItem]:
+    middleware: list[AgentMiddleware[Any, Any, Any]] = [
+        RequestBudget(REQUEST_TOKEN_BUDGET),
+        ToolCallLimitMiddleware(run_limit=MAX_TOOL_CALLS, exit_behavior="end"),
+    ]
     agent = create_agent(
         model,
         tools=collector.tools(),
         system_prompt=EVIDENCE_PROMPT,
-        middleware=[ToolCallLimitMiddleware(run_limit=MAX_TOOL_CALLS, exit_behavior="end")],
+        middleware=middleware,
+        name="evidence_agent",
     )
     await agent.ainvoke({"messages": [HumanMessage(question)]})
     return collector.items

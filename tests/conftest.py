@@ -15,6 +15,7 @@ os.environ["CHAINLIT_ENV_FILE"] = "no-such-file.env"
 
 TEST_DATABASE = "gigawhat_test"
 KEY_VARIABLES = (
+    "GOOGLE_API_KEY",
     "GROQ_API_KEY",
     "OPENAI_API_KEY",
     "COHERE_API_KEY",

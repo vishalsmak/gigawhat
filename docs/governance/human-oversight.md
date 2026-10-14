@@ -26,7 +26,6 @@ The strongest oversight control is what the system is unable to do.
 | Safety-critical | How do I purge the 75 mbar main on Mill Lane? | Steps to isolate and earth the 11 kV feeder at Ashford Road? | Strict mode: word-for-word extracts, no model-written text, held back until an Authorised Person releases them | Authorised Person releases or declines; work is still done under the permit system |
 | Emergency | Strong smell of gas outside number 14 | Someone has had a shock at the substation | Fixed emergency card only: 999, 0800 111 999, 105 | The person acts at once; GigaWhat does nothing else |
 
-Examples are taken from `docs/architecture.html`.
 
 ### How the tier is chosen
 
@@ -133,7 +132,7 @@ The audit event's own `visitor_id` and `persona` columns are still the **request
 | Auditor view | This browser's events | Everyone's events, to authorised auditors only |
 | `/api/audit` | This browser's events; nothing without the cookie | Returns 403 when demo mode is off, because the full trail needs sign-on (`src/gigawhat/api.py`; `tests/test_api.py`) |
 
-`docs/architecture.html` now states that single sign-on is not built and that separation of duties compares personas. Until it is built, demo mode must stay on: with it off, anyone can choose the Authorised Person persona and see and decide every pending request in a unit.
+`docs/phase-1-architecture.md` (assumption A6, threat T10) states that single sign-on is not built and that separation of duties compares personas. Until it is built, demo mode must stay on: with it off, anyone can choose the Authorised Person persona and see and decide every pending request in a unit.
 
 ## 10. Users' own oversight
 
@@ -160,14 +159,7 @@ Still open:
 - The switch is read when the process starts. Changing it needs a restart of the app container. `/health` shows the state the running process is actually in, so use it to confirm.
 - Paused replies are not written to the audit trail.
 
-On the lean AWS host: set the parameter, then recreate the app container so it reads the new value.
-
-```sh
-aws ssm put-parameter --name /gigawhat/GIGAWHAT_PAUSED --type String --value true --overwrite
-# then, in a Session Manager shell on the instance:
-sudo /opt/gigawhat/fetch-env.sh
-sudo docker compose -f /opt/gigawhat/docker-compose.prod.yml up -d --force-recreate app
-```
+To pause: set `GIGAWHAT_PAUSED=true` in the app's environment and restart it. How that is done depends on the host, which is not chosen yet.
 
 Confirm that `/health` reports `paused`. Reverse with `--value false` and the same two commands.
 

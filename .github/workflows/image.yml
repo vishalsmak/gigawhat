@@ -1,6 +1,6 @@
 name: Image
 
-# Builds the hosted image for x86 and Graviton and publishes it to GitHub Container Registry,
+# Builds the image for x86 and arm64 and publishes it to GitHub Container Registry,
 # only after CI has passed on main.
 on:
   workflow_run:

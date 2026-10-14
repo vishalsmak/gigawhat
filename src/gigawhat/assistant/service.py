@@ -30,16 +30,10 @@ from gigawhat.assistant.rails import InputRails
 from gigawhat.assistant.responses import Response
 from gigawhat.config import Settings
 from gigawhat.db import database_url
-from gigawhat.models import (
-    RERANK_MODELS,
-    chat_model_name,
-    create_answer_model,
-    create_fast_model,
-    embedding_model,
-)
 from gigawhat.personas import Persona
-from gigawhat.retrieval.service import build_retriever
-from gigawhat.tracing import create_tracer, flush
+from gigawhat.providers.registry import ChatRole, ModelRegistry
+from gigawhat.retrieval.search import Retriever
+from gigawhat.tracing import flush
 
 CHECKPOINT_POOL_SIZE = 10
 STEP_LABELS = {
@@ -79,6 +73,12 @@ class Runtime:
     tracer: LangChainTracer | None = None
     paused: bool = False
 
+    @property
+    def trace_metadata(self) -> dict[str, str]:
+        """What every trace is labelled with, so runs can be filtered and compared."""
+        models = {f"{role}_model": name for role, name in self.components.model_names.items()}
+        return {"prompt_version": PROMPT_VERSION} | models
+
 
 class Assistant:
     def __init__(self, graph: CompiledStateGraph[Any], runtime: Runtime) -> None:
@@ -89,6 +89,10 @@ class Assistant:
     @property
     def oversight(self) -> Oversight:
         return self._components.oversight
+
+    @property
+    def trace_metadata(self) -> dict[str, str]:
+        return self._runtime.trace_metadata
 
     async def ask(self, question: Question, on_step: StepListener | None = None) -> Turn:
         """Personal data is masked here, before the question enters graph state, which is
@@ -105,7 +109,7 @@ class Assistant:
             "pii_entities": list(masked.entities),
             "started_at": time.time(),
         }
-        config = self._config(thread_id, question.persona)
+        config = self._run_config(thread_id, "ask", question.persona)
         try:
             async for update in self._graph.astream(state, config, stream_mode="updates"):
                 for node in update:
@@ -130,7 +134,7 @@ class Assistant:
             "decider_visitor": request.decider_visitor,
             "note": request.note,
         }
-        config = self._config(approval.thread_id, request.decider_persona)
+        config = self._run_config(approval.thread_id, "decide", request.decider_persona)
         await self._graph.ainvoke(Command(resume=resume), config)
         return await self._turn(approval.thread_id)
 
@@ -143,13 +147,20 @@ class Assistant:
         if self._runtime.tracer is not None:
             flush(self._runtime.tracer)
 
-    def _config(self, thread_id: str, persona: Persona | None = None) -> Any:
-        config: dict[str, Any] = {"configurable": {"thread_id": thread_id}}
+    def _config(self, thread_id: str) -> Any:
+        return {"configurable": {"thread_id": thread_id}}
+
+    def _run_config(self, thread_id: str, run_name: str, persona: Persona) -> Any:
+        """Labels a run the same way whichever tracer receives it: the assistant's own, or an
+        evaluation experiment's. LangSmith groups runs sharing a thread_id into one thread."""
+        metadata = {"thread_id": thread_id, "persona": str(persona)} | self._runtime.trace_metadata
+        config = self._config(thread_id) | {
+            "run_name": run_name,
+            "metadata": metadata,
+            "tags": [str(persona)],
+        }
         if self._runtime.tracer is not None:
             config["callbacks"] = [self._runtime.tracer]
-            # LangSmith groups runs that share a thread_id into one conversation.
-            config["metadata"] = {"thread_id": thread_id}
-            config["tags"] = [str(persona)] if persona else []
         return config
 
     async def _turn(self, thread_id: str) -> Turn:
@@ -159,23 +170,22 @@ class Assistant:
         return Turn(thread_id, values["response"], str(tier) if tier else None)
 
 
-async def create_assistant(settings: Settings) -> Assistant:
-    fast_model = create_fast_model(settings)
+async def create_assistant(settings: Settings, tracer: LangChainTracer | None) -> Assistant:
+    """Pass create_tracer(settings) to trace each question, or None when something else traces,
+    such as a LangSmith evaluation."""
+    models = ModelRegistry(settings)
+    fast_model = models.chat(ChatRole.FAST)
     components = Components(
         rails=InputRails(fast_model),
         fast_model=fast_model,
-        answer_model=create_answer_model(settings),
-        retriever=build_retriever(settings),
+        answer_model=models.chat(ChatRole.ANSWER),
+        retriever=Retriever(settings, models.embeddings(), models.reranker()),
         oversight=Oversight(create_async_engine(database_url(settings), pool_pre_ping=True)),
-        model_names={
-            "chat": chat_model_name(settings),
-            "embeddings": embedding_model(settings).name,
-            "reranker": RERANK_MODELS[settings.active_reranker],
-        },
+        model_names=models.names(),
     )
     checkpointer, pool = await open_checkpointer(settings)
     pii_masker()  # Load spaCy now rather than on the first question.
-    runtime = Runtime(components, pool, create_tracer(settings), paused=settings.paused)
+    runtime = Runtime(components, pool, tracer, paused=settings.paused)
     return Assistant(build_graph(components, checkpointer), runtime)
 
 

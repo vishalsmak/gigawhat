@@ -20,12 +20,12 @@ from gigawhat.records.load import load_records
 
 if TYPE_CHECKING:
     from gigawhat.assistant.service import Turn
-    from gigawhat.evaluation.cases import Case
-    from gigawhat.evaluation.checks import CaseResult
+    from gigawhat.evaluation.runner import Evaluation, EvaluationPlan
     from gigawhat.retrieval.search import RetrievalResult, Retriever
 
 HTTP_TIMEOUT_SECONDS = 3.0
 DOWNLOAD_TIMEOUT_SECONDS = 120.0
+PASSAGE_PREVIEW_CHARS = 400
 STATUS_MARKS = {Status.OK: "✔", Status.WARN: "!", Status.FAIL: "✘"}
 STATUS_STYLES = {
     DocumentStatus.APPROVED: "green",
@@ -44,13 +44,13 @@ console = Console()
 
 @app.command()
 def doctor() -> None:
-    """Check that the database, models and tracing are ready for the current profile."""
+    """Check the database, each model role and its limits, and tracing."""
     settings = get_settings()
     console.print(f"Profile: {settings.profile}")
     with httpx.Client(timeout=HTTP_TIMEOUT_SECONDS) as http:
         checks = run_checks(settings, http)
     for check in checks:
-        console.print(f"  {STATUS_MARKS[check.status]} {check.name:<9} {check.detail}")
+        console.print(f"  {STATUS_MARKS[check.status]} {check.name:<10} {check.detail}")
     if any(check.status is Status.FAIL for check in checks):
         raise typer.Exit(code=1)
 
@@ -159,10 +159,12 @@ def search(
     ] = Persona.GAS_FIELD_ENGINEER,
 ) -> None:
     """Show the passages retrieval finds for a question, with relevance scores."""
-    from gigawhat.retrieval.service import build_retriever
+    from gigawhat.providers.registry import ModelRegistry
+    from gigawhat.retrieval.search import Retriever
 
     settings = get_settings()
-    retriever = build_retriever(settings)
+    models = ModelRegistry(settings)
+    retriever = Retriever(settings, models.embeddings(), models.reranker())
     result = asyncio.run(_search_and_close(retriever, question, persona))
     enough = "[green]enough evidence[/]" if result.sufficient else "[red]not enough evidence[/]"
     console.print(f"Persona: {persona} · {enough}")
@@ -170,7 +172,8 @@ def search(
         console.print(
             f"\n[bold]{passage.citation}[/] {passage.title}  relevance {passage.relevance:.2f}"
         )
-        console.print(passage.text[:400] + ("…" if len(passage.text) > 400 else ""))
+        preview = passage.text[:PASSAGE_PREVIEW_CHARS]
+        console.print(preview + ("…" if len(passage.text) > PASSAGE_PREVIEW_CHARS else ""))
 
 
 async def _search_and_close(
@@ -203,8 +206,10 @@ def ask(
 
 async def _ask_and_close(question: str, persona: Persona) -> "Turn":
     from gigawhat.assistant.service import Question, create_assistant
+    from gigawhat.tracing import create_tracer
 
-    assistant = await create_assistant(get_settings())
+    settings = get_settings()
+    assistant = await create_assistant(settings, create_tracer(settings))
     started = time.monotonic()
 
     async def show(label: str) -> None:
@@ -232,37 +237,62 @@ def eval_run(
     concurrency: Annotated[int, typer.Option(help="Cases run at once.")] = 1,
     judge: Annotated[bool, typer.Option(help="Also score answers with DeepEval.")] = False,
 ) -> None:
-    """Run the evaluation, write a report to evals/reports, and fail if a release gate fails."""
+    """Run the evaluation, write a report to evals/reports, and fail if a release gate fails.
+
+    With a LangSmith key on the cloud profile, the run is also a LangSmith experiment.
+    """
     from gigawhat.evaluation.cases import load_cases
     from gigawhat.evaluation.report import all_gates_pass, markdown
+    from gigawhat.evaluation.runner import EvaluationPlan
 
     settings = get_settings()
-    cases = [case for name in suite for case in load_cases(EVAL_SUITES[name])[:limit]]
-    results = asyncio.run(_evaluate(cases, concurrency, judge))
+    plan = EvaluationPlan(
+        {name: load_cases(EVAL_SUITES[name]) for name in suite}, limit, concurrency, judge
+    )
+    evaluation = asyncio.run(_evaluate(plan))
     stamp = date.today().isoformat()
     title = f"GigaWhat evaluation · {'+'.join(suite)} · {settings.profile} profile · {stamp}"
     EVAL_REPORTS.mkdir(parents=True, exist_ok=True)
-    report = EVAL_REPORTS / f"{stamp}-{settings.profile}-{'-'.join(suite)}.md"
-    report.write_text(markdown(results, title))
+    report = EVAL_REPORTS / report_name(stamp, str(settings.profile), plan)
+    experiment = evaluation.experiment
+    report.write_text(markdown(evaluation.results, title, experiment.name if experiment else None))
     console.print(f"Report: {report}")
-    if not all_gates_pass(results):
+    if experiment:
+        console.print(f"LangSmith experiment: {experiment.url}")
+    if not all_gates_pass(evaluation.results):
         console.print("[bold red]A release gate failed.[/]")
         raise typer.Exit(code=1)
     console.print("[bold green]All release gates passed.[/]")
 
 
-async def _evaluate(cases: list["Case"], concurrency: int, judge: bool) -> list["CaseResult"]:
+def report_name(stamp: str, profile: str, plan: "EvaluationPlan") -> str:
+    """A limited run is named apart, so it never overwrites the report of a full run."""
+    limited = f"-limit{plan.limit}" if plan.limit else ""
+    return f"{stamp}-{profile}-{'-'.join(plan.suites)}{limited}.md"
+
+
+async def _evaluate(plan: "EvaluationPlan") -> "Evaluation":
+    """A LangSmith experiment when LangSmith may be used, otherwise a run on this machine. The
+    assistant gets no tracer of its own: the experiment traces each case."""
     from gigawhat.assistant.service import create_assistant
+    from gigawhat.evaluation.experiment import run_experiment
     from gigawhat.evaluation.judge import build_judge
-    from gigawhat.evaluation.runner import Evaluator, run_cases
-    from gigawhat.models import chat_model_name, create_answer_model
+    from gigawhat.evaluation.runner import Evaluation, Evaluator, run_cases
+    from gigawhat.providers.registry import ChatRole, ModelRegistry
+    from gigawhat.tracing import langsmith_client
 
     settings = get_settings()
-    assistant = await create_assistant(settings)
+    models = ModelRegistry(settings)
     judge_model = (
-        build_judge(create_answer_model(settings), chat_model_name(settings)) if judge else None
+        build_judge(models.chat(ChatRole.ANSWER), str(models.chat_choice(ChatRole.ANSWER)))
+        if plan.judge
+        else None
     )
+    evaluator = Evaluator(await create_assistant(settings, tracer=None), judge_model)
+    client = langsmith_client(settings)
     try:
-        return await run_cases(Evaluator(assistant, judge_model), cases, concurrency)
+        if client is None:
+            return Evaluation(await run_cases(evaluator, plan.cases, plan.concurrency))
+        return await run_experiment(evaluator, plan, client)
     finally:
-        await assistant.aclose()
+        await evaluator.assistant.aclose()

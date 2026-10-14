@@ -1,12 +1,26 @@
-from collections.abc import AsyncIterator, Iterator
+from collections.abc import AsyncIterator, Iterator, Sequence
 from datetime import date, timedelta
 from pathlib import Path
+from typing import Any
 
 import pytest
+from langchain.agents import create_agent
+from langchain_core.callbacks import CallbackManagerForLLMRun
+from langchain_core.language_models import BaseChatModel
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolMessage
+from langchain_core.outputs import ChatGeneration, ChatResult
+from langchain_core.runnables import Runnable
+from langchain_core.tools import tool
 from sqlalchemy import Engine, delete, insert
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
-from gigawhat.assistant.evidence import EvidenceCollector, wants_records
+from gigawhat.assistant.evidence import (
+    FINISHED,
+    REQUEST_TOKEN_BUDGET,
+    EvidenceCollector,
+    RequestBudget,
+    wants_records,
+)
 from gigawhat.config import Settings
 from gigawhat.db import database_url
 from gigawhat.records.load import load_records
@@ -106,3 +120,56 @@ async def test_every_register_entry_can_be_cited(
     await collector.document_register(TEST_DOC)
 
     assert [item.record_id for item in collector.items] == [f"REG-{TEST_DOC}-v1"]
+
+
+class LookupOnceModel(BaseChatModel):
+    """Asks for one lookup, then finishes once it has the result. Counts the requests it gets."""
+
+    requests: int = 0
+
+    @property
+    def _llm_type(self) -> str:
+        return "lookup-once"
+
+    def _generate(
+        self,
+        messages: list[BaseMessage],
+        stop: list[str] | None = None,
+        run_manager: CallbackManagerForLLMRun | None = None,
+        **kwargs: Any,
+    ) -> ChatResult:
+        self.requests += 1
+        if any(isinstance(message, ToolMessage) for message in messages):
+            reply = AIMessage(FINISHED)
+        else:
+            reply = AIMessage("", tool_calls=[{"name": "lookup", "args": {}, "id": "call-1"}])
+        return ChatResult(generations=[ChatGeneration(message=reply)])
+
+    def bind_tools(self, tools: Sequence[Any], **kwargs: Any) -> Runnable[Any, Any]:
+        return self
+
+
+async def requests_sent(budget: int, result_words: int, system_prompt: str = "") -> int:
+    @tool
+    def lookup() -> str:
+        """Look up a record."""
+        return "reading " * result_words
+
+    model = LookupOnceModel()
+    agent = create_agent(
+        model, tools=[lookup], system_prompt=system_prompt, middleware=[RequestBudget(budget)]
+    )
+    await agent.ainvoke({"messages": [HumanMessage("Anything on T-104?")]})
+    return model.requests
+
+
+async def test_requests_within_the_budget_reach_the_model() -> None:
+    assert await requests_sent(REQUEST_TOKEN_BUDGET, result_words=100) == 2
+
+
+async def test_request_over_the_budget_ends_the_agent_without_sending_it() -> None:
+    assert await requests_sent(REQUEST_TOKEN_BUDGET, result_words=20_000) == 1
+
+
+async def test_budget_counts_the_system_prompt() -> None:
+    assert await requests_sent(budget=1_000, result_words=0, system_prompt="rule " * 5_000) == 0

@@ -15,7 +15,7 @@ This document says what is versioned, who should own each part, how a change rea
 | Prompts: tier classifier, input guardrail policy, evidence agent, answer writer | `src/gigawhat/assistant/prompts.py` (in `.github/CODEOWNERS`) | Engineering, with safety team review | `PROMPT_VERSION` in every audit event (`prompt_version` column, not nullable); shown in the Auditor view | Graph tests; full evaluation |
 | Safety-tier rules | `src/gigawhat/assistant/safety_topics.yaml` (in `.github/CODEOWNERS`) | Electricity Safety Manager and Gas Safety Manager (stated in the file header) | Part of `PROMPT_VERSION`; matched rule IDs in each audit event (`guardrails.rules`) | `tests/test_tiers.py`; full evaluation |
 | Guardrail policy | `INPUT_POLICY` in `prompts.py`; NeMo configuration built by `rails_config_yaml()` | Engineering, with safety team review | `INPUT_POLICY` is part of `PROMPT_VERSION`; block or allow in each audit event | Red-team set |
-| Model names and settings | `src/gigawhat/models.py` | Engineering | `models` column in every audit event: chat, embeddings, reranker | Full evaluation on both profiles |
+| Model names and settings | `src/gigawhat/providers/registry.py` (models by role, per profile) and `providers/limits.py` (declared rate limits); a chat role can be switched in `.env` | Engineering | `models` column in every audit event: fast, answer, embeddings, reranker. The same names label every LangSmith trace and experiment. | `tests/test_registry.py`; `gigawhat doctor`; full evaluation on the affected profile |
 | Retrieval settings and thresholds | `src/gigawhat/retrieval/search.py` (`MIN_RELEVANCE`, `PASSAGES`, `CANDIDATES`), `src/gigawhat/assistant/responses.py` (`STRICT_EXTRACTS`), `src/gigawhat/retrieval/glossary.yaml` | Engineering | Not recorded | Retrieval tests; full evaluation |
 | Personal-data masking | `src/gigawhat/assistant/pii.py` | Engineering, with DPO review | Entity types found, per event | `tests/test_pii.py`; red-team cases R022 to R025 |
 | Document register | `data/corpus/register.yaml` (in `.github/CODEOWNERS`) and `data/corpus/procedures/`; HSE downloads pinned by `source_sha256` | Document controller | Citations name document, version and section; `document_versions` holds the content hash, embedding model and ingest time | `tests/test_register.py`, `tests/test_ingest.py`, `tests/test_project_data.py`, `tests/test_hse.py` |
@@ -24,7 +24,6 @@ This document says what is versioned, who should own each part, how a change rea
 | Evaluation sets | `evals/golden.yaml`, `evals/redteam.yaml` (in `.github/CODEOWNERS`) | Safety team and engineering | Reports in `evals/reports/` | `tests/test_evaluation.py::test_project_evaluation_sets_load` |
 | Dependencies | `pyproject.toml`, `uv.lock` (with hashes) | Engineering | Not recorded | CI installs with `--locked` |
 | Container image | `Dockerfile`; built by `.github/workflows/image.yml` | Engineering | Not recorded in the app | Image workflow |
-| Infrastructure | `infra/terraform/lean`, `github-deploy` | Engineering | Terraform state (local, git-ignored) | `terraform plan` reviewed before `apply` (`infra/README.md`) |
 
 ### The prompt fingerprint
 
@@ -57,18 +56,16 @@ Two caveats. `gigawhat data ingest --rebuild` deletes stored versions so they ca
 | 3 | For changes listed in section 3, the full evaluation is run and its report attached to the pull request | Convention. `.github/workflows/eval.yml` is run by hand. |
 | 4 | Review and merge to `main` | `.github/CODEOWNERS` names owners for `safety_topics.yaml`, `prompts.py`, `register.yaml` and `evals/`. Their review is only required if branch protection is set to require code-owner review, which the repository cannot show. |
 | 5 | The image is built for amd64 and arm64 from the commit CI tested and pushed to GitHub Container Registry as `main` and `sha-<7 characters>` | `.github/workflows/image.yml`, triggered by `workflow_run` only when CI completes successfully on `main`, or by hand |
-| 6 | Someone runs the Deploy workflow with a tag (`main` or `sha-xxxxxxx`) | `.github/workflows/deploy.yml`, manual. It uses no GitHub environment, so its OIDC subject (`repo:<owner>/<repo>:ref:refs/heads/main`) matches the deploy role's trust policy in `infra/terraform/github-deploy/main.tf` |
-| 7 | On the instance, `deploy.sh` refreshes `.env` from Parameter Store, pulls the image, starts Postgres, runs `gigawhat db upgrade`, seeds an empty database from S3 if needed, and restarts | `deploy/deploy.sh` through SSM Run Command |
+| 6 | Deployment: none yet. Hosting is chosen in Phase 4 (plan question Q4). The earlier AWS pipeline (Terraform, a Deploy workflow and SSM scripts) was removed on 14 October 2026 and is in git history. | — |
 
 Gaps in this path:
 
-- Images are built only from commits that passed CI, but Deploy does not check that the evaluation passed for that commit. The release gates block a release only if people follow step 3.
+- Images are built only from commits that passed CI, but nothing checks that the evaluation passed for that commit. The release gates block a release only if people follow step 3.
 - Running the Image workflow by hand skips the CI condition.
-- Without a GitHub environment, Deploy has no required-reviewer step. Anyone who can run workflows on `main` can deploy, and the deploy role can run shell commands as root on the instance (stated in `infra/README.md`). Protect the branch and limit who can run workflows.
 
 ## 3. Which changes need what
 
-| Change | Tests in CI | Full evaluation (golden and red-team, with judge) | Sign-off |
+| Change | Tests in CI | Full evaluation (golden and red-team) | Sign-off |
 |---|---|---|---|
 | Safety-tier rules (`safety_topics.yaml`) | Yes | Yes, on both profiles | Electricity Safety Manager and Gas Safety Manager |
 | Prompts or guardrail policy | Yes | Yes, on both profiles | Engineering lead and safety team |
@@ -78,7 +75,6 @@ Gaps in this path:
 | New document version or status change in the register | Yes | Golden set at least, and any case naming that document | Document controller |
 | Migration | Yes | Golden set at least | Engineering lead; auditor if it touches `audit_events` or `approvals` |
 | User interface wording for approvals, emergencies or pauses | Yes | Not required | Safety team |
-| Infrastructure | `terraform validate` and plan review | Not required | Engineering lead; security |
 
 ## 4. Release gates and quality targets
 
@@ -106,21 +102,19 @@ The method is in [evaluation-report.md](evaluation-report.md).
 
 ## 5. Rollback
 
-**Application.** Redeploy an earlier image tag. Run the Deploy workflow with that `sha-xxxxxxx` tag, or in a Session Manager shell run `sudo /opt/gigawhat/deploy.sh sha-xxxxxxx`. Images are kept in GitHub Container Registry; nothing in the repository deletes old tags.
+**Application.** Run an earlier image tag (`sha-xxxxxxx`) from GitHub Container Registry, however the chosen host runs containers. Nothing in the repository deletes old tags.
 
 **Database.** Migrations are forward-only in practice:
 
 - The CLI offers `gigawhat db upgrade` and no downgrade command.
 - The migration files do contain `downgrade()` functions, but running them is unsafe: downgrading `0005` drops `audit_events`, `approvals` and `feedback`, and with them the audit trail.
-- `deploy.sh` runs `gigawhat db upgrade` with the image being deployed, under `set -e`. If the database is already at a revision that the older image does not know, Alembic is expected to stop with an unknown-revision error and the deploy will abort before the app restarts. Rolling back across a migration therefore does not work with the script as written.
+- If a deployment runs `gigawhat db upgrade` with an older image while the database is at a revision that image does not know, Alembic is expected to stop with an unknown-revision error. Rolling back across a migration therefore does not work.
 
-So: roll back the image only between images with the same migration head. If a migration is wrong, fix forward with a new migration. Restoring an EBS snapshot (7 daily snapshots are kept) is the last resort, and it loses every audit event written since the snapshot. Record that loss.
-
-**Deploy scripts.** `update.sh` downloads `deploy/` files from the `main` branch (`git_ref` in `infra/terraform/lean`), not from the image tag. Rolling back the image does not roll back `deploy.sh` or the compose file.
+So: roll back the image only between images with the same migration head. If a migration is wrong, fix forward with a new migration. Restoring a database backup is the last resort, and it loses every audit event written since the backup. Record that loss.
 
 **Documents.** Never edit a published version to undo a change. Issue a new version, or change its status in the register and run `gigawhat data ingest`. The old version stays stored for audit questions.
 
-**Safety-tier rules and prompts.** Revert the commit and redeploy. The audit trail shows which `PROMPT_VERSION` produced each answer before and after.
+**Safety-tier rules and prompts.** Revert the commit and release again. The audit trail shows which `PROMPT_VERSION` produced each answer before and after.
 
 ## 6. Records of change
 
@@ -131,5 +125,5 @@ So: roll back the image only between images with the same migration head. If a m
 | Which document versions? | `audit_events.sources` (document, version, section) and `document_versions` |
 | Which application version? | Not recorded. Gap. |
 | Who approved the change? | Pull request history on GitHub. Code owners are named in `.github/CODEOWNERS`; enforcement depends on branch protection. |
-| Did the evaluation pass for this release? | The report artefact from the Evaluation workflow, if it was run. Not linked to the deployment. |
-| Who deployed it, and when? | GitHub Actions run history for Deploy; SSM command history in AWS |
+| Did the evaluation pass for this release? | The report in `evals/reports/` or the Evaluation workflow's artefact, if it was run. On the cloud profile with a LangSmith key, also the LangSmith experiment, whose metadata records the Git commit, `PROMPT_VERSION` and the model for each role, with the release gates as summary scores (`src/gigawhat/evaluation/experiment.py`). Not linked to a deployment. |
+| Who deployed it, and when? | Not recorded: there is no deployment until a host is chosen. |

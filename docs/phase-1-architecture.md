@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Proposal for review, 14 October 2026. No application code has changed for it. |
+| Status | Agreed 14 October 2026, with the defaults in section 10 for Q1 to Q11. Phase 2a (model providers) is built; see section 9. |
 | Answers | `docs/project-brief.md`, section 10 ("Your first deliverable") |
 | Baseline | Commit `950cfac`, plus the uncommitted `GIGAWHAT_RERANKER` setting |
 | Labels | **A** assumption, **D** decision already made by the owner, **P** proposal, **Q** open question (section 10) |
@@ -65,7 +65,9 @@ Staff at a regulated gas and electricity utility need to find the approved proce
 |---|---|---|
 | D1 | Keep NeMo Guardrails, DeepEval and the offline (Ollama) profile. Langfuse, Anthropic and the production Terraform are removed. | 12 Oct |
 | D2 | Zero model spend for now. The development chat model is the **Gemini free tier**, once its current limits are confirmed. Embeddings stay on OpenAI (about a cent for the corpus). Reranking is local. | 14 Oct |
-| D3 | Hosting comes after the system runs end to end on the cloud profile. AWS is no longer assumed. | 14 Oct |
+| D3 | Hosting comes after the system runs end to end on the cloud profile. AWS is no longer assumed; the AWS Terraform, deploy scripts and old explainer page were deleted. | 14 Oct |
+| D4 | Fast role on `gemini-3.1-flash-lite`, answer role on `gemini-3.5-flash-lite`: free-tier quotas are per model, so each role gets its own 500 requests a day (measured limits: 15 a minute, 500 a day; the full Flash models allow only 20 a day). Groq stays selectable per role. | 14 Oct |
+| D5 | LangSmith traces everything on the cloud profile; the demo account is in the US region, which is acceptable for fictional data. On the cloud profile each evaluation run is a LangSmith experiment. | 14 Oct |
 
 ## 2. Proposed architecture
 
@@ -297,14 +299,14 @@ The move is mechanical and is done first, with no change in behaviour, so the ex
 | Integration | LangChain, for model wrappers and the evidence agent only | Saves provider-specific code. Kept thin. | Provider SDKs directly |
 | Store | **PostgreSQL 17 + pgvector** (keep) | One store for vectors, full text, RLS, records, audit and checkpoints. RLS is the strongest access control available here. | A separate vector DB (Qdrant, OpenSearch): more to secure and no RLS; Bedrock Knowledge Bases (filtering, not a security boundary) |
 | Parsing | Docling (keep) | Good section and table structure from PDFs; runs locally | LlamaParse (hosted, paid); Unstructured |
-| Chat, development | **Gemini free tier** (D2), behind the registry | Free, with limits large enough for a full evaluation in a day (to confirm) | Groq free (8,000 tokens a minute: fails); offline Ollama (free, slow) |
+| Chat, development | **Gemini free tier** (D2, D4), behind the registry: `gemini-3.1-flash-lite` (fast), `gemini-3.5-flash-lite` (answer) | Free; a full evaluation uses about half of each model's daily quota | Groq free (8,000 tokens a minute: fails); offline Ollama (free, slow) |
 | Chat, paid | `gpt-oss-20b` on Groq's Dev tier | Cheapest paid option that fits; the same weights as the offline profile | OpenAI small models (need retuning) |
 | Embeddings | OpenAI `text-embedding-3-small` | Already indexed; about a cent for the corpus | Gemini embeddings (free; re-index needed); local Qwen3 (offline profile) |
 | Reranker | Local `bge-reranker-v2-m3` (development); Cohere when hosted | The 0.2 and 0.3 thresholds were tuned on bge; free | Cohere only (needs a paid key); none (worse retrieval) |
 | Personal data | Presidio + spaCy (keep) | Runs locally, before any model | Provider-side redaction (data has already left) |
 | Input rail | NeMo Guardrails (kept, D1) | Existing and tested | Fold into the tier classifier: one call fewer |
-| Tracing | LangSmith, EU region, optional and cloud only | Native to LangChain; free developer plan | Langfuse (removed) |
-| Evaluation | Own harness and gates; DeepEval (kept, D1); LangSmith datasets optional | Deterministic gates matter more than judge scores (brief §4F) | promptfoo; Ragas |
+| Tracing | LangSmith, optional and cloud only; EU by default, US for the demo (D5) | Native to LangChain; free developer plan | Langfuse (removed) |
+| Evaluation | Own checks and gates; on the cloud profile run as LangSmith experiments (`aevaluate`, a dataset synced from the YAML, gates as summary scores); DeepEval (kept, D1) | Deterministic gates matter more than judge scores (brief §4F); experiments make runs comparable | promptfoo; Ragas |
 | UI | Chainlit for the demo | Existing | A mobile-first web UI for field use, once a pilot workflow is chosen (Q6) |
 | Hosting | Undecided (D3, Q4) | Must be cheap and suit the data-residency answer | A small VM; a PaaS free or low tier |
 
@@ -390,7 +392,7 @@ To be agreed with the safety team (Q9):
 | Phase | Work | Accepted when |
 |---|---|---|
 | **1. Discovery and architecture** (now) | This document; answers to Q1–Q11 | The owner agrees the design; each open question is answered or deferred with an owner |
-| **2a. Providers** | Model registry by role; Gemini adapter; limit check in `doctor`; request-size budget for the evidence agent | `doctor` reports provider limits; the full 85-case evaluation completes on the free tier; five gates pass |
+| **2a. Providers** (built 14 Oct) | Model registry by role; Gemini adapter; limit check in `doctor`; request-size budget for the evidence agent; LangSmith tracing and experiments | `doctor` reports provider limits; the full 85-case evaluation completes on the free tier; five gates pass |
 | **2b. Layer split** | The module moves in section 5; validation extracted into named validators; structured JSON logging | No change in behaviour: all tests pass and evaluation results are within run-to-run noise |
 | **2c. Brief behaviours** | Six-part answer; clarify outcome; escalation routes; evidence assessment | The new clarification and escalation cases pass; the UI shows each part; G7 passes |
 | **3. Hardening** | Conflicts declared in the register and their validator; document-level access; retrieval dataset and metrics; injection fixtures in documents; cost metrics | All eight gates pass; the targets in section 8 are met or have accepted exceptions |

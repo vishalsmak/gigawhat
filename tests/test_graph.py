@@ -14,6 +14,7 @@ from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage
 from langchain_core.outputs import ChatGeneration, ChatResult
 from langchain_core.runnables import Runnable, RunnableLambda
+from langchain_core.tracers.context import collect_runs
 from langgraph.types import Command
 from pydantic import Field
 from sqlalchemy import Engine, select, update
@@ -28,6 +29,7 @@ from gigawhat.assistant.oversight import (
     DecisionRequest,
     Oversight,
 )
+from gigawhat.assistant.prompts import PROMPT_VERSION
 from gigawhat.assistant.rails import RailsVerdict
 from gigawhat.assistant.responses import STRICT_MIN_RELEVANCE, ResponseKind
 from gigawhat.assistant.rewrite import SearchQueries
@@ -557,6 +559,16 @@ def assistant_for(harness: Harness, paused: bool = False) -> Assistant:
         harness.rails, harness.model, harness.model, harness.retriever, harness.oversight, {}
     )
     return Assistant(harness.graph, Runtime(components, pool=None, paused=paused))  # type: ignore[arg-type]
+
+
+async def test_question_is_traced_as_a_run_named_ask_with_the_prompt_version(
+    harness: Harness,
+) -> None:
+    with collect_runs() as runs:
+        await assistant_for(harness).ask(Question("Who owns PR-CORP-001?", Persona.AUDITOR, "v"))
+
+    root = next(run for run in runs.traced_runs if run.name == "ask")
+    assert root.extra["metadata"]["prompt_version"] == PROMPT_VERSION
 
 
 async def test_failed_model_call_is_reported_as_a_service_error(harness: Harness) -> None:
