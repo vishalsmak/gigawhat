@@ -4,7 +4,7 @@ from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import HumanMessage, SystemMessage
 from pydantic import BaseModel, Field
 
-from gigawhat.assistant.prompts import REWRITE_PROMPT
+from gigawhat.prompts import REWRITE_PROMPT
 
 MAX_REWRITES = 2
 

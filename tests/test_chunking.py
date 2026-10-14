@@ -2,7 +2,12 @@ from pathlib import Path
 
 import pytest
 
-from gigawhat.corpus.chunking import CHUNK_MAX_TOKENS, CHUNK_TOKENIZER, DoclingChunker, SectionChunk
+from gigawhat.ingestion.chunking import (
+    CHUNK_MAX_TOKENS,
+    CHUNK_TOKENIZER,
+    DoclingChunker,
+    SectionChunk,
+)
 
 pytestmark = pytest.mark.slow
 

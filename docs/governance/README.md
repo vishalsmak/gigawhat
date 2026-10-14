@@ -20,7 +20,7 @@ Every statement is meant to be checkable against the repository. Each document n
 
 ### Suggested reading by role
 
-- **Safety team:** system card, risk register, human oversight, then the evaluation report. The safety-tier rules in `src/gigawhat/assistant/safety_topics.yaml` are yours to own.
+- **Safety team:** system card, risk register, human oversight, then the evaluation report. The safety-tier rules in `src/gigawhat/policy/safety_topics.yaml` are yours to own.
 - **Data protection officer:** data protection, then the system card. Section 11 of the data protection document lists the questions that still need your answer.
 - **Auditors:** risk register (every control has a named test or gate), change control (what the audit trail records and what it does not), human oversight sections 5 and 8.
 - **Engineering:** the gaps in every document. Most have a concrete fix.

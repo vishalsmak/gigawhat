@@ -2,9 +2,9 @@
 
 import asyncio
 
-from gigawhat.assistant.service import Assistant, create_assistant
 from gigawhat.config import get_settings
-from gigawhat.tracing import create_tracer
+from gigawhat.observability.tracing import create_tracer
+from gigawhat.orchestration.service import Assistant, create_assistant
 from gigawhat.ui.limits import RateLimiter
 
 _assistant: Assistant | None = None

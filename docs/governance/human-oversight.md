@@ -12,9 +12,9 @@ GigaWhat is advisory. This document explains how people stay in control: which q
 
 The strongest oversight control is what the system is unable to do.
 
-- It has no connection to plant, SCADA or OT. Its only tools are six read-only queries over copies of records in its own database (`src/gigawhat/assistant/evidence.py`).
-- No model can release or decline a request. Only an Authorised Person persona's action in the chat interface calls `Oversight.decide` (`src/gigawhat/assistant/oversight.py`).
-- For safety-critical questions no model writes any text. Code copies the procedure (`src/gigawhat/assistant/responses.py`).
+- It has no connection to plant, SCADA or OT. Its only tools are six read-only queries over copies of records in its own database (`src/gigawhat/records/evidence.py`).
+- No model can release or decline a request. Only an Authorised Person persona's action in the chat interface calls `Oversight.decide` (`src/gigawhat/oversight/store.py`).
+- For safety-critical questions no model writes any text. Code copies the procedure (`src/gigawhat/orchestration/responses.py`).
 - It cannot see documents or records outside the persona's business units. Row-level security in the database enforces this (migration `0004_access_control.py`).
 
 ## 2. The four safety tiers
@@ -29,7 +29,7 @@ The strongest oversight control is what the system is unable to do.
 
 ### How the tier is chosen
 
-1. Fixed rules in `src/gigawhat/assistant/safety_topics.yaml` run first. The file is owned by the Electricity Safety Manager and the Gas Safety Manager (its header says so), changes to it need code-owner review (`.github/CODEOWNERS`), and it must pass the safety evaluation set before release. A safety-critical match needs both an intention to act ("how do I", "steps to", "can I", "how high", "minimum") and a hazardous topic (isolation, switching, permits, purging, confined space, pressure work, live working, excavation).
+1. Fixed rules in `src/gigawhat/policy/safety_topics.yaml` run first. The file is owned by the Electricity Safety Manager and the Gas Safety Manager (its header says so), changes to it need code-owner review (`.github/CODEOWNERS`), and it must pass the safety evaluation set before release. A safety-critical match needs both an intention to act ("how do I", "steps to", "can I", "how high", "minimum") and a hazardous topic (isolation, switching, permits, purging, confined space, pressure work, live working, excavation).
 2. If a rule finds an emergency, the emergency card is shown at once. No model is asked (`tests/test_graph.py::test_emergency_is_answered_without_asking_any_model`).
 3. Otherwise the input guardrail and a model classifier run in parallel. The classifier's prompt tells it to choose the more serious tier when unsure (`TIER_PROMPT` in `prompts.py`).
 4. The stricter of the rule result and the classifier result is used (`stricter` in `tiers.py`). The classifier can raise the tier but never lower it below the rules (`tests/test_graph.py::test_rules_escalate_when_the_model_underrates_the_question`).
@@ -37,7 +37,7 @@ The strongest oversight control is what the system is unable to do.
 
 ## 3. Strict mode
 
-For a safety-critical question, after retrieval (`prepare_release` in `src/gigawhat/assistant/graph.py`):
+For a safety-critical question, after retrieval (`prepare_release` in `src/gigawhat/orchestration/graph.py`):
 
 - Code takes up to two sections of approved procedures (`STRICT_EXTRACTS = 2`) that score at least 0.3 with the reranker (`STRICT_MIN_RELEVANCE`), a higher bar than the 0.2 an ordinary answer needs, so the loosest matches never reach an Authorised Person. A near miss can still get through (in the evaluation, G059 sent a section of a procedure that excludes the work asked about); the Authorised Person reads the extract and declines it. HSE guidance alone is never enough. Sections titled revision history, references, records, definitions, purpose, scope or responsibilities are skipped (`strict_extracts`).
 - If nothing qualifies, GigaWhat abstains and no request is raised (`tests/test_graph.py::test_guidance_alone_is_not_released_for_safety_critical_work`, `::test_weakly_matching_procedure_is_not_sent_for_release`; `tests/test_responses.py`).

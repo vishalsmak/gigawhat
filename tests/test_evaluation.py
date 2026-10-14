@@ -1,7 +1,5 @@
 from typing import Any
 
-from gigawhat.assistant.responses import Response, ResponseKind, SourceView
-from gigawhat.assistant.service import Turn
 from gigawhat.evaluation.cases import Case, load_cases
 from gigawhat.evaluation.checks import (
     CaseResult,
@@ -11,7 +9,9 @@ from gigawhat.evaluation.checks import (
     score,
 )
 from gigawhat.evaluation.report import all_gates_pass, gates, markdown, metrics
-from gigawhat.personas import Persona
+from gigawhat.identity.personas import Persona
+from gigawhat.orchestration.responses import Response, ResponseKind, SourceView
+from gigawhat.orchestration.service import Turn
 
 
 def case(**overrides: Any) -> Case:

@@ -7,7 +7,7 @@ from langchain_core.outputs import ChatGeneration, ChatResult
 from langchain_core.rate_limiters import BaseRateLimiter
 from langchain_ollama import ChatOllama
 
-from gigawhat.assistant.rails import ConfiguredSettingsModel, InputRails
+from gigawhat.policy.rails import ConfiguredSettingsModel, InputRails
 
 
 class CountingLimiter(BaseRateLimiter):

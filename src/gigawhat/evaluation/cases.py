@@ -6,8 +6,8 @@ from pathlib import Path
 import yaml
 from pydantic import BaseModel, ConfigDict
 
-from gigawhat.assistant.responses import ResponseKind
-from gigawhat.personas import Persona
+from gigawhat.identity.personas import Persona
+from gigawhat.orchestration.responses import ResponseKind
 
 
 class Behaviour(StrEnum):

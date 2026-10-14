@@ -10,13 +10,13 @@ from datetime import date
 
 import chainlit as cl
 
-from gigawhat.assistant.oversight import ApprovalError, Decision, DecisionRequest, Feedback
-from gigawhat.assistant.responses import ResponseKind
-from gigawhat.assistant.service import Question, Turn
 from gigawhat.config import get_settings
-from gigawhat.corpus.catalogue import StoredVersion, stored_versions
-from gigawhat.db import create_db_engine
-from gigawhat.personas import PROFILES, Persona, PersonaProfile, profile_of
+from gigawhat.identity.personas import PROFILES, Persona, PersonaProfile, profile_of
+from gigawhat.ingestion.catalogue import StoredVersion, stored_versions
+from gigawhat.orchestration.responses import ResponseKind
+from gigawhat.orchestration.service import Question, Turn
+from gigawhat.oversight.store import ApprovalError, Decision, DecisionRequest, Feedback
+from gigawhat.storage.db import create_db_engine
 from gigawhat.ui import presentation
 from gigawhat.ui.runtime import get_assistant, limiter
 from gigawhat.ui.starters import STARTERS

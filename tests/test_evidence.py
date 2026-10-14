@@ -14,18 +14,18 @@ from langchain_core.tools import tool
 from sqlalchemy import Engine, delete, insert
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
-from gigawhat.assistant.evidence import (
+from gigawhat.config import Settings
+from gigawhat.records.evidence import (
     FINISHED,
     REQUEST_TOKEN_BUDGET,
     EvidenceCollector,
     RequestBudget,
     wants_records,
 )
-from gigawhat.config import Settings
-from gigawhat.db import database_url
 from gigawhat.records.load import load_records
 from gigawhat.retrieval.query import analyse_query
-from gigawhat.schema import document_versions, documents
+from gigawhat.storage.db import database_url
+from gigawhat.storage.schema import document_versions, documents
 
 TEST_DOC = "PR-GAS-097"
 

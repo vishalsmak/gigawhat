@@ -7,7 +7,7 @@ from typer.testing import CliRunner
 
 from gigawhat.cli import app, report_name, versions_table
 from gigawhat.config import get_settings
-from gigawhat.corpus.catalogue import StoredVersion
+from gigawhat.ingestion.catalogue import StoredVersion
 
 runner = CliRunner()
 TODAY = date(2026, 10, 9)

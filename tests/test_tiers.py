@@ -1,6 +1,6 @@
 import pytest
 
-from gigawhat.assistant.tiers import Tier, stricter, tier_rules
+from gigawhat.policy.tiers import Tier, stricter, tier_rules
 
 
 @pytest.mark.parametrize(

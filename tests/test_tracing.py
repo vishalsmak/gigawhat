@@ -1,7 +1,7 @@
 import pytest
 
 from gigawhat.config import Profile, Settings
-from gigawhat.tracing import create_tracer, langsmith_client
+from gigawhat.observability.tracing import create_tracer, langsmith_client
 
 
 def test_offline_profile_never_traces_even_with_a_key(monkeypatch: pytest.MonkeyPatch) -> None:

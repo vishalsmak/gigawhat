@@ -49,8 +49,8 @@ If a system does fall within Annex III, the Article 6(3) route out (for example 
 
 ### Why the design keeps it advisory
 
-- No connection to plant, SCADA or OT; read-only tools only (`src/gigawhat/assistant/evidence.py`).
-- No model writes steps for safety-critical work; code quotes the approved procedure (`src/gigawhat/assistant/responses.py`).
+- No connection to plant, SCADA or OT; read-only tools only (`src/gigawhat/records/evidence.py`).
+- No model writes steps for safety-critical work; code quotes the approved procedure (`src/gigawhat/orchestration/responses.py`).
 - An Authorised Person must release safety-critical extracts, and a release is not a permit ([human-oversight.md](human-oversight.md)).
 - Emergencies get fixed text directing people to 999 and the emergency services, nothing else.
 - Every outcome is logged, so the advisory role can be shown after the fact.
@@ -136,15 +136,15 @@ Practices most relevant to GigaWhat:
 
 | Requirement or principle | How GigaWhat addresses it | Evidence (file or test) | Gap for a real deployment |
 |---|---|---|---|
-| EU AI Act Annex III point 2: avoid being a safety component | Advisory only; no plant connection; quotes procedures; humans release | `src/gigawhat/assistant/evidence.py`; `graph.py`; `tests/test_graph.py::test_safety_critical_answer_never_asks_the_model_to_write` | Record a formal classification assessment; revisit when the final Commission guidelines are adopted or any monitoring feature is added |
+| EU AI Act Annex III point 2: avoid being a safety component | Advisory only; no plant connection; quotes procedures; humans release | `src/gigawhat/records/evidence.py`; `graph.py`; `tests/test_graph.py::test_safety_critical_answer_never_asks_the_model_to_write` | Record a formal classification assessment; revisit when the final Commission guidelines are adopted or any monitoring feature is added |
 | EU AI Act Art. 9, risk management | Hazard log with controls and verification | [risk-register.md](risk-register.md) | Named owner, review cadence, sign-off |
-| EU AI Act Art. 10, data governance | Register is the source of truth; validated; immutable versions | `src/gigawhat/corpus/register.py`; `ingest.py`; `src/gigawhat/corpus/hse.py`; `tests/test_ingest.py::test_editing_a_published_version_is_refused`; `tests/test_hse.py::test_refuses_a_download_that_does_not_match_the_registered_checksum` | Real document-control integration |
+| EU AI Act Art. 10, data governance | Register is the source of truth; validated; immutable versions | `src/gigawhat/ingestion/register.py`; `ingest.py`; `src/gigawhat/ingestion/hse.py`; `tests/test_ingest.py::test_editing_a_published_version_is_refused`; `tests/test_hse.py::test_refuses_a_download_that_does_not_match_the_registered_checksum` | Real document-control integration |
 | EU AI Act Art. 12 and 26(6), logging and retention | Append-only audit events with prompt version and models | Migration `0005_oversight.py`; `tests/test_graph.py::test_release_and_request_are_both_audited` | Retention policy; separate writer role; off-host copy; app version in each event |
 | EU AI Act Art. 13 and 50(1), transparency | System card; citations; banner and closing note saying answers are written by AI | [system-card.md](system-card.md); `src/gigawhat/ui/chat.py`; `responses.py` (`AI_NOTE`) | No automated test of the AI note |
 | EU AI Act Art. 14, human oversight | Approval through `interrupt()`, with the extract withheld until release; separation of duties in code and database; expiry; full extract and a required note for the decider; pause switch that also blocks decisions | `oversight.py`; migration `0005_oversight.py`; `tests/test_graph.py::test_requester_does_not_see_the_extract_before_release`, `::test_requester_cannot_release_their_own_request`, `::test_expired_request_cannot_be_released`, `::test_paused_assistant_refuses_decisions` | Identity-based separation of duties; evidence that the extract was read; pause without restart |
-| EU AI Act Art. 15, accuracy and robustness | Release gates; quote checks; abstention | `src/gigawhat/evaluation/report.py`; `answer.py`; `tests/test_answer.py` | Evaluation in the release pipeline; larger, realistic test sets |
+| EU AI Act Art. 15, accuracy and robustness | Release gates; quote checks; abstention | `src/gigawhat/evaluation/report.py`; `src/gigawhat/validation/`; `tests/test_validation.py` | Evaluation in the release pipeline; larger, realistic test sets |
 | EU AI Act Art. 15, cybersecurity | Input guardrail; row-level security; a restricted reader role; a non-root container | `rails.py`; migration `0004_access_control.py`; `Dockerfile` | Least-privilege database logins; WAF; image digests; penetration test |
-| EU AI Act Art. 26(2), competent overseers | Authorised Person persona | `src/gigawhat/personas.py` | Sign-on with group membership tied to real appointments |
+| EU AI Act Art. 26(2), competent overseers | Authorised Person persona | `src/gigawhat/identity/personas.py` | Sign-on with group membership tied to real appointments |
 | UK principle: safety, security, robustness | Tiers, strict mode, gates, red-team | `safety_topics.yaml`; `evals/redteam.yaml` | As above |
 | UK principle: transparency and explainability | Citations, gaps, AI note, step list, system card | `responses.py`; `service.py` (`STEP_LABELS`) | Verify claim wording against quotes |
 | UK principle: accountability and governance | Audit trail; change control; code owners | `audit_events`; [change-control.md](change-control.md); `.github/CODEOWNERS` | Named owners; branch protection that requires code-owner review |

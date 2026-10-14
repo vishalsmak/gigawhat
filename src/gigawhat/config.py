@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 from functools import lru_cache
 from pathlib import Path
-from typing import Annotated, Any, Self
+from typing import Annotated, Any, Literal, Self
 
 from pydantic import BeforeValidator, Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -82,6 +82,8 @@ class Settings(BaseSettings):
     questions_per_hour: int = 30
     # Operations' stop switch: when true the assistant answers nothing.
     paused: bool = False
+    # The server's structured logs; the CLI logs warnings only, beside its own output.
+    log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
     ollama_url: str = "http://localhost:11434"
     # Unset, each chat role uses its profile's default model; see providers.registry.
     fast_model: ConfiguredChoice | None = None

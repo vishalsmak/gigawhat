@@ -15,8 +15,8 @@ from typing import Any
 from sqlalchemy import insert, select, update
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from gigawhat.personas import Persona, profile_of
-from gigawhat.schema import approvals, audit_events, feedback
+from gigawhat.identity.personas import Persona, profile_of
+from gigawhat.storage.schema import approvals, audit_events, feedback
 
 RECENT_EVENTS = 50
 # A request nobody decides within this time can no longer be released; the requester asks again.

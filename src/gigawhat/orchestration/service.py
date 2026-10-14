@@ -6,6 +6,7 @@ from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, replace
 from typing import Any
 
+import structlog
 from langchain_core.tracers import LangChainTracer
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
@@ -14,28 +15,30 @@ from langgraph.types import Command
 from psycopg.rows import dict_row
 from psycopg_pool import AsyncConnectionPool
 from sqlalchemy.ext.asyncio import create_async_engine
+from structlog.contextvars import bound_contextvars
 
-from gigawhat.assistant import responses
-from gigawhat.assistant.graph import STATE_TYPES, AssistantState, Components, build_graph
-from gigawhat.assistant.oversight import (
+from gigawhat.config import Settings
+from gigawhat.identity.personas import Persona
+from gigawhat.observability.tracing import flush
+from gigawhat.orchestration import responses
+from gigawhat.orchestration.graph import STATE_TYPES, AssistantState, Components, build_graph
+from gigawhat.orchestration.responses import Response
+from gigawhat.oversight.store import (
     Approval,
     ApprovalError,
     AuditEvent,
     DecisionRequest,
     Oversight,
 )
-from gigawhat.assistant.pii import pii_masker
-from gigawhat.assistant.prompts import PROMPT_VERSION
-from gigawhat.assistant.rails import InputRails
-from gigawhat.assistant.responses import Response
-from gigawhat.config import Settings
-from gigawhat.db import database_url
-from gigawhat.personas import Persona
+from gigawhat.policy.pii import pii_masker
+from gigawhat.policy.rails import InputRails
+from gigawhat.prompts import PROMPT_VERSION
 from gigawhat.providers.registry import ChatRole, ModelRegistry
 from gigawhat.retrieval.search import Retriever
-from gigawhat.tracing import flush
+from gigawhat.storage.db import database_url
 
 CHECKPOINT_POOL_SIZE = 10
+logger = structlog.get_logger()
 STEP_LABELS = {
     "screen": "Checked for emergencies",
     "check_input": "Checked the question against the guardrails",
@@ -99,26 +102,10 @@ class Assistant:
         saved to Postgres."""
         if self._runtime.paused:
             return Turn(thread_id="", response=responses.paused(), tier=None)
-        masked = pii_masker().mask(question.text)
-        thread_id = str(uuid.uuid4())
-        state: AssistantState = {
-            "thread_id": thread_id,
-            "visitor_id": question.visitor_id,
-            "persona": question.persona,
-            "question": masked.text,
-            "pii_entities": list(masked.entities),
-            "started_at": time.time(),
-        }
-        config = self._run_config(thread_id, "ask", question.persona)
-        try:
-            async for update in self._graph.astream(state, config, stream_mode="updates"):
-                for node in update:
-                    if on_step and node in STEP_LABELS:
-                        await on_step(STEP_LABELS[node])
-        except Exception as error:  # A failed model or API call must still leave an audit record.
-            await self.oversight.record(_failure_event(state, error))
-            return Turn(thread_id, responses.service_error(), None)
-        return await self._turn(thread_id)
+        state = _initial_state(question)
+        with bound_contextvars(thread_id=state["thread_id"], persona=str(question.persona)):
+            logger.info("question.received", personal_data_found=len(state["pii_entities"]))
+            return await self._answer(state, on_step)
 
     async def pending_approvals(self, persona: Persona, visitor_id: str | None) -> list[Approval]:
         return await self.oversight.pending_for(persona, visitor_id)
@@ -135,7 +122,11 @@ class Assistant:
             "note": request.note,
         }
         config = self._run_config(approval.thread_id, "decide", request.decider_persona)
-        await self._graph.ainvoke(Command(resume=resume), config)
+        with bound_contextvars(thread_id=approval.thread_id, persona=str(request.decider_persona)):
+            logger.info(
+                "approval.decided", approval_id=approval.approval_id, decision=str(request.decision)
+            )
+            await self._graph.ainvoke(Command(resume=resume), config)
         return await self._turn(approval.thread_id)
 
     async def outcome(self, thread_id: str) -> Turn:
@@ -146,6 +137,28 @@ class Assistant:
         await self._runtime.pool.close()
         if self._runtime.tracer is not None:
             flush(self._runtime.tracer)
+
+    async def _answer(self, state: AssistantState, on_step: StepListener | None) -> Turn:
+        thread_id = state["thread_id"]
+        config = self._run_config(thread_id, "ask", state["persona"])
+        try:
+            async for update in self._graph.astream(state, config, stream_mode="updates"):
+                for node in update:
+                    logger.info("workflow.step", node=node)
+                    if on_step and node in STEP_LABELS:
+                        await on_step(STEP_LABELS[node])
+        except Exception as error:  # A failed model or API call must still leave an audit record.
+            logger.error("question.failed", error=type(error).__name__)
+            await self.oversight.record(_failure_event(state, error))
+            return Turn(thread_id, responses.service_error(), None)
+        turn = await self._turn(thread_id)
+        logger.info(
+            "question.answered",
+            kind=str(turn.response.kind),
+            tier=turn.tier,
+            seconds=round(time.time() - state["started_at"], 2),
+        )
+        return turn
 
     def _config(self, thread_id: str) -> Any:
         return {"configurable": {"thread_id": thread_id}}
@@ -202,6 +215,18 @@ async def open_checkpointer(settings: Settings) -> tuple[AsyncPostgresSaver, Asy
     checkpointer = AsyncPostgresSaver(pool, serde=serde)  # type: ignore[arg-type]
     await checkpointer.setup()
     return checkpointer, pool
+
+
+def _initial_state(question: Question) -> AssistantState:
+    masked = pii_masker().mask(question.text)
+    return {
+        "thread_id": str(uuid.uuid4()),
+        "visitor_id": question.visitor_id,
+        "persona": question.persona,
+        "question": masked.text,
+        "pii_entities": list(masked.entities),
+        "started_at": time.time(),
+    }
 
 
 def _failure_event(state: AssistantState, error: Exception) -> AuditEvent:

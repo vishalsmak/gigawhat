@@ -111,7 +111,7 @@ def rails_config_yaml() -> str:
 
 
 def _fingerprint() -> str:
-    rules = resources.files("gigawhat.assistant").joinpath("safety_topics.yaml").read_text()
+    rules = resources.files("gigawhat.policy").joinpath("safety_topics.yaml").read_text()
     prompts = (TIER_PROMPT, INPUT_POLICY, REWRITE_PROMPT, EVIDENCE_PROMPT, ANSWER_PROMPT, rules)
     material = "\n".join(prompts)
     return hashlib.sha256(material.encode()).hexdigest()[:12]

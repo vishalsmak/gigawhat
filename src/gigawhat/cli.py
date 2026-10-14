@@ -10,17 +10,18 @@ from rich.console import Console
 from rich.table import Table
 
 from gigawhat.config import get_settings
-from gigawhat.corpus.catalogue import StoredVersion, stored_versions
-from gigawhat.corpus.hse import fetch_guidance
-from gigawhat.corpus.register import DocumentStatus, load_register
-from gigawhat.db import create_db_engine, upgrade_to_head
 from gigawhat.doctor import Status, run_checks
-from gigawhat.personas import Persona
+from gigawhat.identity.personas import Persona
+from gigawhat.ingestion.catalogue import StoredVersion, stored_versions
+from gigawhat.ingestion.hse import fetch_guidance
+from gigawhat.ingestion.register import DocumentStatus, load_register
+from gigawhat.observability.logs import configure_logging
 from gigawhat.records.load import load_records
+from gigawhat.storage.db import create_db_engine, upgrade_to_head
 
 if TYPE_CHECKING:
-    from gigawhat.assistant.service import Turn
     from gigawhat.evaluation.runner import Evaluation, EvaluationPlan
+    from gigawhat.orchestration.service import Turn
     from gigawhat.retrieval.search import RetrievalResult, Retriever
 
 HTTP_TIMEOUT_SECONDS = 3.0
@@ -40,6 +41,13 @@ data_app = typer.Typer(help="Documents and records.", no_args_is_help=True)
 app.add_typer(db_app, name="db")
 app.add_typer(data_app, name="data")
 console = Console()
+# The CLI prints its own readable output; structured logs show only what went wrong.
+CLI_LOG_LEVEL = "WARNING"
+
+
+@app.callback()
+def main() -> None:
+    configure_logging(CLI_LOG_LEVEL)
 
 
 @app.command()
@@ -86,7 +94,7 @@ def data_ingest(
 ) -> None:
     """Parse, chunk and embed the register's documents, then apply their statuses."""
     # Imported here: Docling loads PyTorch, which would slow every other command.
-    from gigawhat.corpus.pipeline import build_ingestor
+    from gigawhat.ingestion.pipeline import build_ingestor
 
     settings = get_settings()
     register = load_register(settings.register_path)
@@ -205,8 +213,8 @@ def ask(
 
 
 async def _ask_and_close(question: str, persona: Persona) -> "Turn":
-    from gigawhat.assistant.service import Question, create_assistant
-    from gigawhat.tracing import create_tracer
+    from gigawhat.observability.tracing import create_tracer
+    from gigawhat.orchestration.service import Question, create_assistant
 
     settings = get_settings()
     assistant = await create_assistant(settings, create_tracer(settings))
@@ -274,12 +282,12 @@ def report_name(stamp: str, profile: str, plan: "EvaluationPlan") -> str:
 async def _evaluate(plan: "EvaluationPlan") -> "Evaluation":
     """A LangSmith experiment when LangSmith may be used, otherwise a run on this machine. The
     assistant gets no tracer of its own: the experiment traces each case."""
-    from gigawhat.assistant.service import create_assistant
     from gigawhat.evaluation.experiment import run_experiment
     from gigawhat.evaluation.judge import build_judge
     from gigawhat.evaluation.runner import Evaluation, Evaluator, run_cases
+    from gigawhat.observability.tracing import langsmith_client
+    from gigawhat.orchestration.service import create_assistant
     from gigawhat.providers.registry import ChatRole, ModelRegistry
-    from gigawhat.tracing import langsmith_client
 
     settings = get_settings()
     models = ModelRegistry(settings)

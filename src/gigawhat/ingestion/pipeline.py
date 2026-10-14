@@ -1,10 +1,10 @@
 """Wires the ingestion pipeline for the current profile."""
 
 from gigawhat.config import Settings
-from gigawhat.corpus.chunking import CHUNK_MAX_TOKENS, CHUNK_TOKENIZER, DoclingChunker
-from gigawhat.corpus.ingest import Ingestor
-from gigawhat.db import create_db_engine
+from gigawhat.ingestion.chunking import CHUNK_MAX_TOKENS, CHUNK_TOKENIZER, DoclingChunker
+from gigawhat.ingestion.ingest import Ingestor
 from gigawhat.providers.registry import ModelRegistry
+from gigawhat.storage.db import create_db_engine
 
 
 def build_ingestor(settings: Settings) -> Ingestor:

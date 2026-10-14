@@ -10,12 +10,12 @@ import uuid
 from dataclasses import dataclass, field, replace
 from typing import Any
 
-from gigawhat.assistant.responses import ResponseKind
-from gigawhat.assistant.service import Assistant, Question
 from gigawhat.evaluation.cases import Case
 from gigawhat.evaluation.checks import CaseResult, Outcome, score
 from gigawhat.evaluation.judge import judge_answer
-from gigawhat.personas import Persona
+from gigawhat.identity.personas import Persona
+from gigawhat.orchestration.responses import ResponseKind
+from gigawhat.orchestration.service import Assistant, Question
 
 
 @dataclass(frozen=True)

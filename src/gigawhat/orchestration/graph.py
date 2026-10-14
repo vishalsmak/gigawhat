@@ -11,35 +11,29 @@ from dataclasses import dataclass
 from datetime import date
 from typing import Any, Protocol, TypedDict
 
+import structlog
 from langchain_core.language_models import BaseChatModel
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.types import Checkpointer, interrupt
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from gigawhat.assistant import responses
-from gigawhat.assistant.answer import (
+from gigawhat.generation.answer import (
     Claim,
     Conflict,
     NextStep,
     Reference,
-    Verification,
     build_references,
     draft_answer,
-    verify,
 )
-from gigawhat.assistant.evidence import (
-    EvidenceCollector,
-    EvidenceItem,
-    gather_evidence,
-    wants_records,
-)
-from gigawhat.assistant.oversight import ApprovalRequest, AuditEvent, Decision, Oversight
-from gigawhat.assistant.prompts import PROMPT_VERSION
-from gigawhat.assistant.rails import RailsVerdict
-from gigawhat.assistant.responses import Response, ResponseKind, SourceView
-from gigawhat.assistant.rewrite import rewrite_queries
-from gigawhat.assistant.tiers import (
+from gigawhat.generation.rewrite import rewrite_queries
+from gigawhat.identity.personas import Persona, profile_of
+from gigawhat.ingestion.register import BusinessUnit
+from gigawhat.orchestration import responses
+from gigawhat.orchestration.responses import Response, ResponseKind, SourceView
+from gigawhat.oversight.store import ApprovalRequest, AuditEvent, Decision, Oversight
+from gigawhat.policy.rails import RailsVerdict
+from gigawhat.policy.tiers import (
     RuleVerdict,
     Tier,
     TierDecision,
@@ -47,10 +41,18 @@ from gigawhat.assistant.tiers import (
     stricter,
     tier_rules,
 )
-from gigawhat.corpus.register import BusinessUnit
-from gigawhat.personas import Persona, profile_of
+from gigawhat.prompts import PROMPT_VERSION
+from gigawhat.records.evidence import (
+    EvidenceCollector,
+    EvidenceItem,
+    gather_evidence,
+    wants_records,
+)
 from gigawhat.retrieval.query import QueryAnalysis
 from gigawhat.retrieval.search import Passage, RetrievalResult, Revision
+from gigawhat.validation.validators import CheckResult, Outcome, Verification, validate
+
+logger = structlog.get_logger()
 
 
 class AssistantState(TypedDict, total=False):
@@ -106,6 +108,8 @@ STATE_TYPES = [
         EvidenceItem,
         Reference,
         Verification,
+        CheckResult,
+        Outcome,
         Claim,
         NextStep,
         Conflict,
@@ -237,7 +241,9 @@ class _Nodes:
         if not references:
             return {"response": responses.abstain()}
         draft = await draft_answer(self._c.answer_model, state["question"], references)
-        verification = verify(draft, references)
+        verification = validate(draft, references)
+        outcomes = {check.name: str(check.outcome) for check in verification.checks}
+        logger.info("validation.checked", **outcomes)
         if not verification.has_content:
             response = responses.abstain()
         else:
@@ -310,7 +316,7 @@ class _Nodes:
             + [{"record": item.record_id} for item in state.get("evidence", [])],
             response_kind=str(response.kind),
             response=response.text,
-            verification={"dropped": list(verification.dropped)} if verification else {},
+            verification=_validation_record(verification),
             models=self._c.model_names,
             latency_ms=int((time.time() - state["started_at"]) * 1000),
         )
@@ -323,3 +329,13 @@ def _release_unit(extracts: list[Passage], requester: Persona) -> str:
     if unit == BusinessUnit.SHARED:
         return profile_of(requester).business_units[0].value
     return unit
+
+
+def _validation_record(verification: Verification | None) -> dict[str, object]:
+    """What the audit keeps of validation: each check's outcome and what it dropped."""
+    if verification is None:
+        return {}
+    return {
+        "dropped": list(verification.dropped),
+        "checks": {check.name: str(check.outcome) for check in verification.checks},
+    }

@@ -1,6 +1,6 @@
 import pytest
 
-from gigawhat.assistant.pii import PiiMasker, pii_masker
+from gigawhat.policy.pii import PiiMasker, pii_masker
 
 pytestmark = pytest.mark.slow
 

@@ -5,7 +5,7 @@ from datetime import date
 
 from sqlalchemy import Connection, func, select
 
-from gigawhat.schema import chunks, document_versions, documents
+from gigawhat.storage.schema import chunks, document_versions, documents
 
 
 @dataclass(frozen=True)

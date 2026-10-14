@@ -1,7 +1,7 @@
 from alembic import context
 
 from gigawhat.config import Settings, get_settings
-from gigawhat.db import create_db_engine, database_url
+from gigawhat.storage.db import create_db_engine, database_url
 
 settings: Settings = context.config.attributes.get("settings") or get_settings()
 

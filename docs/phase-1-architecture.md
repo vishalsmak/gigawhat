@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Agreed 14 October 2026, with the defaults in section 10 for Q1 to Q11. Phase 2a (model providers) is built; see section 9. |
+| Status | Agreed 14 October 2026, with the defaults in section 10 for Q1 to Q11. Phases 2a (model providers) and 2b (layer split) are built; see section 9. |
 | Answers | `docs/project-brief.md`, section 10 ("Your first deliverable") |
 | Baseline | Commit `950cfac`, plus the uncommitted `GIGAWHAT_RERANKER` setting |
 | Labels | **A** assumption, **D** decision already made by the owner, **P** proposal, **Q** open question (section 10) |
@@ -393,7 +393,7 @@ To be agreed with the safety team (Q9):
 |---|---|---|
 | **1. Discovery and architecture** (now) | This document; answers to Q1–Q11 | The owner agrees the design; each open question is answered or deferred with an owner |
 | **2a. Providers** (built 14 Oct) | Model registry by role; Gemini adapter; limit check in `doctor`; request-size budget for the evidence agent; LangSmith tracing and experiments | `doctor` reports provider limits; the full 85-case evaluation completes on the free tier; five gates pass |
-| **2b. Layer split** | The module moves in section 5; validation extracted into named validators; structured JSON logging | No change in behaviour: all tests pass and evaluation results are within run-to-run noise |
+| **2b. Layer split** (built 14 Oct) | The module moves in section 5; validation extracted into named validators; structured JSON logging | No change in behaviour: all tests pass and evaluation results are within run-to-run noise |
 | **2c. Brief behaviours** | Six-part answer; clarify outcome; escalation routes; evidence assessment | The new clarification and escalation cases pass; the UI shows each part; G7 passes |
 | **3. Hardening** | Conflicts declared in the register and their validator; document-level access; retrieval dataset and metrics; injection fixtures in documents; cost metrics | All eight gates pass; the targets in section 8 are met or have accepted exceptions |
 | **4. Pilot** | Hosting (Q4); identity provider (Q3); Authorised Person notifications; one chosen workflow (Q6); feedback capture | Agreed with stakeholders; T10 closed |

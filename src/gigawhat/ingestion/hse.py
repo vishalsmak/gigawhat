@@ -6,7 +6,7 @@ from pathlib import Path
 
 import httpx
 
-from gigawhat.corpus.register import Register
+from gigawhat.ingestion.register import Register
 
 PDF_MAGIC = b"%PDF"
 

@@ -9,6 +9,7 @@ from chainlit.utils import mount_chainlit
 from fastapi import FastAPI, HTTPException, Request, Response
 
 from gigawhat.config import get_settings
+from gigawhat.observability.logs import configure_logging
 from gigawhat.ui.runtime import close_assistant, get_assistant
 from gigawhat.ui.visitor import (
     VISITOR_COOKIE,
@@ -22,6 +23,7 @@ CHAT_MODULE = Path(__file__).parent / "ui" / "chat.py"
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    configure_logging(get_settings().log_level)
     await get_assistant()
     yield
     await close_assistant()

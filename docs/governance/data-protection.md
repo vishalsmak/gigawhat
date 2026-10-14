@@ -25,7 +25,7 @@ UK GDPR requires a DPIA where processing is likely to result in a high risk to i
 
 ## 3. Data flows
 
-The order in which data moves for one question on the cloud profile. Step numbers match `Assistant.ask` in `src/gigawhat/assistant/service.py` and the graph in `src/gigawhat/assistant/graph.py`.
+The order in which data moves for one question on the cloud profile. Step numbers match `Assistant.ask` in `src/gigawhat/orchestration/service.py` and the graph in `src/gigawhat/orchestration/graph.py`.
 
 | # | From | To | Data | Personal data? | Leaves the host? |
 |---|---|---|---|---|---|
@@ -44,11 +44,11 @@ The order in which data moves for one question on the cloud profile. Step number
 | 13 | App | LangSmith (cloud profile only, and only if `LANGSMITH_API_KEY` is set). The region follows `LANGSMITH_ENDPOINT`: the code defaults to the EU, and the demo uses the US. | Trace of every model call, tool call and graph step: masked question, prompts, sources, records, outputs; persona; thread ID; prompt version and model names. For `gigawhat eval run`, also the evaluation cases as a dataset, and each case's trace and scores as an experiment (`src/gigawhat/evaluation/experiment.py`). | Masking misses only; the evaluation cases are fictional | **Yes** |
 | 14 | Authorised Person's browser | `approvals`, graph state, `audit_events` | Decision, decider browser ID and persona, and a required free-text note, **masked** before storage (`Assistant.decide`) | Browser ID; masking misses in the note | No |
 | 15 | Browser | `feedback` | Thread ID, browser ID, persona, helpful yes or no | Browser ID | No |
-| 16 | App | NVIDIA telemetry endpoint (NeMo Guardrails default) | Nothing: usage statistics are switched off by `NEMO_GUARDRAILS_NO_USAGE_STATS=1`, set in `src/gigawhat/assistant/rails.py` and in the `Dockerfile`. The image also sets `HF_HUB_DISABLE_TELEMETRY=1`, and DeepEval's telemetry is off (`src/gigawhat/evaluation/judge.py`). | No | No |
+| 16 | App | NVIDIA telemetry endpoint (NeMo Guardrails default) | Nothing: usage statistics are switched off by `NEMO_GUARDRAILS_NO_USAGE_STATS=1`, set in `src/gigawhat/policy/rails.py` and in the `Dockerfile`. The image also sets `HF_HUB_DISABLE_TELEMETRY=1`, and DeepEval's telemetry is off (`src/gigawhat/evaluation/judge.py`). | No | No |
 
 Which provider serves each step is set per role in `src/gigawhat/providers/registry.py`, and can be changed in `.env` (for example `GIGAWHAT_ANSWER_MODEL=groq:openai/gpt-oss-20b`). `gigawhat doctor` shows the provider and model for each role.
 
-On the **offline** profile, steps 5, 6, 8 and 10 go to Ollama and a local reranker on the same machine, and step 13 never happens: nothing goes to LangSmith on the offline profile whatever keys are set (`langsmith_client` in `src/gigawhat/tracing.py`; `tests/test_tracing.py`). Settings refuse a cloud chat model on the offline profile (`tests/test_config.py::test_offline_profile_rejects_a_cloud_chat_model`). Offline evaluation runs on the local runner: LangSmith's `aevaluate` contacted LangSmith in a test even with `upload_results=False`, so it is never used offline. The first run downloads the chunking tokenizer and reranker from Hugging Face; `.env.example` suggests `HF_HUB_OFFLINE=1` afterwards.
+On the **offline** profile, steps 5, 6, 8 and 10 go to Ollama and a local reranker on the same machine, and step 13 never happens: nothing goes to LangSmith on the offline profile whatever keys are set (`langsmith_client` in `src/gigawhat/observability/tracing.py`; `tests/test_tracing.py`). Settings refuse a cloud chat model on the offline profile (`tests/test_config.py::test_offline_profile_rejects_a_cloud_chat_model`). Offline evaluation runs on the local runner: LangSmith's `aevaluate` contacted LangSmith in a test even with `upload_results=False`, so it is never used offline. The first run downloads the chunking tokenizer and reranker from Hugging Face; `.env.example` suggests `HF_HUB_OFFLINE=1` afterwards.
 
 ## 4. Personal data categories
 
@@ -65,7 +65,7 @@ On the **offline** profile, steps 5, 6, 8 and 10 go to Ollama and a local rerank
 
 ## 5. Masking with Presidio
 
-`src/gigawhat/assistant/pii.py` runs Presidio locally with the spaCy `en_core_web_md` model, before the question reaches graph state, any model, LangSmith or the audit trail. Authorised Persons' release and decline notes are masked the same way before they are stored (`Assistant.decide` in `service.py`; `tests/test_graph.py::test_decision_note_is_masked_before_it_is_stored`).
+`src/gigawhat/policy/pii.py` runs Presidio locally with the spaCy `en_core_web_md` model, before the question reaches graph state, any model, LangSmith or the audit trail. Authorised Persons' release and decline notes are masked the same way before they are stored (`Assistant.decide` in `service.py`; `tests/test_graph.py::test_decision_note_is_masked_before_it_is_stored`).
 
 | Detected | Replaced with |
 |---|---|
@@ -101,7 +101,7 @@ There is no retention or deletion process in the code today. Everything below is
 | LangGraph checkpoint tables (`checkpoints`, `checkpoint_blobs`, `checkpoint_writes`, created by `AsyncPostgresSaver.setup()`) | Full graph state per question: masked question, retrieved passages, records, response, decision | As above | Forever | Delete 30 days after a thread finishes. The audit trail holds the lasting record. |
 | `feedback` | Thread ID, browser ID, persona, helpful yes or no | Browser ID | Forever | 12 months |
 | LangSmith (cloud profile, if enabled; US region for the demo) | Traces of every step; the evaluation dataset (fictional cases) and experiments | Masking misses | 14 days for base traces on the free Developer plan; datasets until deleted | 30 to 90 days; self-hosting needs LangSmith's Enterprise plan |
-| Container logs on the host | Uvicorn access lines with IP addresses; error traces | IP addresses | Depends on the host, which is not chosen yet | 30 days in a managed log store |
+| Container logs on the host | Uvicorn access lines with IP addresses; error traces; GigaWhat's structured JSON events (thread ID, persona, workflow step, tier, validation outcomes, timings, error types), which never include question, note or answer text, and withhold such fields if passed by mistake (`src/gigawhat/observability/logs.py`; `tests/test_logs.py`, `tests/test_graph.py::test_logs_never_contain_the_question`) | IP addresses | Depends on the host, which is not chosen yet | 30 days in a managed log store |
 | Chainlit `.files/<session>/` | Source passages shown in the side panel, for the session | No | Normally removed when the session ends | No change |
 | Browser | `gw_visitor` cookie: random ID, HttpOnly, SameSite Lax, Secure over HTTPS | Browser ID | 30 days | Replaced by the sign-on session |
 | Evaluation reports (`evals/reports/`, GitHub Actions artefacts) | Fictional evaluation questions and results | No | Kept in Git or as artefacts | No change |
@@ -135,7 +135,7 @@ A regulated deployment could reach the models through a cloud provider's managed
 | Control | Where |
 |---|---|
 | Row-level security on documents and records by business unit; nothing visible without a unit | Migration `0004_access_control.py` |
-| Restricted reader role `gigawhat_reader` with SELECT only on documents and records; no access to `approvals`, `audit_events` or `feedback` | Migration `0004_access_control.py`; `create_reader_engine` in `src/gigawhat/db.py` |
+| Restricted reader role `gigawhat_reader` with SELECT only on documents and records; no access to `approvals`, `audit_events` or `feedback` | Migration `0004_access_control.py`; `create_reader_engine` in `src/gigawhat/storage/db.py` |
 | Append-only audit table | Migration `0005_oversight.py` |
 | App container runs as a non-root user (uid 10001) | `Dockerfile` |
 | File upload off; raw HTML in messages off | `.chainlit/config.toml` |

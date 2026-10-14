@@ -4,7 +4,7 @@ import pytest
 from pydantic import ValidationError
 
 from gigawhat.config import Settings
-from gigawhat.corpus.register import DocumentEntry, DocumentStatus, Register, load_register
+from gigawhat.ingestion.register import DocumentEntry, DocumentStatus, Register, load_register
 
 
 def version(number: int, status: str, **overrides: Any) -> dict[str, Any]:

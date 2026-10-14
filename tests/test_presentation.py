@@ -6,11 +6,11 @@ from typing import Any
 
 import pytest
 
-from gigawhat.assistant.oversight import Approval
-from gigawhat.assistant.responses import Response, ResponseKind
-from gigawhat.assistant.service import Turn
-from gigawhat.corpus.catalogue import StoredVersion
-from gigawhat.personas import PROFILES, Persona
+from gigawhat.identity.personas import PROFILES, Persona
+from gigawhat.ingestion.catalogue import StoredVersion
+from gigawhat.orchestration.responses import Response, ResponseKind
+from gigawhat.orchestration.service import Turn
+from gigawhat.oversight.store import Approval
 from gigawhat.ui.presentation import (
     PENDING_HINT,
     RESPONSE_BADGES,

@@ -2,8 +2,8 @@ import pytest
 from sqlalchemy import Engine
 
 from gigawhat.config import Settings
-from gigawhat.db import current_revision, head_revision, pgvector_version
 from gigawhat.doctor import Status, check_database
+from gigawhat.storage.db import current_revision, head_revision, pgvector_version
 
 pytestmark = pytest.mark.integration
 

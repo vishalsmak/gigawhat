@@ -12,15 +12,15 @@ This document says what is versioned, who should own each part, how a change rea
 
 | Item | Where | Proposed owner | How it is recorded at run time | Checks |
 |---|---|---|---|---|
-| Prompts: tier classifier, input guardrail policy, evidence agent, answer writer | `src/gigawhat/assistant/prompts.py` (in `.github/CODEOWNERS`) | Engineering, with safety team review | `PROMPT_VERSION` in every audit event (`prompt_version` column, not nullable); shown in the Auditor view | Graph tests; full evaluation |
-| Safety-tier rules | `src/gigawhat/assistant/safety_topics.yaml` (in `.github/CODEOWNERS`) | Electricity Safety Manager and Gas Safety Manager (stated in the file header) | Part of `PROMPT_VERSION`; matched rule IDs in each audit event (`guardrails.rules`) | `tests/test_tiers.py`; full evaluation |
+| Prompts: tier classifier, input guardrail policy, evidence agent, answer writer | `src/gigawhat/prompts.py` (in `.github/CODEOWNERS`) | Engineering, with safety team review | `PROMPT_VERSION` in every audit event (`prompt_version` column, not nullable); shown in the Auditor view | Graph tests; full evaluation |
+| Safety-tier rules | `src/gigawhat/policy/safety_topics.yaml` (in `.github/CODEOWNERS`) | Electricity Safety Manager and Gas Safety Manager (stated in the file header) | Part of `PROMPT_VERSION`; matched rule IDs in each audit event (`guardrails.rules`) | `tests/test_tiers.py`; full evaluation |
 | Guardrail policy | `INPUT_POLICY` in `prompts.py`; NeMo configuration built by `rails_config_yaml()` | Engineering, with safety team review | `INPUT_POLICY` is part of `PROMPT_VERSION`; block or allow in each audit event | Red-team set |
 | Model names and settings | `src/gigawhat/providers/registry.py` (models by role, per profile) and `providers/limits.py` (declared rate limits); a chat role can be switched in `.env` | Engineering | `models` column in every audit event: fast, answer, embeddings, reranker. The same names label every LangSmith trace and experiment. | `tests/test_registry.py`; `gigawhat doctor`; full evaluation on the affected profile |
-| Retrieval settings and thresholds | `src/gigawhat/retrieval/search.py` (`MIN_RELEVANCE`, `PASSAGES`, `CANDIDATES`), `src/gigawhat/assistant/responses.py` (`STRICT_EXTRACTS`), `src/gigawhat/retrieval/glossary.yaml` | Engineering | Not recorded | Retrieval tests; full evaluation |
-| Personal-data masking | `src/gigawhat/assistant/pii.py` | Engineering, with DPO review | Entity types found, per event | `tests/test_pii.py`; red-team cases R022 to R025 |
+| Retrieval settings and thresholds | `src/gigawhat/retrieval/search.py` (`MIN_RELEVANCE`, `PASSAGES`, `CANDIDATES`), `src/gigawhat/orchestration/responses.py` (`STRICT_EXTRACTS`), `src/gigawhat/retrieval/glossary.yaml` | Engineering | Not recorded | Retrieval tests; full evaluation |
+| Personal-data masking | `src/gigawhat/policy/pii.py` | Engineering, with DPO review | Entity types found, per event | `tests/test_pii.py`; red-team cases R022 to R025 |
 | Document register | `data/corpus/register.yaml` (in `.github/CODEOWNERS`) and `data/corpus/procedures/`; HSE downloads pinned by `source_sha256` | Document controller | Citations name document, version and section; `document_versions` holds the content hash, embedding model and ingest time | `tests/test_register.py`, `tests/test_ingest.py`, `tests/test_project_data.py`, `tests/test_hse.py` |
 | Operational records | `data/records/` | Records owners (fictional) | Record IDs cited in answers | `tests/test_records.py`, `tests/test_project_data.py` |
-| Database schema | `src/gigawhat/migrations/versions/0001` to `0005` (Alembic) | Engineering | `alembic_version` table | `tests/test_database.py` |
+| Database schema | `src/gigawhat/storage/migrations/versions/0001` to `0005` (Alembic) | Engineering | `alembic_version` table | `tests/test_database.py` |
 | Evaluation sets | `evals/golden.yaml`, `evals/redteam.yaml` (in `.github/CODEOWNERS`) | Safety team and engineering | Reports in `evals/reports/` | `tests/test_evaluation.py::test_project_evaluation_sets_load` |
 | Dependencies | `pyproject.toml`, `uv.lock` (with hashes) | Engineering | Not recorded | CI installs with `--locked` |
 | Container image | `Dockerfile`; built by `.github/workflows/image.yml` | Engineering | Not recorded in the app | Image workflow |
@@ -30,20 +30,20 @@ This document says what is versioned, who should own each part, how a change rea
 `PROMPT_VERSION` is the first 12 hexadecimal characters of the SHA-256 of `TIER_PROMPT`, `INPUT_POLICY`, `EVIDENCE_PROMPT`, `ANSWER_PROMPT` and the text of `safety_topics.yaml` (`_fingerprint` in `prompts.py`). Any edit to those changes it, so every audit record shows which prompt and rule set produced it. At commit `3e8cb02` it is `01cc75222082`. To print it:
 
 ```sh
-uv run python -c "from gigawhat.assistant.prompts import PROMPT_VERSION; print(PROMPT_VERSION)"
+uv run python -c "from gigawhat.prompts import PROMPT_VERSION; print(PROMPT_VERSION)"
 ```
 
 It does not cover the NeMo wrapper (`RAILS_CONFIG`), the glossary, the fixed response texts (emergency, refusal, abstain, strict preface), the retrieval thresholds or the masking rules. The audit trail also does not record the application version (Git commit or image tag). Adding the image's commit SHA to every audit event would close both gaps.
 
 ### The document register
 
-The register, not the file, decides which version is current (`src/gigawhat/corpus/register.py`). It is validated on load: version numbers are unique, at most one version is approved, no superseded version is newer than the approved one, and approved procedures have an effective date.
+The register, not the file, decides which version is current (`src/gigawhat/ingestion/register.py`). It is validated on load: version numbers are unique, at most one version is approved, no superseded version is newer than the approved one, and approved procedures have an effective date.
 
-**A published version can never be edited.** Ingestion stores a SHA-256 of each version's file. If a stored version's file changes, ingestion stops with `DocumentControlError`: "Issue a new version number instead of editing a published one." (`src/gigawhat/corpus/ingest.py`). Nothing is written (`tests/test_ingest.py::test_editing_a_published_version_is_refused`, `::test_refused_edit_leaves_database_untouched`). A new version and its predecessor's change to `superseded` are written in one transaction (`::test_new_version_supersedes_old_one`), and the database refuses two approved versions of one document (`::test_database_rejects_a_second_approved_version`).
+**A published version can never be edited.** Ingestion stores a SHA-256 of each version's file. If a stored version's file changes, ingestion stops with `DocumentControlError`: "Issue a new version number instead of editing a published one." (`src/gigawhat/ingestion/ingest.py`). Nothing is written (`tests/test_ingest.py::test_editing_a_published_version_is_refused`, `::test_refused_edit_leaves_database_untouched`). A new version and its predecessor's change to `superseded` are written in one transaction (`::test_new_version_supersedes_old_one`), and the database refuses two approved versions of one document (`::test_database_rejects_a_second_approved_version`).
 
 This is why the conflict between PR-GAS-010 v4 and PR-GAS-021 v5 found while building the evaluation set stays in place until a new version resolves it (`data/README.md`).
 
-Public HSE guidance is pinned the same way at download time: `gigawhat data fetch-hse` refuses a PDF whose SHA-256 differs from `source_sha256` in the register, with `ChecksumMismatchError` (`src/gigawhat/corpus/hse.py`; `tests/test_hse.py::test_refuses_a_download_that_does_not_match_the_registered_checksum`). A new HSE edition is adopted by reviewing it and updating the checksum.
+Public HSE guidance is pinned the same way at download time: `gigawhat data fetch-hse` refuses a PDF whose SHA-256 differs from `source_sha256` in the register, with `ChecksumMismatchError` (`src/gigawhat/ingestion/hse.py`; `tests/test_hse.py::test_refuses_a_download_that_does_not_match_the_registered_checksum`). A new HSE edition is adopted by reviewing it and updating the checksum.
 
 Two caveats. `gigawhat data ingest --rebuild` deletes stored versions so they can be rebuilt. It is labelled development-only and now asks for confirmation, naming the database, but it can still be run against production. Status changes in the register (for example approved to withdrawn) are applied on the next ingest without any record of who made them beyond Git history.
 

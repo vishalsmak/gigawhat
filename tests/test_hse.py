@@ -4,8 +4,8 @@ from pathlib import Path
 import httpx
 import pytest
 
-from gigawhat.corpus.hse import ChecksumMismatchError, NotAPdfError, fetch_guidance
-from gigawhat.corpus.register import Register
+from gigawhat.ingestion.hse import ChecksumMismatchError, NotAPdfError, fetch_guidance
+from gigawhat.ingestion.register import Register
 
 PDF_BYTES = b"%PDF-1.7 fake"
 

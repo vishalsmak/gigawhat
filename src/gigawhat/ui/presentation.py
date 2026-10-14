@@ -13,13 +13,13 @@ from dataclasses import dataclass
 from datetime import date
 from typing import Any
 
-from gigawhat.assistant.oversight import Approval
-from gigawhat.assistant.responses import ResponseKind
-from gigawhat.assistant.service import Turn
-from gigawhat.assistant.tiers import Tier
-from gigawhat.corpus.catalogue import StoredVersion
-from gigawhat.corpus.register import DocumentStatus
-from gigawhat.personas import Persona, PersonaProfile, profile_of
+from gigawhat.identity.personas import Persona, PersonaProfile, profile_of
+from gigawhat.ingestion.catalogue import StoredVersion
+from gigawhat.ingestion.register import DocumentStatus
+from gigawhat.orchestration.responses import ResponseKind
+from gigawhat.orchestration.service import Turn
+from gigawhat.oversight.store import Approval
+from gigawhat.policy.tiers import Tier
 
 PENDING_HINT = (
     "In this demo, switch to the Authorised Person persona for that unit to release or decline "

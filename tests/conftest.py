@@ -3,11 +3,12 @@ from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
+import structlog
 from sqlalchemy import Engine
 from sqlalchemy.exc import OperationalError
 
 from gigawhat.config import Profile, Settings
-from gigawhat.db import create_db_engine, upgrade_to_head
+from gigawhat.storage.db import create_db_engine, upgrade_to_head
 
 # Chainlit loads ./.env into the process environment when imported, which would hand a
 # developer's profile and API keys to every test that follows. Point it at a file that isn't there.
@@ -31,6 +32,14 @@ def clean_key_environment(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setitem(Settings.model_config, "env_file", None)
     for name in KEY_VARIABLES:
         monkeypatch.delenv(name, raising=False)
+
+
+@pytest.fixture(autouse=True)
+def default_logging() -> Iterator[None]:
+    """configure_logging (which every CLI command runs) changes structlog for the whole process,
+    bound to that test's captured stderr; put it back after each test."""
+    yield
+    structlog.reset_defaults()
 
 
 @pytest.fixture(scope="session")

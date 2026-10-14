@@ -7,7 +7,7 @@ from enum import Enum
 
 from pydantic import BaseModel
 
-from gigawhat.assistant.graph import STATE_TYPES, AssistantState
+from gigawhat.orchestration.graph import STATE_TYPES, AssistantState
 
 
 def project_classes(annotation: object) -> set[type]:

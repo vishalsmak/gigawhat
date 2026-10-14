@@ -9,10 +9,10 @@ from langchain_core.embeddings import DeterministicFakeEmbedding
 from sqlalchemy import Engine, text
 
 from gigawhat.config import Settings
-from gigawhat.corpus.chunking import SectionChunk
-from gigawhat.corpus.ingest import Ingestor
-from gigawhat.corpus.register import DocumentEntry
-from gigawhat.personas import Persona
+from gigawhat.identity.personas import Persona
+from gigawhat.ingestion.chunking import SectionChunk
+from gigawhat.ingestion.ingest import Ingestor
+from gigawhat.ingestion.register import DocumentEntry
 from gigawhat.providers.registry import ModelRegistry
 from gigawhat.retrieval.search import MIN_RELEVANCE, Retriever
 

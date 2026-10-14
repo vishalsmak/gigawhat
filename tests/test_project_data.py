@@ -8,7 +8,7 @@ import yaml
 from sqlalchemy import Engine
 
 from gigawhat.config import Settings
-from gigawhat.corpus.register import DocType, load_register
+from gigawhat.ingestion.register import DocType, load_register
 from gigawhat.records.load import load_records
 
 SETTINGS = Settings(_env_file=None)
@@ -72,3 +72,11 @@ def test_committed_records_satisfy_database_constraints(database: Engine) -> Non
     loaded = {table.table: table.rows for table in load_records(database, SETTINGS.records_dir)}
 
     assert loaded["incidents"] == len(INCIDENTS)
+
+
+def test_every_codeowners_path_exists() -> None:
+    """A path that no longer exists silently drops the review its owner must give."""
+    codeowners = Path(".github/CODEOWNERS").read_text().splitlines()
+    paths = [line.split()[0].lstrip("/") for line in codeowners if line.startswith("/")]
+
+    assert [path for path in paths if not Path(path).exists()] == []

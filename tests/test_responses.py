@@ -1,8 +1,8 @@
 from datetime import date, timedelta
 from typing import Any
 
-from gigawhat.assistant.answer import Claim, Reference, Verification
-from gigawhat.assistant.responses import (
+from gigawhat.generation.answer import Claim, Reference
+from gigawhat.orchestration.responses import (
     AI_NOTE,
     REVISION_NOTICE_PERIOD,
     STRICT_MIN_RELEVANCE,
@@ -11,6 +11,7 @@ from gigawhat.assistant.responses import (
     strict_extracts,
 )
 from gigawhat.retrieval.search import Passage
+from gigawhat.validation.validators import Verification
 
 TODAY = date(2026, 10, 10)
 

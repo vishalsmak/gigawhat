@@ -6,11 +6,11 @@ from typing import Any
 
 from langsmith.schemas import Example, Run
 
-from gigawhat.assistant.responses import Response, ResponseKind, SourceView
 from gigawhat.evaluation.cases import Case
 from gigawhat.evaluation.checks import Outcome
 from gigawhat.evaluation.experiment import Scoring, example_fields, sync_dataset
-from gigawhat.personas import Persona
+from gigawhat.identity.personas import Persona
+from gigawhat.orchestration.responses import Response, ResponseKind, SourceView
 
 NOW = datetime.now(UTC)
 PHONE = "07700 900461"

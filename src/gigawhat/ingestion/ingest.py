@@ -15,9 +15,9 @@ from langchain_core.embeddings import Embeddings
 from sqlalchemy import Connection, Engine, delete, insert, select, update
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 
-from gigawhat.corpus.chunking import Chunker, SectionChunk
-from gigawhat.corpus.register import DocumentEntry, DocumentStatus, VersionEntry
-from gigawhat.schema import chunks, document_versions, documents
+from gigawhat.ingestion.chunking import Chunker, SectionChunk
+from gigawhat.ingestion.register import DocumentEntry, DocumentStatus, VersionEntry
+from gigawhat.storage.schema import chunks, document_versions, documents
 
 EMBED_BATCH_SIZE = 64
 # Shorter chunks are table-of-contents and page furniture, not content worth searching.

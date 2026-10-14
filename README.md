@@ -82,6 +82,28 @@ Models are chosen by role in [`src/gigawhat/providers/registry.py`](src/gigawhat
 
 The two chat roles use different Gemini models because free-tier quotas are per model: each gets its own 15 requests a minute and 500 a day. Switch a chat role in `.env` with `GIGAWHAT_FAST_MODEL` or `GIGAWHAT_ANSWER_MODEL`, written `provider:model` (`gemini`, `groq` or `ollama`), for example when a model's daily quota is used up. `gigawhat doctor` checks each role's key and model, shows its rate limits, and checks that the answer model's tokens-a-minute limit fits an evidence request.
 
+## Code layout
+
+`src/gigawhat/` is split into layers ([`docs/phase-1-architecture.md`](docs/phase-1-architecture.md), section 5). Dependencies point inwards: the interface uses orchestration, which uses the layers below it.
+
+| Layer | Does |
+|---|---|
+| `api.py`, `ui/`, `cli.py` | The interfaces: HTTP, the Chainlit chat and the command line |
+| `orchestration/` | The LangGraph workflow (`graph.py`), the service the interfaces call (`service.py`) and the responses it returns |
+| `identity/` | Personas: who is asking and what they may see or release |
+| `policy/` | Safety tiers and their rules, the input guardrail, personal-data masking |
+| `retrieval/` | Hybrid search under row-level security, reranking |
+| `records/` | Read-only record tools and the agent that picks them |
+| `generation/` | Search rewrites and drafting cited answers |
+| `validation/` | Named checks on every draft before it is shown |
+| `oversight/` | Approvals, the append-only audit trail, feedback |
+| `providers/` | Models by role, their limits and pacing |
+| `ingestion/` | The document register, parsing, chunking and embedding |
+| `storage/` | Database engine, schema and migrations |
+| `observability/` | Structured JSON logs and LangSmith tracing |
+| `evaluation/` | Cases, checks, release gates, LangSmith experiments |
+| `prompts.py` | Every prompt; `PROMPT_VERSION` is their fingerprint |
+
 ## Development
 
 ```sh

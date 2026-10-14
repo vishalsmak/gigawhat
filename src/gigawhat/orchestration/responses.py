@@ -8,8 +8,9 @@ from enum import StrEnum
 
 from pydantic import BaseModel
 
-from gigawhat.assistant.answer import Reference, Verification
+from gigawhat.generation.answer import Reference
 from gigawhat.retrieval.search import Passage, Revision
+from gigawhat.validation.validators import Verification
 
 STRICT_EXTRACTS = 2
 # Extracts put in front of an Authorised Person must clearly match the question, so the bar is

@@ -5,10 +5,10 @@ from dataclasses import dataclass, field
 
 from pydantic import BaseModel, ConfigDict
 
-from gigawhat.assistant.pii import pii_masker
-from gigawhat.assistant.responses import Response, ResponseKind
-from gigawhat.assistant.service import Turn
 from gigawhat.evaluation.cases import EXPECTED_KINDS, Behaviour, Case
+from gigawhat.orchestration.responses import Response, ResponseKind
+from gigawhat.orchestration.service import Turn
+from gigawhat.policy.pii import pii_masker
 
 CITATION = re.compile(r"^(?P<doc>(?:PR-(?:ELEC|GAS|CORP)-\d{3}|HSE-[A-Z]+\d+)) v(?P<version>\d+)")
 CITING_BEHAVIOURS = {Behaviour.ANSWER, Behaviour.STRICT}

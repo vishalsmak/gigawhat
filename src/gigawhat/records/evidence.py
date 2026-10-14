@@ -24,7 +24,7 @@ from langchain_core.tools import BaseTool, StructuredTool
 from sqlalchemy import Row, text
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from gigawhat.assistant.prompts import EVIDENCE_PROMPT
+from gigawhat.prompts import EVIDENCE_PROMPT
 from gigawhat.retrieval.query import QueryAnalysis
 
 MAX_TOOL_CALLS = 5

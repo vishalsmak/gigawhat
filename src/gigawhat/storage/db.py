@@ -6,9 +6,9 @@ from sqlalchemy import URL, Connection, Engine, create_engine, text
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
 from gigawhat.config import Settings
-from gigawhat.personas import PersonaProfile
+from gigawhat.identity.personas import PersonaProfile
 
-MIGRATIONS_LOCATION = "gigawhat:migrations"
+MIGRATIONS_LOCATION = "gigawhat.storage:migrations"
 READER_ROLE = "gigawhat_reader"
 
 

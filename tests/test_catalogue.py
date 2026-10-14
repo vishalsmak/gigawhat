@@ -1,7 +1,7 @@
 from dataclasses import replace
 from datetime import date
 
-from gigawhat.corpus.catalogue import StoredVersion
+from gigawhat.ingestion.catalogue import StoredVersion
 
 TODAY = date(2026, 10, 9)
 STORED = StoredVersion(

@@ -11,7 +11,7 @@ from typing import Any
 import yaml
 from sqlalchemy import Engine, Table, insert, text
 
-from gigawhat.schema import alarms, assets, incidents, inspections, sites, work_orders
+from gigawhat.storage.schema import alarms, assets, incidents, inspections, sites, work_orders
 
 Converter = Callable[[str], Any]
 Row = dict[str, Any]

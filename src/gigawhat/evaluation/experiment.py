@@ -21,13 +21,13 @@ from langsmith import Client, aevaluate
 from langsmith.evaluation import EvaluationResult, EvaluationResults
 from langsmith.schemas import Example, Run
 
-from gigawhat.assistant.pii import pii_masker
-from gigawhat.assistant.responses import ResponseKind
 from gigawhat.evaluation.cases import Case
 from gigawhat.evaluation.checks import CaseResult, Outcome, score
 from gigawhat.evaluation.judge import SCORE_NAMES, judge_answer
 from gigawhat.evaluation.report import gates
 from gigawhat.evaluation.runner import Evaluation, EvaluationPlan, Evaluator, Experiment
+from gigawhat.orchestration.responses import ResponseKind
+from gigawhat.policy.pii import pii_masker
 
 DATASET = "gigawhat-evaluation"
 DATASET_DESCRIPTION = (

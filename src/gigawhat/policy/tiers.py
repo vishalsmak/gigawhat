@@ -11,7 +11,7 @@ from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import HumanMessage, SystemMessage
 from pydantic import BaseModel, Field
 
-from gigawhat.assistant.prompts import TIER_PROMPT
+from gigawhat.prompts import TIER_PROMPT
 
 
 class Tier(StrEnum):
@@ -71,7 +71,7 @@ class TierDecision(BaseModel):
 
 @cache
 def tier_rules() -> TierRules:
-    source = resources.files("gigawhat.assistant").joinpath("safety_topics.yaml").read_text()
+    source = resources.files("gigawhat.policy").joinpath("safety_topics.yaml").read_text()
     raw = yaml.safe_load(source)
     critical = raw["safety_critical"]
     return TierRules(

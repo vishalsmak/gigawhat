@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-from gigawhat.personas import Persona
+from gigawhat.identity.personas import Persona
 
 
 @dataclass(frozen=True)

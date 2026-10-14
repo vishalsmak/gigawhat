@@ -9,18 +9,18 @@ from sqlalchemy import Engine, func, insert, select, text
 from sqlalchemy.exc import IntegrityError
 
 from gigawhat.config import Settings
-from gigawhat.corpus.catalogue import stored_versions
-from gigawhat.corpus.chunking import SectionChunk
-from gigawhat.corpus.ingest import (
+from gigawhat.ingestion.catalogue import stored_versions
+from gigawhat.ingestion.chunking import SectionChunk
+from gigawhat.ingestion.ingest import (
     MIN_BODY_CHARS,
     DocumentControlError,
     Ingestor,
     Outcome,
     contextual_content,
 )
-from gigawhat.corpus.register import DocumentEntry
+from gigawhat.ingestion.register import DocumentEntry
 from gigawhat.providers.registry import ModelRegistry
-from gigawhat.schema import chunks, document_versions
+from gigawhat.storage.schema import chunks, document_versions
 
 pytestmark = pytest.mark.integration
 

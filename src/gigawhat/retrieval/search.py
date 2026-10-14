@@ -17,10 +17,10 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncEngine
 
 from gigawhat.config import Settings
-from gigawhat.db import create_reader_engine
-from gigawhat.personas import Persona, profile_of
+from gigawhat.identity.personas import Persona, profile_of
 from gigawhat.retrieval.query import QueryAnalysis, analyse_query
 from gigawhat.retrieval.rerank import Reranker
+from gigawhat.storage.db import create_reader_engine
 
 SEARCH_VIEW = "current_chunks"
 CANDIDATES_PER_SEARCH = 20

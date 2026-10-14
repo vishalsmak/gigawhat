@@ -19,28 +19,30 @@ from langgraph.types import Command
 from pydantic import Field
 from sqlalchemy import Engine, select, update
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
+from structlog.contextvars import merge_contextvars
+from structlog.testing import capture_logs
 
-from gigawhat.assistant.answer import Claim, Conflict, DraftAnswer
-from gigawhat.assistant.graph import AssistantState, Components, build_graph
-from gigawhat.assistant.oversight import (
+from gigawhat.config import Settings
+from gigawhat.generation.answer import Claim, Conflict, DraftAnswer
+from gigawhat.generation.rewrite import SearchQueries
+from gigawhat.identity.personas import Persona
+from gigawhat.orchestration.graph import AssistantState, Components, build_graph
+from gigawhat.orchestration.responses import STRICT_MIN_RELEVANCE, ResponseKind
+from gigawhat.orchestration.service import Assistant, Question, Runtime, open_checkpointer
+from gigawhat.oversight.store import (
     APPROVAL_TTL,
     ApprovalError,
     Decision,
     DecisionRequest,
     Oversight,
 )
-from gigawhat.assistant.prompts import PROMPT_VERSION
-from gigawhat.assistant.rails import RailsVerdict
-from gigawhat.assistant.responses import STRICT_MIN_RELEVANCE, ResponseKind
-from gigawhat.assistant.rewrite import SearchQueries
-from gigawhat.assistant.service import Assistant, Question, Runtime, open_checkpointer
-from gigawhat.assistant.tiers import Tier, TierDecision
-from gigawhat.config import Settings
-from gigawhat.db import database_url
-from gigawhat.personas import Persona
+from gigawhat.policy.rails import RailsVerdict
+from gigawhat.policy.tiers import Tier, TierDecision
+from gigawhat.prompts import PROMPT_VERSION
 from gigawhat.retrieval.query import analyse_query
 from gigawhat.retrieval.search import Passage, RetrievalResult, Revision
-from gigawhat.schema import approvals, audit_events
+from gigawhat.storage.db import database_url
+from gigawhat.storage.schema import approvals, audit_events
 
 pytestmark = pytest.mark.integration
 
@@ -311,6 +313,17 @@ async def test_routine_answer_is_audited(harness: Harness, database: Engine) -> 
     assert audit_types(database, values["thread_id"]) == ["answer"]
 
 
+async def test_audit_records_each_validation_check(harness: Harness, database: Engine) -> None:
+    values = await harness.ask("Which procedure sets the vent stack height?")
+
+    query = select(audit_events.c.verification).where(
+        audit_events.c.thread_id == values["thread_id"]
+    )
+    with database.connect() as connection:
+        verification = connection.execute(query).scalar_one()
+    assert verification["checks"]["quotes_match_sources"] == "passed"
+
+
 async def test_invented_quote_is_dropped_and_assistant_abstains(harness: Harness) -> None:
     draft = good_draft()
     draft.claims[0].quote = "outlet is at least 4 m above ground level"
@@ -569,6 +582,44 @@ async def test_question_is_traced_as_a_run_named_ask_with_the_prompt_version(
 
     root = next(run for run in runs.traced_runs if run.name == "ask")
     assert root.extra["metadata"]["prompt_version"] == PROMPT_VERSION
+
+
+LOGGED_QUESTION = "Who owns PR-CORP-001? Ring me on 07700 900461"
+
+
+async def test_question_is_logged_step_by_step_under_its_thread(harness: Harness) -> None:
+    with capture_logs(processors=[merge_contextvars]) as logs:
+        turn = await assistant_for(harness).ask(Question(LOGGED_QUESTION, Persona.AUDITOR, "v"))
+
+    events = [(log["event"], log["thread_id"]) for log in logs]
+    assert events[0] == ("question.received", turn.thread_id)
+    assert events[-1] == ("question.answered", turn.thread_id)
+
+
+async def test_logs_never_contain_the_question(harness: Harness) -> None:
+    with capture_logs(processors=[merge_contextvars]) as logs:
+        await assistant_for(harness).ask(Question(LOGGED_QUESTION, Persona.AUDITOR, "v"))
+
+    logged = " ".join(str(value) for log in logs for value in log.values())
+    # Not even masked: the masked question still names the document.
+    assert "07700" not in logged and "PR-CORP-001" not in logged
+
+
+async def test_failed_model_call_is_logged_by_error_type(harness: Harness) -> None:
+    harness.rails.fail = True
+
+    with capture_logs() as logs:
+        await assistant_for(harness).ask(Question("Who owns PR-CORP-001?", Persona.AUDITOR, "v"))
+
+    assert {"event": "question.failed", "error": "ConnectionError", "log_level": "error"} in logs
+
+
+async def test_validation_outcomes_are_logged(harness: Harness) -> None:
+    with capture_logs() as logs:
+        await harness.ask("Which procedure sets the vent stack height?")
+
+    checked = next(log for log in logs if log["event"] == "validation.checked")
+    assert checked["quotes_match_sources"] == "passed"
 
 
 async def test_failed_model_call_is_reported_as_a_service_error(harness: Harness) -> None:

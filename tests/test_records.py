@@ -5,7 +5,7 @@ from sqlalchemy import Engine, func, select
 from sqlalchemy.exc import IntegrityError
 
 from gigawhat.records.load import load_records
-from gigawhat.schema import alarms, incidents, inspections
+from gigawhat.storage.schema import alarms, incidents, inspections
 
 pytestmark = pytest.mark.integration
 

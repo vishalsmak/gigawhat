@@ -8,10 +8,10 @@ import httpx
 from pydantic import SecretStr
 from sqlalchemy.exc import OperationalError
 
-from gigawhat.assistant.evidence import REQUEST_TOKEN_BUDGET
 from gigawhat.config import ModelChoice, Profile, Provider, RerankerKind, Settings
-from gigawhat.db import create_db_engine, current_revision, head_revision, pgvector_version
 from gigawhat.providers.registry import ROLE_SETTINGS, ChatRole, ModelRegistry
+from gigawhat.records.evidence import REQUEST_TOKEN_BUDGET
+from gigawhat.storage.db import create_db_engine, current_revision, head_revision, pgvector_version
 
 # Looking a model up is free: it uses no tokens and no quota.
 MODEL_URLS = {

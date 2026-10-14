@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from enum import StrEnum
 
-from gigawhat.corpus.register import BusinessUnit
+from gigawhat.ingestion.register import BusinessUnit
 
 
 class Persona(StrEnum):
