@@ -40,7 +40,7 @@ dependencies = [
 [project.optional-dependencies]
 # Loading documents: Docling and its PDF layout models (PyTorch). Not needed to serve answers.
 ingest = ["docling>=2.137.0", "langchain-docling>=3.0.0"]
-# The offline profile's local reranker (PyTorch). The cloud profile reranks with Cohere.
+# The local reranker (PyTorch): always on offline, and on cloud with GIGAWHAT_RERANKER=local.
 offline = ["sentence-transformers>=6.1.0"]
 
 [project.scripts]

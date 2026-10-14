@@ -57,7 +57,7 @@ GigaWhat must not be used for any of the following. The design keeps them out of
 | Safety-tier classifier and input guardrail ("fast model") | `openai/gpt-oss-20b` on Groq, reasoning `low`, temperature 0, up to 2,048 output tokens including reasoning | `gpt-oss:20b` on Ollama, reasoning `low`, temperature 0 |
 | Evidence gathering and cited answers ("answer model") | `openai/gpt-oss-20b` on Groq, reasoning `medium`, temperature 0, up to 16,000 output tokens including reasoning | `gpt-oss:20b` on Ollama, reasoning `medium`, temperature 0 |
 | Embeddings | OpenAI `text-embedding-3-small`, 1,536 dimensions | `qwen3-embedding:0.6b` on Ollama, 1,024 dimensions, with a task instruction on queries only |
-| Reranker | Cohere `rerank-v3.5` | `BAAI/bge-reranker-v2-m3`, run locally with sentence-transformers |
+| Reranker | Cohere `rerank-v3.5`, or `BAAI/bge-reranker-v2-m3` locally with `GIGAWHAT_RERANKER=local` | `BAAI/bge-reranker-v2-m3`, run locally with sentence-transformers |
 | Personal-data detection | Presidio with spaCy `en_core_web_md` 3.8.0, run locally | Same |
 | Document parsing (ingestion only) | Docling, OCR switched off | Same |
 | Chunk boundaries (ingestion only) | Tokenizer `Qwen/Qwen3-Embedding-0.6B`, 512 tokens per chunk, so both profiles split documents identically | Same |

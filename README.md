@@ -66,7 +66,7 @@ Set `GIGAWHAT_PROFILE` in `.env`:
 
 | Profile | Models | Needs |
 |---|---|---|
-| `cloud` (default) | `gpt-oss-20b` on Groq for answers, OpenAI for embeddings, Cohere for reranking. The hosted demo uses this. | `GROQ_API_KEY`, `OPENAI_API_KEY`, `COHERE_API_KEY` |
+| `cloud` (default) | `gpt-oss-20b` on Groq for answers, OpenAI for embeddings, Cohere for reranking (or the local reranker with `GIGAWHAT_RERANKER=local`). The hosted demo uses this. | `GROQ_API_KEY`, `OPENAI_API_KEY`, and `COHERE_API_KEY` unless reranking locally |
 | `offline` | Open models on [Ollama](https://ollama.com). Nothing leaves your machine. | Ollama running locally |
 
 Each profile has its own database (`gigawhat_cloud`, `gigawhat_offline`) because the two embedding models produce different vectors.

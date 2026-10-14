@@ -1,7 +1,7 @@
 import httpx
 import pytest
 
-from gigawhat.config import Profile, Settings
+from gigawhat.config import Profile, RerankerKind, Settings
 from gigawhat.doctor import Status, check_database, check_models, check_tracing
 
 UNUSED_PORT = 1
@@ -28,6 +28,15 @@ def test_cloud_profile_passes_with_keys(monkeypatch: pytest.MonkeyPatch) -> None
     monkeypatch.setenv("COHERE_API_KEY", "co-test")
 
     assert check_models(make_settings(), httpx.Client()).status is Status.OK
+
+
+def test_local_reranker_does_not_need_a_cohere_key(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("GROQ_API_KEY", "gsk-test")
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
+
+    check = check_models(make_settings(reranker=RerankerKind.LOCAL), httpx.Client())
+
+    assert check.status is Status.OK
 
 
 def test_offline_profile_passes_when_ollama_answers() -> None:

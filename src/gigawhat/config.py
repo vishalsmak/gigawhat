@@ -13,6 +13,13 @@ class Profile(StrEnum):
     OFFLINE = "offline"
 
 
+class RerankerKind(StrEnum):
+    """Which cross-encoder scores passages. Local needs the `offline` extra (PyTorch)."""
+
+    COHERE = "cohere"
+    LOCAL = "local"
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_prefix="GIGAWHAT_", env_file=".env", env_ignore_empty=True, extra="ignore"
@@ -33,6 +40,8 @@ class Settings(BaseSettings):
     # Operations' stop switch: when true the assistant answers nothing.
     paused: bool = False
     ollama_url: str = "http://localhost:11434"
+    # Read only on the cloud profile; see active_reranker.
+    reranker: RerankerKind = RerankerKind.COHERE
 
     # Standard names, so LangChain integrations can read the same variables.
     groq_api_key: SecretStr | None = Field(default=None, validation_alias="GROQ_API_KEY")
@@ -59,6 +68,11 @@ class Settings(BaseSettings):
     @property
     def records_dir(self) -> Path:
         return self.data_dir / "records"
+
+    @property
+    def active_reranker(self) -> RerankerKind:
+        """Offline always reranks locally, whatever is configured: nothing leaves the machine."""
+        return RerankerKind.LOCAL if self.profile is Profile.OFFLINE else self.reranker
 
     @property
     def tracing_enabled(self) -> bool:

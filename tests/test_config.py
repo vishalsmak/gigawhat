@@ -1,6 +1,6 @@
 import pytest
 
-from gigawhat.config import Profile, Settings
+from gigawhat.config import Profile, RerankerKind, Settings
 
 
 def make_settings(**overrides: object) -> Settings:
@@ -52,3 +52,19 @@ def test_tracing_enabled_with_a_langsmith_key(monkeypatch: pytest.MonkeyPatch) -
 
 def test_traces_go_to_the_eu_region_by_default() -> None:
     assert make_settings().langsmith_endpoint == "https://eu.api.smith.langchain.com"
+
+
+def test_cloud_reranks_with_cohere_by_default() -> None:
+    assert make_settings().active_reranker is RerankerKind.COHERE
+
+
+def test_cloud_can_rerank_locally(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("GIGAWHAT_RERANKER", "local")
+
+    assert make_settings().active_reranker is RerankerKind.LOCAL
+
+
+def test_offline_reranks_locally_even_when_cohere_is_configured() -> None:
+    settings = make_settings(profile=Profile.OFFLINE, reranker=RerankerKind.COHERE)
+
+    assert settings.active_reranker is RerankerKind.LOCAL

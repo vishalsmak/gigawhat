@@ -170,7 +170,7 @@ async def create_assistant(settings: Settings) -> Assistant:
         model_names={
             "chat": chat_model_name(settings),
             "embeddings": embedding_model(settings).name,
-            "reranker": RERANK_MODELS[settings.profile],
+            "reranker": RERANK_MODELS[settings.active_reranker],
         },
     )
     checkpointer, pool = await open_checkpointer(settings)

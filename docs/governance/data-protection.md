@@ -36,7 +36,7 @@ The order in which data moves for one question on the cloud profile. Step number
 | 5 | App | Groq API (input rail, tier classifier and query rewriting) | Masked question with the guardrail, tier and rewrite prompts | Masking misses only | **Yes** |
 | 6 | App | OpenAI API (embedding) | Masked question and up to two rewrites of it | Masking misses only | **Yes** |
 | 7 | App | Postgres as `gigawhat_reader` | Search query; returns document chunks | No | No |
-| 8 | App | Cohere API (rerank) | Masked question and up to 24 candidate passages | Masking misses only | **Yes** |
+| 8 | App | Cohere API (rerank; not called with `GIGAWHAT_RERANKER=local`) | Masked question and up to 24 candidate passages | Masking misses only | **Yes** |
 | 9 | App | Postgres as `gigawhat_reader` (evidence tools, if triggered) | Asset IDs and search words; returns records | No (records name roles only) | No |
 | 10 | App | Groq API (evidence agent and answer) | Masked question, sources, records, prompts | Masking misses only | **Yes** |
 | 11 | App | Postgres `approvals` (safety-critical only) | Masked question, extract, citations, requester browser ID and persona | Browser ID | No |

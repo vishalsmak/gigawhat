@@ -8,7 +8,7 @@ from langchain_groq import ChatGroq
 from langchain_ollama import ChatOllama, OllamaEmbeddings
 from langchain_openai import OpenAIEmbeddings
 
-from gigawhat.config import Profile, Settings
+from gigawhat.config import Profile, RerankerKind, Settings
 from gigawhat.retrieval.rerank import CohereReranker, LocalReranker, Reranker
 
 # Chunk boundaries come from one tokenizer so both profiles split documents identically.
@@ -40,8 +40,8 @@ FAST_MAX_TOKENS = 2048
 ANSWER_MAX_TOKENS = 16000
 
 RERANK_MODELS = {
-    Profile.CLOUD: "rerank-v3.5",
-    Profile.OFFLINE: "BAAI/bge-reranker-v2-m3",
+    RerankerKind.COHERE: "rerank-v3.5",
+    RerankerKind.LOCAL: "BAAI/bge-reranker-v2-m3",
 }
 
 
@@ -81,10 +81,10 @@ def create_embeddings(settings: Settings) -> Embeddings:
 
 
 def create_reranker(settings: Settings) -> Reranker:
-    name = RERANK_MODELS[settings.profile]
-    if settings.profile is Profile.OFFLINE:
-        return LocalReranker(name)
-    return CohereReranker(name, settings.cohere_api_key)
+    kind = settings.active_reranker
+    if kind is RerankerKind.LOCAL:
+        return LocalReranker(RERANK_MODELS[kind])
+    return CohereReranker(RERANK_MODELS[kind], settings.cohere_api_key)
 
 
 def create_fast_model(settings: Settings) -> BaseChatModel:

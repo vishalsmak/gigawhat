@@ -26,7 +26,8 @@ KEY_VARIABLES = (
 
 @pytest.fixture(autouse=True)
 def clean_key_environment(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Keep a developer's exported API keys from leaking into tests."""
+    """Keep a developer's .env and exported API keys from leaking into tests."""
+    monkeypatch.setitem(Settings.model_config, "env_file", None)
     for name in KEY_VARIABLES:
         monkeypatch.delenv(name, raising=False)
 

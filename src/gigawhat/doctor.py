@@ -2,11 +2,12 @@
 
 from dataclasses import dataclass
 from enum import StrEnum
+from importlib.util import find_spec
 
 import httpx
 from sqlalchemy.exc import OperationalError
 
-from gigawhat.config import Profile, Settings
+from gigawhat.config import Profile, RerankerKind, Settings
 from gigawhat.db import create_db_engine, current_revision, head_revision, pgvector_version
 
 
@@ -61,12 +62,17 @@ def check_cloud_keys(settings: Settings) -> Check:
     keys = {
         "GROQ_API_KEY": settings.groq_api_key,
         "OPENAI_API_KEY": settings.openai_api_key,
-        "COHERE_API_KEY": settings.cohere_api_key,
     }
+    if settings.active_reranker is RerankerKind.COHERE:
+        keys["COHERE_API_KEY"] = settings.cohere_api_key
+    elif find_spec("sentence_transformers") is None:
+        return Check(
+            "models", Status.FAIL, "GIGAWHAT_RERANKER=local needs PyTorch: uv sync --all-extras"
+        )
     missing = [name for name, value in keys.items() if value is None]
     if missing:
         return Check("models", Status.FAIL, f"Cloud profile needs {', '.join(missing)} in .env")
-    return Check("models", Status.OK, "Groq, OpenAI and Cohere keys set")
+    return Check("models", Status.OK, f"Keys set · reranker: {settings.active_reranker}")
 
 
 def check_ollama(settings: Settings, http: httpx.Client) -> Check:
