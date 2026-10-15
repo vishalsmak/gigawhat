@@ -22,6 +22,7 @@ This document says what is versioned, who should own each part, how a change is 
 | Operational records | `data/records/` | Records owners (fictional) | Record IDs cited in answers | `tests/test_records.py`, `tests/test_project_data.py` |
 | Database schema | `src/gigawhat/storage/migrations/versions/0001` to `0005` (Alembic) | Engineering | `alembic_version` table | `tests/test_database.py` |
 | Evaluation sets | `evals/golden.yaml`, `evals/redteam.yaml` (in `.github/CODEOWNERS`) | Safety team and engineering | Reports in `evals/reports/` | `tests/test_evaluation.py::test_project_evaluation_sets_load` |
+| Hosting | `deploy/aws/`: Terraform, the server's Compose file and deploy script. API keys and the database password live in Parameter Store, not the repository. | Engineering | Not recorded: the server runs the moving `main` image tag | `terraform validate` and `terraform plan` |
 | Dependencies | `pyproject.toml`, `uv.lock` (with hashes) | Engineering | Not recorded | CI installs with `--locked` |
 | Container image | `Dockerfile`; built by `.github/workflows/image.yml` | Engineering | Not recorded in the app | Image workflow |
 
@@ -58,12 +59,13 @@ Two caveats. `gigawhat data ingest --rebuild` deletes stored versions so they ca
 | 3 | For changes listed in section 3, the full evaluation is run and its report attached to the pull request | Convention. `.github/workflows/eval.yml` is run by hand. |
 | 4 | Review and merge to `main` | `.github/CODEOWNERS` names owners for `safety_topics.yaml`, `prompts.py`, `register.yaml` and `evals/`. Their review is only required if branch protection is set to require code-owner review, which the repository cannot show. |
 | 5 | The image is built for amd64 and arm64 from the commit CI tested and pushed to GitHub Container Registry as `main` and `sha-<7 characters>` | `.github/workflows/image.yml`, triggered by `workflow_run` only when CI completes successfully on `main`, or by hand |
-| 6 | Deployment: none yet. Hosting is chosen in Phase 4 (plan question Q4). The earlier AWS pipeline (Terraform, a Deploy workflow and SSM scripts) was removed on 14 October 2026 and is in git history. | — |
+| 6 | Deployment, by hand: `deploy.sh` on the AWS server, run through Systems Manager, pulls the `main` image and restarts what changed | Convention: the commands are in `deploy/aws/README.md` |
 
 Gaps in this path:
 
 - Images are built only from commits that passed CI, but nothing checks that the evaluation passed for that commit. The release gates block a release only if people follow step 3.
 - Running the Image workflow by hand skips the CI condition.
+- The server deploys whatever `main` points to when `deploy.sh` runs. Nothing checks the evaluation first, and nothing records which image digest is live.
 
 ## 3. Which changes need what
 
@@ -104,7 +106,7 @@ The method is in [evaluation-report.md](evaluation-report.md).
 
 ## 5. Rollback
 
-**Application.** Run an earlier image tag (`sha-xxxxxxx`) from GitHub Container Registry, however the chosen host runs containers. Nothing in the repository deletes old tags.
+**Application.** Run an earlier image tag (`sha-xxxxxxx`) from GitHub Container Registry. On the AWS demo, open a Systems Manager session, set that tag in `/opt/gigawhat/compose.yaml` and run `deploy.sh`. Nothing in the repository deletes old tags.
 
 **Database.** Migrations are forward-only in practice:
 
@@ -112,7 +114,7 @@ The method is in [evaluation-report.md](evaluation-report.md).
 - The migration files do contain `downgrade()` functions, but running them is unsafe: downgrading `0005` drops `audit_events`, `approvals` and `feedback`, and with them the audit trail.
 - If a deployment runs `gigawhat db upgrade` with an older image while the database is at a revision that image does not know, Alembic is expected to stop with an unknown-revision error. Rolling back across a migration therefore does not work.
 
-So: roll back the image only between images with the same migration head. If a migration is wrong, fix forward with a new migration. Restoring a database backup is the last resort, and it loses every audit event written since the backup. Record that loss.
+So: roll back the image only between images with the same migration head. If a migration is wrong, fix forward with a new migration. Restoring a database backup is the last resort, and it loses every audit event written since the backup. Record that loss. The AWS demo has no backups: its database lives on the server's disk and goes with it on `terraform destroy`.
 
 **Documents.** Never edit a published version to undo a change. Issue a new version, or change its status in the register and run `gigawhat data ingest`. The old version stays stored for audit questions.
 
@@ -128,4 +130,4 @@ So: roll back the image only between images with the same migration head. If a m
 | Which application version? | Not recorded. Gap. |
 | Who approved the change? | Pull request history on GitHub. Code owners are named in `.github/CODEOWNERS`; enforcement depends on branch protection. |
 | Did the evaluation pass for this release? | The report in `evals/reports/` or the Evaluation workflow's artefact, if it was run. On the cloud profile with a LangSmith key, also the LangSmith experiment, whose metadata records the Git commit, `PROMPT_VERSION` and the model for each role, with the release gates as summary scores (`src/gigawhat/evaluation/experiment.py`). Not linked to a deployment. |
-| Who deployed it, and when? | Not recorded: there is no deployment until a host is chosen. |
+| Who deployed it, and when? | Systems Manager's command history and AWS CloudTrail record who ran `deploy.sh` and when. Neither records which image digest it pulled. |

@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | Status | Draft prepared by engineering for the demo. It has not been reviewed by a data protection officer (DPO) and no consultation has taken place. |
-| Written against | Commit `3e8cb02` plus the follow-up fixes made on 10 October 2026; processors updated on 14 October 2026 for Phase 2a: Gemini for chat (Groq optional), and LangSmith tracing and evaluation in its US region for the demo |
+| Written against | Commit `3e8cb02` plus the follow-up fixes made on 10 October 2026; processors updated on 14 October 2026 for Phase 2a: Gemini for chat (Groq optional), and LangSmith tracing and evaluation in its US region for the demo; hosting added on 15 October 2026: AWS `eu-north-1` behind CloudFront, with Cohere reranking on the hosted demo |
 | Controller | For the demo: whoever operates the hosted instance. For a real deployment: the utility. |
 | Audience | Data protection officer, security, engineering |
 
@@ -29,14 +29,14 @@ The order in which data moves for one question on the cloud profile. Step number
 
 | # | From | To | Data | Personal data? | Leaves the host? |
 |---|---|---|---|---|---|
-| 1 | Browser | App (Chainlit; over HTTPS once hosted) | Question as typed; `gw_visitor` cookie; chosen persona | Yes, possibly: whatever the user typed; browser ID | No (arrives at host) |
+| 1 | Browser | App (Chainlit). On the hosted demo, through AWS CloudFront: HTTPS from the browser to CloudFront, then plain HTTP from CloudFront to the server. CloudFront caches nothing and its access logs are off (`deploy/aws/main.tf`). | Question as typed; `gw_visitor` cookie; chosen persona | Yes, possibly: whatever the user typed; browser ID | No (arrives at host) |
 | 2 | App | App memory | Uvicorn access log line with client IP address and path, written to the container log | IP address | No |
 | 3 | App | Presidio and spaCy, in process | Question as typed | Yes | No |
 | 4 | App | Graph state, saved to Postgres checkpoint tables | **Masked** question, persona, browser ID | Browser ID; masking misses | No |
 | 5 | App | Google Gemini API, fast role: `gemini-3.1-flash-lite` (input rail, tier classifier and query rewriting) | Masked question with the guardrail, tier and rewrite prompts | Masking misses only | **Yes** |
 | 6 | App | OpenAI API (embedding) | Masked question and up to two rewrites of it | Masking misses only | **Yes** |
 | 7 | App | Postgres as `gigawhat_reader` | Search query; returns document chunks | No | No |
-| 8 | App | Cohere API (rerank; not called with `GIGAWHAT_RERANKER=local`) | Masked question and up to 24 candidate passages | Masking misses only | **Yes** |
+| 8 | App | Cohere API (rerank; the hosted demo uses it; not called with `GIGAWHAT_RERANKER=local`) | Masked question and up to 24 candidate passages | Masking misses only | **Yes** |
 | 9 | App | Postgres as `gigawhat_reader` (evidence tools, if triggered) | Asset IDs and search words; returns records | No (records name roles only) | No |
 | 10 | App | Google Gemini API, answer role: `gemini-3.5-flash-lite` (evidence agent and answer) | Masked question, sources, records, prompts | Masking misses only | **Yes** |
 | 11 | App | Postgres `approvals` (safety-critical only) | Masked question, extract, citations, requester browser ID and persona | Browser ID | No |
@@ -101,9 +101,9 @@ There is no retention or deletion process in the code today. Everything below is
 | LangGraph checkpoint tables (`checkpoints`, `checkpoint_blobs`, `checkpoint_writes`, created by `AsyncPostgresSaver.setup()`) | Full graph state per question: masked question, retrieved passages, records, response, decision | As above | Forever | Delete 30 days after a thread finishes. The audit trail holds the lasting record. |
 | `feedback` | Thread ID, browser ID, persona, helpful yes or no | Browser ID | Forever | 12 months |
 | LangSmith (cloud profile, if enabled; US region for the demo) | Traces of every step; the evaluation dataset (fictional cases) and experiments | Masking misses | 14 days for base traces on the free Developer plan; datasets until deleted | 30 to 90 days; self-hosting needs LangSmith's Enterprise plan |
-| Container logs on the host | Uvicorn access lines with IP addresses; error traces; GigaWhat's structured JSON events (thread ID, persona, workflow step, tier, validation outcomes, timings, error types), which never include question, note or answer text, and withhold such fields if passed by mistake (`src/gigawhat/observability/logs.py`; `tests/test_logs.py`, `tests/test_graph.py::test_logs_never_contain_the_question`) | IP addresses | Depends on the host, which is not chosen yet | 30 days in a managed log store |
+| Container logs on the host | Uvicorn access lines with IP addresses; error traces; GigaWhat's structured JSON events (thread ID, persona, workflow step, tier, validation outcomes, timings, error types), which never include question, note or answer text, and withhold such fields if passed by mistake (`src/gigawhat/observability/logs.py`; `tests/test_logs.py`, `tests/test_graph.py::test_logs_never_contain_the_question`) | IP addresses | Hosted demo: Docker's log files on the server's disk, with no rotation configured, until the server is removed | 30 days in a managed log store |
 | Chainlit `.files/<session>/` | Source passages shown in the side panel, for the session | No | Normally removed when the session ends | No change |
-| Browser | `gw_visitor` cookie: random ID, HttpOnly, SameSite Lax, Secure over HTTPS | Browser ID | 30 days | Replaced by the sign-on session |
+| Browser | `gw_visitor` cookie: random ID, HttpOnly, SameSite Lax, Secure over HTTPS. Not Secure on the hosted demo: CloudFront removes `X-Forwarded-Proto`, so the app sees plain HTTP. | Browser ID | 30 days | Replaced by the sign-on session |
 | Evaluation reports (`evals/reports/`, GitHub Actions artefacts) | Fictional evaluation questions and results | No | Kept in Git or as artefacts | No change |
 
 The append-only design and the right to erasure pull in different directions. Masking before storage reduces the conflict but does not remove it, because masking can miss things. The DPO needs to decide how an erasure request for data in an audit record will be handled.
@@ -115,8 +115,9 @@ The append-only design and the right to erasure pull in different directions. Ma
 | Google (Gemini API, free tier) | To be confirmed: Google's processor terms cover paid services | cloud (default for both chat roles) | Masked questions, prompts, retrieved sources, records, model outputs | The Gemini API Additional Terms (updated 28 April 2026) say that on unpaid services Google may use inputs and outputs to improve its products, that human reviewers may read them, and not to submit personal information. **For users in the UK, EEA or Switzerland, the paid-services data terms apply to unpaid quota too**: inputs and outputs are not used to improve products, and are logged for a limited period only to detect abuse. This depends on where the account holder is. No processing location is stated per request. |
 | Groq (GroqCloud API) | Processor | cloud, only if a chat role is switched to it | Masked questions, prompts, retrieved sources, records, model outputs | Not retained by default, but may be logged for up to 30 days to investigate reliability problems or suspected abuse. Zero data retention can be switched on in the Groq console. Not used for training unless the customer allows it. Retained customer data is held in Google Cloud in the United States; the data processing addendum allows processing in "the United States and other countries", with transfers under standard contractual clauses. No EU processing option was found in Groq's public documentation. |
 | OpenAI (Embeddings API) | Processor | cloud | Masked questions and their rewrites; document text at ingest | Not used for training unless the customer opts in. Embedding inputs are kept up to 30 days for abuse monitoring and not otherwise stored; zero data retention needs OpenAI's approval. Processed globally by default. EU data residency (`eu.api.openai.com`) exists but needs sales approval and a modified-retention amendment. |
-| Cohere (Rerank API) | Processor on a production key; on a trial key Cohere acts as a controller under its privacy policy | cloud | Masked questions; candidate passages for reranking | Hosted on Google Cloud in the United States. For paying customers, logged prompts and generations are deleted after 30 days and training use can be switched off; zero data retention is for enterprise customers only. Trial keys may not be used for production or commercial purposes, and Cohere may use trial inputs and outputs to improve its products. |
+| Cohere (Rerank API) | Processor on a production key; on a trial key Cohere acts as a controller under its privacy policy | cloud; the hosted demo uses a **trial key** | Masked questions; candidate passages for reranking | Hosted on Google Cloud in the United States. For paying customers, logged prompts and generations are deleted after 30 days and training use can be switched off; zero data retention is for enterprise customers only. Trial keys may not be used for production or commercial purposes, and Cohere may use trial inputs and outputs to improve its products. |
 | LangSmith | Processor | cloud only, and only if a key is set | Traces of every step; evaluation datasets and experiments | The demo account is in the US region. The EU region is Google Cloud `europe-west4` (Netherlands), with sign-in on AWS `eu-central-1` (Germany); a key works only in the region it was created in, which `gigawhat doctor` checks. Base traces kept 14 days on the free plan. Not used to train models. LangChain has no EU legal entity; its data processing addendum is available from support. |
+| Amazon Web Services (EC2, EBS, CloudFront, Systems Manager) | Processor: the AWS GDPR Data Processing Addendum is part of the AWS Service Terms | hosted demo | Everything the app stores (Postgres, container logs) on one server; every request passes through CloudFront | Server and disk in `eu-north-1` (Stockholm). CloudFront edge locations in the United States, Mexico, Canada, Europe, Israel and Türkiye (`PriceClass_100`). Data stays until `terraform destroy`. |
 | GitHub | Code, images, CI | build only | Source code, container images, evaluation reports with fictional data | Not used for production data |
 
 The **offline** profile sends no questions, answers or traces off the machine. It downloads models from Hugging Face on the first run.
@@ -125,8 +126,8 @@ A regulated deployment could reach the models through a cloud provider's managed
 
 ## 8. Data residency
 
-- Postgres, the audit trail, approvals and checkpoints live wherever the app is hosted. Hosting is not chosen yet (plan question Q4); the earlier AWS design was removed on 14 October 2026 and is in git history.
-- On the cloud profile, masked questions and sources leave the UK and EU for Google (Gemini API; no processing location is stated) and OpenAI (global processing by default), and for Groq (United States) or Cohere (United States) if they are chosen. The demo sends traces and evaluation experiments to LangSmith's US region; the code defaults to the EU region (`LANGSMITH_ENDPOINT`).
+- Postgres, the audit trail, approvals, checkpoints and container logs live wherever the app is hosted. For the hosted demo that is one AWS server in `eu-north-1` (Stockholm), inside the EU; requests reach it through CloudFront edge locations (`deploy/aws/`).
+- On the cloud profile, masked questions and sources leave the UK and EU for Google (Gemini API; no processing location is stated) and OpenAI (global processing by default), and Cohere (United States; used by the hosted demo), and for Groq (United States) if it is chosen. The demo sends traces and evaluation experiments to LangSmith's US region; the code defaults to the EU region (`LANGSMITH_ENDPOINT`).
 - Each such transfer needs a UK transfer mechanism, for example the International Data Transfer Agreement or Addendum, or the UK Extension to the EU-US Data Privacy Framework where the recipient is certified. Which applies to each processor has not been checked.
 
 ## 9. Security controls
@@ -139,7 +140,16 @@ A regulated deployment could reach the models through a cloud provider's managed
 | App container runs as a non-root user (uid 10001) | `Dockerfile` |
 | File upload off; raw HTML in messages off | `.chainlit/config.toml` |
 
-Host-level controls (network access, secrets storage, TLS, backups) depend on where GigaWhat is hosted, which is not chosen yet (plan question Q4).
+Host-level controls on the hosted demo (`deploy/aws/main.tf`, `deploy/aws/compose.yaml`):
+
+| Control | Where |
+|---|---|
+| The server accepts HTTP only from CloudFront's addresses (the managed prefix list), and has no SSH: people reach it through Systems Manager | Security group in `main.tf` |
+| Postgres listens on the server's loopback address only | `compose.yaml` |
+| API keys and the database password are encrypted SecureString parameters, read at deploy time and written to a root-only file; none are in the repository or the Terraform state | `put_secrets.py`, `deploy.sh` |
+| Encrypted disk; instance metadata only through IMDSv2 | `main.tf` |
+
+Accepted for the demo, to fix before real use: CloudFront reaches the server over plain HTTP; the visitor cookie is not marked Secure; there are no backups; the Systems Manager policy lets the server read any parameter in the account, not just GigaWhat's.
 
 Weaknesses to fix before real use:
 

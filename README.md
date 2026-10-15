@@ -4,6 +4,8 @@ An AI assistant that helps operational staff at a gas and electricity utility fi
 
 This is a reference implementation built to production standards and run as a demo. The utility, its procedures and its records are fictional. Public HSE guidance is downloaded by a script, not redistributed.
 
+**Try it:** https://d1ekoe0gpj2rjn.cloudfront.net. Pick a persona at the top of the chat and start from its example questions. It runs on free-tier models, so an answer can take up to half a minute, and each browser may ask 30 questions an hour.
+
 It is being restructured to the plan in [`docs/phase-1-architecture.md`](docs/phase-1-architecture.md): components, request flow ([`docs/diagrams/request-flow.png`](docs/diagrams/request-flow.png)), threat model, evaluation plan and roadmap.
 
 ## Status
@@ -16,7 +18,7 @@ It is being restructured to the plan in [`docs/phase-1-architecture.md`](docs/ph
 | 4 | Workflow: guardrails, safety tiers, cited answers, approvals, audit | ✅ |
 | 5 | Chainlit UI with personas | ✅ |
 | 6 | Evaluation: golden and red-team sets, release gates, LangSmith tracing | ✅ |
-| 7 | Deployment: container image and GitHub Actions | ✅ image builds; hosting not yet chosen |
+| 7 | Deployment: container image, GitHub Actions, hosting on AWS | ✅ |
 | 8 | Governance documents | ✅ |
 
 ## Quickstart
@@ -47,6 +49,10 @@ uv run uvicorn gigawhat.api:app --port 8000   # chat UI at http://localhost:8000
 uv run gigawhat ask "How do I purge the 75 mbar main on Mill Lane?" --persona gas_field_engineer
 uv run gigawhat search "vent stack height" --persona gas_field_engineer
 ```
+
+## Hosting
+
+The demo link runs on AWS: one small arm64 server running the published image and Postgres with Docker Compose, behind CloudFront for HTTPS. It is built with Terraform, keeps its API keys in Parameter Store, and uses the Cohere reranker because the local one needs more memory than the server has. [`deploy/aws/README.md`](deploy/aws/README.md) is the runbook: what it builds, what it costs, how to deploy, pause and remove it.
 
 Pick a persona at the top of the chat; each opens on its own welcome and example questions, and the **Readme** button explains every status a reply can have. Safety-critical questions wait for an Authorised Person: switch to the Authorised Person persona for the same business unit to release or decline them, then switch back to see the outcome. The Auditor persona shows this browser's audit trail.
 

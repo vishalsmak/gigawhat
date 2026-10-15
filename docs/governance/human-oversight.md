@@ -159,7 +159,15 @@ Still open:
 - The switch is read when the process starts. Changing it needs a restart of the app container. `/health` shows the state the running process is actually in, so use it to confirm.
 - Paused replies are not written to the audit trail.
 
-To pause: set `GIGAWHAT_PAUSED=true` in the app's environment and restart it. How that is done depends on the host, which is not chosen yet.
+To pause: set `GIGAWHAT_PAUSED=true` in the app's environment and restart it. On the hosted demo the switch is a Parameter Store value, and `deploy.sh` restarts the app with it (`deploy/aws/README.md`):
+
+```sh
+aws ssm put-parameter --profile gigawhat --region eu-north-1 \
+  --name /gigawhat/GIGAWHAT_PAUSED --type String --value true --overwrite
+aws ssm send-command --profile gigawhat --region eu-north-1 \
+  --instance-ids "$(terraform -chdir=deploy/aws output -raw instance_id)" \
+  --document-name AWS-RunShellScript --parameters commands=/opt/gigawhat/deploy.sh
+```
 
 Confirm that `/health` reports `paused`. Reverse with `--value false` and the same two commands.
 

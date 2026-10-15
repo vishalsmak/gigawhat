@@ -65,7 +65,7 @@ GigaWhat must not be used for any of the following. The design keeps them out of
 
 The same chat model does every model task within a profile. Each audit event records the chat, embedding and reranker model names (`models` column). It records the configured chat model, not the model that served a fallback.
 
-The hosted image (`Dockerfile`) is cloud-only. It leaves out Docling and PyTorch, which are optional extras (`ingest`, `offline`) in `pyproject.toml`.
+The hosted image (`Dockerfile`) is cloud-only. It leaves out Docling and PyTorch, which are optional extras (`ingest`, `offline`) in `pyproject.toml`. The hosted demo runs it on one AWS server in `eu-north-1` behind CloudFront, with the Cohere reranker, because the local reranker needs more memory than the server's 2 GB (`deploy/aws/`).
 
 ## 5. Data sources
 
@@ -135,7 +135,7 @@ These are honest limits of the current build. The [risk register](risk-register.
 - Keyword search uses one precise term per question (an asset ID, an expanded abbreviation or a rating). Everything else relies on vector search and the reranker.
 - When a question names an asset, the reranker can rank sections that mention the asset (often the Scope section) above the steps. Exploratory testing on 14 October 2026 found a strict extract of PR-ELEC-075 §6.2 "Test closing" offered for a question about isolating FDR-KGM-03, and a question about restoring supply on FDR-ASH-09 that abstained because only the Scope section cleared the 0.3 bar.
 - Strict mode quotes at most two sections. They may not be the right ones, and they are never the whole procedure. The preface tells the user to work to the full procedure and their permit.
-- The relevance thresholds (0.2 for an answer, 0.3 for a strict extract) were set on a small fictional corpus with the offline reranker (bge-reranker-v2-m3). Cohere's scores are distributed differently, so both must be checked with the evaluation on the cloud profile before they are relied on there. No single threshold separates every genuine question from every near miss: in the evaluation, a chatty but genuine safety-critical question scored its right section at 0.35 and a near miss scored 0.29.
+- The relevance thresholds (0.2 for an answer, 0.3 for a strict extract) were set on a small fictional corpus with the offline reranker (bge-reranker-v2-m3). Cohere's scores are distributed differently, so both must be checked with the evaluation on the cloud profile before they are relied on there. Cohere scores weak matches higher: on 15 October 2026 it gave the definitions section of PR-GAS-031 0.61 for a vent-stack question, where bge-reranker-v2-m3 gave 0.14, so more sections pass both thresholds. No single threshold separates every genuine question from every near miss: in the evaluation, a chatty but genuine safety-critical question scored its right section at 0.35 and a near miss scored 0.29.
 - Record tools have fixed windows: the latest 6 inspections, alarms in the 120 days before the newest alarm, open work orders plus the last 3 completed, and up to 5 incidents. Records are gathered only when the question names an asset or uses words such as "alarm", "history", "trend", "current", "superseded", "overdue", "document" or "owner" (`RECORDS_INTENT` in `evidence.py`). The alarm count is given only for an asset the persona can see, so row-level security is never reported as "no alarms" (`tests/test_evidence.py::test_alarm_lookup_on_an_asset_the_persona_cannot_see_gives_no_count`).
 - Overdue notices use the server's date.
 
