@@ -41,7 +41,11 @@ STARTERS: dict[Persona, list[Example]] = {
         Example(
             "Isolate a feeder", "How do I isolate and earth the 11 kV feeder FDR-ASH-07?", "unplug"
         ),
-        Example("Switching alone", "Can HV switching be done by one person on their own?", "users"),
+        Example(
+            "SWG-KGM-11 issues",
+            "Summarise the issues we've had on SWG-KGM-11 and any operating restrictions on it",
+            "history",
+        ),
         Example(
             "Inspection rules",
             "How often must Ashford Road primary substation be inspected?",
@@ -50,9 +54,7 @@ STARTERS: dict[Persona, list[Example]] = {
     ],
     Persona.GAS_AUTHORISED_PERSON: [
         Example(
-            "Permit checks",
-            "What must be in place before a gas permit-to-work is issued?",
-            "clipboard-check",
+            "MAIN-IP-01 leak", "What's the status of the leak on MAIN-IP-01?", "clipboard-check"
         ),
         Example(
             "SSV-112 trip",
@@ -70,9 +72,7 @@ STARTERS: dict[Persona, list[Example]] = {
     ],
     Persona.DOCUMENT_CONTROLLER: [
         Example(
-            "Draft procedure",
-            "What does the live working procedure PR-ELEC-070 say?",
-            "file-pen-line",
+            "Live version", "Which version of PR-GAS-031 is live and since when?", "calendar-check"
         ),
         Example(
             "Current version",
