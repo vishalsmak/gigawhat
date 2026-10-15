@@ -12,6 +12,7 @@ from gigawhat.ingestion.chunking import (
 pytestmark = pytest.mark.slow
 
 SAMPLE = Path(__file__).parent / "fixtures" / "sample_procedure.md"
+PUBLISHED = Path(__file__).parent.parent / "data/corpus/procedures/gas/PR-GAS-010_v4.pdf"
 
 
 @pytest.fixture(scope="module")
@@ -48,3 +49,24 @@ def test_headings_trail_down_from_the_document_title(sections: list[SectionChunk
     isolation = section_titled(sections, "6.1 Isolation")
 
     assert isolation.headings == ("PR-GAS-099 Purging Test Mains", "6 Procedure", "6.1 Isolation")
+
+
+@pytest.fixture(scope="module")
+def published_sections() -> list[SectionChunk]:
+    return DoclingChunker(CHUNK_TOKENIZER, CHUNK_MAX_TOKENS).split(PUBLISHED)
+
+
+def test_published_pdf_has_the_same_sections_as_its_source(
+    published_sections: list[SectionChunk],
+) -> None:
+    source = DoclingChunker(CHUNK_TOKENIZER, CHUNK_MAX_TOKENS).split(PUBLISHED.with_suffix(".md"))
+
+    assert {s.headings[-1] for s in published_sections} == {s.headings[-1] for s in source}
+
+
+def test_published_pdf_keeps_a_hold_point_with_its_steps(
+    published_sections: list[SectionChunk],
+) -> None:
+    planning = section_titled(published_sections, "6.2 Planning and authorisation")
+
+    assert "HOLD POINT: Do not operate any valve" in planning.body

@@ -38,6 +38,8 @@ uv run gigawhat data docs           # every stored version with its status and r
 
 The first `ingest` downloads Docling's PDF layout models and takes a few minutes; later runs skip anything already stored. For the offline profile, run `ollama pull qwen3-embedding:0.6b` first.
 
+The fictional procedures are published as PDFs, like a document management system would hold them. Each PDF is printed from the Markdown file beside it. After editing a procedure's Markdown, publish it again with `uv run scripts/render_procedures.py` (it prints with Google Chrome through Playwright and installs its own dependencies); a test fails until you do.
+
 ## Run it
 
 ```sh

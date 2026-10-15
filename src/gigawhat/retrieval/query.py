@@ -8,7 +8,9 @@ from importlib import resources
 
 import yaml
 
-DOC_ID = re.compile(r"\b(?:PR-(?:ELEC|GAS|CORP)-\d{3}|HSE-(?:HSG|HSR|L)\d+)\b", re.IGNORECASE)
+DOC_ID = re.compile(
+    r"\b(?:PR-(?:ELEC|GAS|CORP)-\d{3}|HSE-(?:HSG|HSR|GS|INDG|L)\d+)\b", re.IGNORECASE
+)
 ASSET_ID = re.compile(
     r"\b(?:GT-\d|T-\d{3}|TX-[A-Z]{3}-\d{2}|RMU-[A-Z]{3}-\d{2}|SWG-[A-Z]{3}-\d{2}|FDR-[A-Z]{3}-\d{2}"
     r"|BAT-[A-Z]{3}|CT-[A-Z]{3}-\d{2}|PRS-[A-Z]{3}-\d{2}|SSV-(?:\d{3}|[A-Z]{3}-[AB])"

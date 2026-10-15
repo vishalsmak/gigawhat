@@ -71,7 +71,7 @@ The hosted image (`Dockerfile`) is cloud-only. It leaves out Docling and PyTorch
 
 | Source | What | Where |
 |---|---|---|
-| Document register | 33 documents: 26 fictional GigaWhat Energy procedures (28 versions, including superseded, draft and withdrawn ones) and 7 public HSE publications (HSG250, HSG253, HSG85, HSR25, L80, L122, L138). The register, not the file, decides which version is current. | `data/corpus/register.yaml`, `data/corpus/procedures/` |
+| Document register | 40 documents: 26 fictional GigaWhat Energy procedures (28 versions, including superseded, draft and withdrawn ones), published as PDFs, and 14 public HSE publications (HSG250, HSG253, HSG85, HSR25, HSG230, GS6, HSG47, L56, L80, L82, L101, L122, L138, INDG73). The register, not the file, decides which version is current. | `data/corpus/register.yaml`, `data/corpus/procedures/` |
 | HSE guidance | Downloaded from hse.gov.uk by `gigawhat data fetch-hse` and checked against the SHA-256 recorded for it in the register (`source_sha256`); a changed file is refused. Not committed or redistributed. | `data/raw/hse/` |
 | Operational records | Fictional sites, assets, work orders, inspections, incidents and alarms. People are identified by role only. | `data/records/` |
 | Questions | Typed by users. They may contain personal data, which is masked first (section 6, step 1). | Not stored unmasked |

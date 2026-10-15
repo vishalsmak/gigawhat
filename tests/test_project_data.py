@@ -1,8 +1,10 @@
 """Integrity checks on the committed fictional dataset, so edits cannot silently break demos."""
 
 import csv
+import hashlib
 from pathlib import Path
 
+import pypdfium2
 import pytest
 import yaml
 from sqlalchemy import Engine
@@ -10,6 +12,7 @@ from sqlalchemy import Engine
 from gigawhat.config import Settings
 from gigawhat.ingestion.register import DocType, load_register
 from gigawhat.records.load import load_records
+from gigawhat.retrieval.query import DOC_ID
 
 SETTINGS = Settings(_env_file=None)
 REGISTER = load_register(SETTINGS.register_path)
@@ -23,17 +26,22 @@ def read_csv(name: str) -> list[dict[str, str]]:
 
 ASSET_SITES = {row["asset_id"]: row["site_id"] for row in read_csv("assets.csv")}
 DOC_IDS = {document.doc_id for document in REGISTER.documents}
+PROCEDURE_FILES = [
+    version.file
+    for document in REGISTER.documents
+    if document.doc_type is DocType.PROCEDURE
+    for version in document.versions
+]
+# Written by scripts/render_procedures.py into each procedure PDF's metadata.
+SOURCE_KEY = "source-sha256:"
 
 
-@pytest.mark.parametrize(
-    "path",
-    [
-        version.file
-        for document in REGISTER.documents
-        if document.doc_type is DocType.PROCEDURE
-        for version in document.versions
-    ],
-)
+@pytest.mark.parametrize("doc_id", sorted(DOC_IDS))
+def test_every_registered_document_id_is_recognised_in_questions(doc_id: str) -> None:
+    assert DOC_ID.fullmatch(doc_id)
+
+
+@pytest.mark.parametrize("path", PROCEDURE_FILES)
 def test_every_registered_procedure_file_exists(path: str) -> None:
     assert (SETTINGS.corpus_dir / path).exists()
 
@@ -44,9 +52,26 @@ def test_every_procedure_file_is_registered() -> None:
         for document in REGISTER.documents
         for version in document.versions
     }
-    on_disk = {path.resolve() for path in Path(SETTINGS.corpus_dir).glob("procedures/*/*.md")}
+    on_disk = {path.resolve() for path in Path(SETTINGS.corpus_dir).glob("procedures/*/*.pdf")}
 
     assert on_disk <= registered
+
+
+def test_every_procedure_source_is_published_as_a_registered_pdf() -> None:
+    published = {(SETTINGS.corpus_dir / path).resolve() for path in PROCEDURE_FILES}
+    sources = Path(SETTINGS.corpus_dir).glob("procedures/*/*.md")
+
+    assert {source.resolve().with_suffix(".pdf") for source in sources} <= published
+
+
+@pytest.mark.parametrize("path", PROCEDURE_FILES)
+def test_every_procedure_pdf_was_published_from_its_current_source(path: str) -> None:
+    pdf = SETTINGS.corpus_dir / path
+    source = hashlib.sha256(pdf.with_suffix(".md").read_bytes()).hexdigest()
+
+    keywords = pypdfium2.PdfDocument(pdf).get_metadata_dict()["Keywords"]
+
+    assert keywords == SOURCE_KEY + source, "run: uv run scripts/render_procedures.py"
 
 
 @pytest.mark.parametrize("incident", INCIDENTS, ids=lambda incident: incident["incident_id"])

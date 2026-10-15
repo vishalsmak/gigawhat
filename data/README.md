@@ -68,9 +68,30 @@ UK gas pressure tiers used throughout: low pressure (LP) up to 75 mbar, medium p
 | Path | What |
 |---|---|
 | `corpus/register.yaml` | The document register: every document, every version, its status and who it applies to. **The register, not the file, decides whether a version is current.** |
-| `corpus/procedures/` | GigaWhat Energy procedures as Markdown, one file per version |
+| `corpus/procedures/` | GigaWhat Energy procedures, one PDF per version, as published by document control: letterhead, document control table, status banner on superseded, draft and withdrawn versions, and the status in every page header. Each PDF is printed from the Markdown file beside it by `scripts/render_procedures.py` and records that file's SHA-256 in its metadata. Ingestion reads the PDFs. |
 | `records/` | Sites, assets, work orders, inspections, incidents and alarms |
 | `raw/hse/` | HSE guidance PDFs, downloaded by `gigawhat data fetch-hse` and not committed |
+
+## Public HSE guidance
+
+Fourteen HSE publications sit beside the fictional procedures, so answers can cite the law and guidance the procedures rest on. They are real, downloaded from hse.gov.uk and checked against the SHA-256 in the register.
+
+| Register ID | Publication | Why it is here |
+|---|---|---|
+| `HSE-HSG250` | Guidance on permit-to-work systems | Permits in gas and electricity |
+| `HSE-HSG253` | The safe isolation of plant and equipment | Isolation of governors and stations |
+| `HSE-HSG85` | Electricity at work: safe working practices | Dead working, live working |
+| `HSE-HSR25` | Memorandum of guidance on the Electricity at Work Regulations 1989 | The regulations behind the safety rules |
+| `HSE-HSG230` | Keeping electrical switchgear safe | Oil circuit breakers such as SWG-KGM-11 |
+| `HSE-GS6` | Avoiding danger from overhead power lines | Lines down, work near lines |
+| `HSE-L80` | A guide to the Gas Safety (Management) Regulations 1996 | Gas escapes and the safety case |
+| `HSE-L56` | Safety in the installation and use of gas systems and appliances | Gas in buildings, emergency control valves |
+| `HSE-L82` | A guide to the Pipelines Safety Regulations 1996 | Mains and their integrity |
+| `HSE-L122` | Safety of pressure systems | Pressure reduction station and governors |
+| `HSE-L138` | Dangerous substances and explosive atmospheres (DSEAR) | Hazardous zones, purging |
+| `HSE-L101` | Safe work in confined spaces | The Kingsmead cable tunnel |
+| `HSE-HSG47` | Avoiding danger from underground services | Digging near mains and cables |
+| `HSE-INDG73` | Protecting lone workers | Lone working (PR-CORP-004) |
 
 ## Deliberate test cases
 

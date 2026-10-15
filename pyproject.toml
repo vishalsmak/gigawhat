@@ -56,6 +56,7 @@ build-backend = "uv_build"
 dev = [
     "deepeval>=4.2.8",
     "mypy>=2.4.0",
+    "pypdfium2>=5.14.0",
     "pytest>=9.1.1",
     "pytest-asyncio>=1.4.0",
     "pytest-cov>=7.1.0",
@@ -82,7 +83,9 @@ files = ["src", "tests", "scripts"]
 untyped_calls_exclude = ["presidio_anonymizer", "chainlit", "deepeval"]
 
 [[tool.mypy.overrides]]
-module = ["pgvector.*", "nemoguardrails.*"]
+# Untyped libraries; playwright and pypdf are installed only in the environment of
+# scripts/render_procedures.py, which declares its own dependencies (PEP 723).
+module = ["pgvector.*", "nemoguardrails.*", "pypdfium2", "pypdf", "playwright.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
