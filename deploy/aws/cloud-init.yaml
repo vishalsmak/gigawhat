@@ -1,0 +1,24 @@
+#cloud-config
+# First boot only: Docker, the AWS CLI and a swap file, then deploy.sh starts the demo.
+# Terraform embeds compose.yaml and deploy.sh from beside this file.
+package_update: true
+packages:
+  - docker.io
+  - docker-compose-v2
+snap:
+  commands:
+    - snap install aws-cli --classic
+# The app and Postgres share 2 GB of memory; swap absorbs the peaks.
+swap:
+  filename: /swapfile
+  size: 2G
+write_files:
+  - path: /opt/gigawhat/compose.yaml
+    encoding: b64
+    content: ${compose}
+  - path: /opt/gigawhat/deploy.sh
+    encoding: b64
+    permissions: "0700"
+    content: ${deploy}
+runcmd:
+  - /opt/gigawhat/deploy.sh

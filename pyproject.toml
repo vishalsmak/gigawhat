@@ -78,14 +78,15 @@ python_version = "3.12"
 strict = true
 plugins = ["pydantic.mypy"]
 mypy_path = "src"
-files = ["src", "tests", "scripts"]
+files = ["src", "tests", "scripts", "deploy"]
 
 untyped_calls_exclude = ["presidio_anonymizer", "chainlit", "deepeval"]
 
 [[tool.mypy.overrides]]
-# Untyped libraries; playwright and pypdf are installed only in the environment of
-# scripts/render_procedures.py, which declares its own dependencies (PEP 723).
-module = ["pgvector.*", "nemoguardrails.*", "pypdfium2", "pypdf", "playwright.*"]
+# Untyped libraries; playwright, pypdf and boto3 are installed only in the environments of
+# scripts/render_procedures.py and deploy/aws/put_secrets.py, which declare their own
+# dependencies (PEP 723).
+module = ["pgvector.*", "nemoguardrails.*", "pypdfium2", "pypdf", "playwright.*", "boto3"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

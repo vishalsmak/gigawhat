@@ -1,0 +1,50 @@
+# The hosted demo on one server. deploy.sh writes .env (the keys and the database password)
+# from Parameter Store before starting it.
+
+x-app: &app
+  image: ghcr.io/vishalsmak/gigawhat:main
+  env_file: .env
+  environment:
+    GIGAWHAT_DATABASE_HOST: db
+    GIGAWHAT_RERANKER: cohere
+    LANGSMITH_ENDPOINT: https://api.smith.langchain.com
+    # Hosted questions trace to their own project, apart from runs on the Mac.
+    LANGSMITH_PROJECT: gigawhat-hosted
+
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: gigawhat
+      POSTGRES_PASSWORD: ${GIGAWHAT_DATABASE_PASSWORD:?run deploy.sh to fetch it}
+      POSTGRES_DB: gigawhat_cloud
+    # Loopback only: reached from outside through a Systems Manager port forward, never directly.
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gigawhat -d gigawhat_cloud"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  migrate:
+    <<: *app
+    command: ["gigawhat", "db", "upgrade"]
+    depends_on:
+      db:
+        condition: service_healthy
+
+  app:
+    <<: *app
+    restart: unless-stopped
+    ports:
+      - "80:8000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+volumes:
+  pgdata:

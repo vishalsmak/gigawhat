@@ -27,3 +27,8 @@ data/raw/
 .chainlit/translations/*
 !.chainlit/translations/en-US.json
 .files/
+
+# Terraform: provider downloads and local state. The lock file is committed.
+deploy/aws/.terraform/
+deploy/aws/*.tfstate
+deploy/aws/*.tfstate.*
